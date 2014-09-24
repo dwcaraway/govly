@@ -1,6 +1,6 @@
-Security Dashboard
+Evented
 =================
-Welcome to the Security Dashboard project, a web application for monitoring and protecting your network resources.
+Welcome to Evented, an event aggregation framework. 
 
 Installation
 ---------------
@@ -39,17 +39,9 @@ cd /path/to/this
 $ pip install -r requirements.txt
 ```
 
-Now in the /path/to/this directory, install the client side (javascript) requirements with bower. This creates an app/bower_components directory with all the javascript dependencies.
+Now in the /path/to/this directory, install the client side (javascript) requirements with bower. This creates an app/statc/js/bower_components directory with all the javascript dependencies.
 ```
 $ bower install
-```
-
-Install the [Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html). We require version 1.7 or later
-
-
-Now install the Neo4j graph database
-```
-$ sudo apt-get install neo4j && neo4j start
 ```
 
 Now install the Grunt build dependencies
@@ -69,9 +61,9 @@ First, install the test requirements
 $ pip install -r test-requirements.txt
 ```
 
-To run Behavior Driven Tests, in the ```tests``` folder, run
+To run tests, navigate to the tests folder. Functional tests are in /functional while unit tests are in /unit. 
 ```
-$ behave
+$ nosetests
 ```
 
 To run client-side functional tests, first install nodejs and then PhantomJS

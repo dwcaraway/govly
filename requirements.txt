@@ -1,4 +1,7 @@
 #Required libraries for compiling and running source
 flask
 flask-restful
+flask-sqlalchemy
 liveandletdie
+sure
+mock

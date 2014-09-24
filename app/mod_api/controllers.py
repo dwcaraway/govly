@@ -7,8 +7,14 @@ from flask.ext import restful
 mod_api = Blueprint('api', __name__, url_prefix='/api')
 api = restful.Api(mod_api)
 
-class HelloWorld(restful.Resource):
-    def get(self):
-        return {'hello': 'world'}
+class Events(restful.Resource):
+	def get(self, complete=False, q='', start=1, limit=20, order='asc'):
+		""" Returns a collection of events matching specified criteria """
+		return {'hello': 'world'}
 
-api.add_resource(HelloWorld, '/')
+class Sources(restful.Resource):
+	def get(self):
+		return {'hey': 'test'}
+
+api.add_resource(Events, '/events')
+api.add_resource(Sources, '/sources')
