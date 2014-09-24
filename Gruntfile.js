@@ -15,7 +15,7 @@ module.exports = function(grunt) {
             css: this.app + '/static/css',
             scss: this.app + '/static/sass',
             js: this.app + '/static/js',
-            runScript: './run_' + this.app.toLowerCase() + '.sh'
+            runScript: './run_server.sh'
         }
     };
  

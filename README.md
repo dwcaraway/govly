@@ -1,6 +1,6 @@
-Evented
+Vitals
 =================
-Welcome to Evented, an event aggregation framework. 
+Welcome to Vitals, a dashboard of economic opportunities in the Dayton region. 
 
 Installation
 ---------------

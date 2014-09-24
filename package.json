@@ -1,5 +1,5 @@
 {
-  "name": "secdb",
+  "name": "vitals",
   "version": "0.1.0",
   "devDependencies": {
     "node-sass": "~0.7.0",

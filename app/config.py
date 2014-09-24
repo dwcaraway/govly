@@ -16,3 +16,6 @@ CSRF_SESSION_KEY = "secret"
 
 # Secret key for signing cookies
 SECRET_KEY = "secret"
+
+# Database
+SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/test.db'
