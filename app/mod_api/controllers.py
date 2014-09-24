@@ -19,8 +19,7 @@ class Events(restful.Resource):
 
 	def get(self, complete=False, q='', start=1, limit=20, order='asc'):
 		""" Returns a collection of events matching specified criteria """
-		response = Builder("/api/events")
-		response.add_curie('r', "/api/rels/{rel}")
+		response = Builder("/api/events").add_curie('r', "/api/rels/{rel}")
 
 		return response.as_object() 
 
@@ -29,7 +28,7 @@ class Sources(restful.Resource):
 
 	def get(self):
 		""" Returns a collection of sources matching specified criteria """
-		response = Builder('/api/sources')
+		response = Builder('/api/sources').add_curie('r', "/api/rels/{rel}")
 		return response.as_object() 
 
 api.add_resource(Events, '/events')
