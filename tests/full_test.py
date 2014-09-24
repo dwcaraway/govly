@@ -3,9 +3,10 @@ from flask import Flask
 import liveandletdie
 import sure
 import logging
+import unittest
 
 
-class FunctionalTests():
+class FunctionalTest(unittest.TestCase):
 
     def setup(self):
         """Setup servers and selenium web drivers prior to tests"""
@@ -19,6 +20,6 @@ class FunctionalTests():
         self.app.die()
         self.browser.quit()
 
-    def test_addition(self):
+    def test_homepage(self):
         """The sum should equal the combination of the two parts"""
         (2+2).should.equal(4)
