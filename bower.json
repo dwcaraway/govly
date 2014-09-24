@@ -1,0 +1,30 @@
+{
+  "name": "secdb",
+  "version": "0.1.0",
+  "authors": [
+    "Tenet3"
+  ],
+  "description": "The Tenet3 Security Dashboard",
+  "main": "run.py",
+  "keywords": [
+    "security"
+  ],
+  "license": "See LICENSE",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "app/static/js/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "~3.4.11",
+    "leaflet": "~0.7.3",
+    "html5shiv": "~3.7.2",
+    "respond": "~1.4.2",
+    "ember": "~1.7.0",
+    "bootstrap": "~3.2.0" 
+  }
+}

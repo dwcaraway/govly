@@ -1,0 +1,8 @@
+.DS_Store
+bower_components
+node_modules
+env
+*.swp
+*.log
+*.pyc
+*.db
