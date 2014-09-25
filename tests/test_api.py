@@ -22,8 +22,8 @@ class ApiTest(unittest.TestCase):
 		os.unlink(self.db_path)
 
 
-class EventTest(ApiTest):
-	"""Tests of api 'Event' resource"""
+class EventListTest(ApiTest):
+	"""Tests of api 'EventList' resource"""
 
 	def test_link_relation_curie(self):
 		"""Verify that Event resource has a link relation curie in HAL response"""

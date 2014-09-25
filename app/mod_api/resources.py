@@ -18,6 +18,9 @@ class EventsList(Resource):
 
 	def get(self, complete=False, q='', page=1, per_page=20, order='asc'):
 		""" Returns a collection of events matching specified criteria """
+
+		
+		
 		pagination = Event.query.paginate(page=page, per_page=per_page)
 		response = Builder("/api/events?page=%d" % pagination.page).add_curie('r', "/api/rels/{rel}") \
 		.add_link('next', '/api/events?page=%d' % pagination.next_num).add_link('prev', '/api/events?page=%d' \

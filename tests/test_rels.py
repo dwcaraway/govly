@@ -30,10 +30,18 @@ class LinkRelationTest(unittest.TestCase):
 
 		(resp.status_code).should.equal(200)
 		(len(data.keys())).should.equal(2)
-		#Loop over the link relations dict, validating the schemas	
-		#TODO find way of validating the schema, not sure that below works
-		for rel_key in data.keys():
-			(Draft4Validator.check_schema(data[rel_key])).should.be(None)
+
+	def test_select_all(self):
+		"""
+		Select all link relations and check them
+		"""
+		resp = self.test_client.get('/rels/')
+		data = json.loads(resp.data)
+
+		for rel_id in data.keys():
+			resp = self.test_client.get('/rels/%s' % rel_id)
+			schema = json.loads(resp.data)
+			(Draft4Validator.check_schema(data)).should.be(None)
 
 	def test_rel_not_found(self):
 		"""Expect error object and message if rel not found"""

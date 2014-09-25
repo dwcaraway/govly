@@ -48,7 +48,7 @@ class LinkRelations(Resource):
 		if schema is None:
 			abort(404, message="Rel {} doesn't exist".format(rel_id))
 		else:
-			return jsonify(RELS[rel_name])
+			return RELS[rel_id]
 
 api.add_resource(LinkRelationsList, '/')
 api.add_resource(LinkRelations, '/<string:rel_id>')
