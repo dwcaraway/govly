@@ -1,6 +1,6 @@
 # Import flask dependencies
 from flask import Blueprint, render_template, jsonify
-from app import app
+from app import app, Event, Source
 from dougrain import Builder
 from flask.ext import restful
 
@@ -8,18 +8,16 @@ from flask.ext import restful
 mod_api = Blueprint('api', __name__, url_prefix='/api')
 api = restful.Api(mod_api)
 
-class LinkRelations(restful.Resource):
-	"""Link relations for resources of the API"""
-
-	def get(self):
-		return {'hello':'world'}
-
-class Events(restful.Resource):
+class EventsList(restful.Resource):
 	"""Events that are happening"""
 
 	def get(self, complete=False, q='', start=1, limit=20, order='asc'):
 		""" Returns a collection of events matching specified criteria """
+		events = Event.query.all()
 		response = Builder("/api/events").add_curie('r', "/api/rels/{rel}")
+
+		for event in events:
+			response = response.embed('r:event', Builder('/foo'))
 
 		return response.as_object() 
 
@@ -31,6 +29,5 @@ class Sources(restful.Resource):
 		response = Builder('/api/sources').add_curie('r', "/api/rels/{rel}")
 		return response.as_object() 
 
-api.add_resource(Events, '/events')
+api.add_resource(EventsList, '/events')
 api.add_resource(Sources, '/sources')
-api.add_resource(LinkRelations, '/rels')

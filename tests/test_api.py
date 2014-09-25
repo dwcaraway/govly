@@ -1,6 +1,9 @@
 import unittest, sure, logging, tempfile, os, json
+from datetime import datetime
 import app as vitals
+from app import Event, Source
 from dougrain import Document
+from tests import hal_loads
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +45,20 @@ class EventTest(ApiTest):
 		(doc.links['self'].url()).should.equal('/api/events')
 		(doc.embedded.keys()).should.equal([])
 
+	def test_single_event(self):
+		"""
+		Call to Event collection with single event
+		"""
+		event = Event('http://www.foo.com', 'Test', 'chicago', datetime.now())
+		vitals.db.session.add(event)
+		vitals.db.session.commit()
+
+		resp = self.test_client.get('/api/events')
+		doc = hal_loads(resp.data)
+
+		(doc.embedded.keys()).should.equal(['r:event'])
+		doc.embedded['r:event']
+
 class SourceTest(ApiTest):
 	"""Test of API 'Source' resource"""
 
@@ -65,19 +82,3 @@ class SourceTest(ApiTest):
 		(resp.status_code).should.equal(200)
 		(doc.links['self'].url()).should.equal('/api/sources')
 		(doc.embedded.keys()).should.equal([])
-
-class LinkRelationTest(ApiTest):
-	"""Test of API 'LinkRelation' resource"""
-
-	def test_empty_link_relations(self):
-		"""
-		Get all members of Link Relations collection and verify that it's an empty data set
-		"""
-		resp = self.test_client.get('/api/rels')
-		doc = hal_loads(resp.data)
-
-		(resp.status_code).should.equal(200)
-
-def hal_loads(resp_str):
-	"""Helper function that converts a string into a HAL object"""	
-	return Document.from_object(json.loads(resp_str))
