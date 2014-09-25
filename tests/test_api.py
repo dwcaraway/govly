@@ -42,6 +42,7 @@ class EventListTest(ApiTest):
 		doc = hal_loads(resp.data)
 
 		(resp.status_code).should.equal(200)
+		(doc.properties['total']).should.equal(0)
 		(doc.links['self'].url()).should.equal('/api/events?page=1')
 		(doc.embedded.keys()).should.equal([])
 
