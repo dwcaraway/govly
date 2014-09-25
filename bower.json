@@ -1,10 +1,10 @@
 {
-  "name": "secdb",
-  "version": "0.1.0",
+  "name": "Vitals",
+  "version": "0.0.1",
   "authors": [
-    "Tenet3"
+    "Fogmine"
   ],
-  "description": "The Tenet3 Security Dashboard",
+  "description": "Economic dashboard of the Dayton region",
   "main": "run.py",
   "keywords": [
     "security"

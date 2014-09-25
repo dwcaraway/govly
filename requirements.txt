@@ -1,8 +1,6 @@
 #Required libraries for compiling and running source
-flask
-flask-restful
-flask-sqlalchemy
-liveandletdie
-sure
-mock
-dougrain
+Flask==0.10.1
+flask-restful==0.2.12
+Flask-SQLAlchemy==2.0
+liveandletdie==0.0.2
+dougrain==0.5.1

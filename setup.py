@@ -1,10 +1,22 @@
 from setuptools import setup
+import os
+from pip.req import parse_requirements
 
-setup(name='YourAppName',
-      version='1.0',
-      description='OpenShift App',
-      author='Your Name',
-      author_email='example@example.com',
-      url='http://www.python.org/sigs/distutils-sig/',
-#      install_requires=['Django>=1.3'],
+
+# parse_requirements() returns generator of pip.req.InstallRequirement objects
+install_reqs = parse_requirements('requirements.txt')
+
+# reqs is a list of requirement
+# e.g. ['django==1.5.1', 'mezzanine==1.4.6']
+reqs = [str(ir.req) for ir in install_reqs]
+
+print reqs
+
+setup(name='Vitals',
+      version='0.0.1',
+      description='Fogmine Economic Dashboard Application of Dayton Region',
+      author='David Caraway',
+      author_email='dave@fogmine.com',
+      url='http://www.fogmine.com',
+      install_requires=reqs
      )

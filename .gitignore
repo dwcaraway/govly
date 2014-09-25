@@ -2,7 +2,9 @@
 bower_components
 node_modules
 env
+dist
 *.swp
 *.log
 *.pyc
 *.db
+*.egg-info
