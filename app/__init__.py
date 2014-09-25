@@ -71,3 +71,5 @@ from app.mod_api.rels import mod_rel as rel_module
 app.register_blueprint(api_module)
 app.register_blueprint(rel_module)
 
+# Create database schema if not already existing
+db.create_all()

@@ -78,6 +78,21 @@ class EventListTest(ApiTest):
 		(doc.embedded.keys()).should.equal(['r:event'])
 		doc.embedded['r:event']
 
+	def test_bad_page(self):
+		"""
+		Page should not be able to be 0 or > num_pages
+		"""
+		for x in range(5):
+			event = Event('http://www.foo.com/%d' % x, 'Test%d' % x, 'chicago', datetime.now())
+			vitals.db.session.add(event)
+		vitals.db.session.commit()
+
+		resp = self.test_client.get('/api/events?page=0')
+		(resp.status_code).should.equal(404)
+
+		resp = self.test_client.get('/api/events?page=6')
+		(resp.status_code).should.equal(404)
+
 class SourceTest(ApiTest):
 	"""Test of API 'Source' resource"""
 

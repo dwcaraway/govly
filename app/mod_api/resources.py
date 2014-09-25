@@ -7,7 +7,7 @@ from flask.ext.restful import reqparse, abort, Api, Resource
 mod_api = Blueprint('api', __name__, url_prefix='/api')
 api = Api(mod_api)
 
-class EndpointsList(Resource):
+class Endpoints(Resource):
 	"""Index of all endpoints"""
 
 	def get(self):
@@ -16,12 +16,25 @@ class EndpointsList(Resource):
 class EventsList(Resource):
 	"""Events that are happening"""
 
-	def get(self, complete=False, q='', page=1, per_page=20, order='asc'):
-		""" Returns a collection of events matching specified criteria """
+	def __init__(self):
+		self.get_req_parse = reqparse.RequestParser()
+		#TODO test for q parameter and then uncomment below
+		#self.getparser.add_argument('q', type=str, help='Free-text search string', default="")
+		self.get_req_parse.add_argument('page', type=int, help='Page number of results', default=1)
+		self.get_req_parse.add_argument('per_page', type=int, help='Max number of items (up to 200) per page', default=20)
+		#TODO test for complete parameter and then uncomment
+		#self.getparser.add_argument('complete', type=bool, help='True if complete events should be included in results, false otherwise', default=False)
+		self.get_req_parse.add_argument('order', type=str, help='Sort order of events response. Ascending sorts from \
+			most distrant past event first to present/future event; descending does the opposite', default='asc')
 
+		super(EventsList, self).__init__()
+
+	def get(self):
+		""" Returns a collection of events matching specified criteria """
 		
-		
-		pagination = Event.query.paginate(page=page, per_page=per_page)
+		args = self.get_req_parse.parse_args()
+
+		pagination = Event.query.paginate(page=args.page, per_page=args.per_page)
 		response = Builder("/api/events?page=%d" % pagination.page).add_curie('r', "/api/rels/{rel}") \
 		.add_link('next', '/api/events?page=%d' % pagination.next_num).add_link('prev', '/api/events?page=%d' \
 		 % pagination.prev_num).add_link('first', '/api/events?page=1').add_link('last', '/api/events?page=%d' \
@@ -40,5 +53,7 @@ class SourcesList(Resource):
 		response = Builder('/api/sources').add_curie('r', "/api/rels/{rel}")
 		return response.as_object() 
 
-api.add_resource(EventsList, '/events')
-api.add_resource(SourcesList, '/sources')
+api.add_resource(EventsList, '/events', endpoint = 'events')
+api.add_resource(SourcesList, '/sources', endpoint = 'sources')
+api.add_resource(Endpoints, '/')
+
