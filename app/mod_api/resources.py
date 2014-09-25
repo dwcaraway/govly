@@ -2,26 +2,31 @@
 from flask import Blueprint, render_template, jsonify
 from app import app, Event, Source
 from dougrain import Builder
-from flask.ext import restful
+from flask.ext.restful import reqparse, abort, Api, Resource
 
-# Define the blueprint: 'api', set its url prefix: app.url/api
 mod_api = Blueprint('api', __name__, url_prefix='/api')
-api = restful.Api(mod_api)
+api = Api(mod_api)
 
-class EventsList(restful.Resource):
+class EndpointsList(Resource):
+	"""Index of all endpoints"""
+
+	def get(self):
+		return {}
+
+class EventsList(Resource):
 	"""Events that are happening"""
 
 	def get(self, complete=False, q='', start=1, limit=20, order='asc'):
 		""" Returns a collection of events matching specified criteria """
 		events = Event.query.all()
-		response = Builder("/api/events").add_curie('r', "/api/rels/{rel}")
+		response = Builder("/api/events?page=1").add_curie('r', "/api/rels/{rel}")
 
 		for event in events:
-			response = response.embed('r:event', Builder('/foo'))
+			response = response.embed('r:event', Builder('/api/rel'))
 
-		return response.as_object() 
+		return response.as_object()
 
-class Sources(restful.Resource):
+class SourcesList(Resource):
 	"""Sources of events"""
 
 	def get(self):
@@ -30,4 +35,4 @@ class Sources(restful.Resource):
 		return response.as_object() 
 
 api.add_resource(EventsList, '/events')
-api.add_resource(Sources, '/sources')
+api.add_resource(SourcesList, '/sources')

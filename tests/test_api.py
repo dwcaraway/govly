@@ -42,7 +42,7 @@ class EventTest(ApiTest):
 		doc = hal_loads(resp.data)
 
 		(resp.status_code).should.equal(200)
-		(doc.links['self'].url()).should.equal('/api/events')
+		(doc.links['self'].url()).should.equal('/api/events?page=1')
 		(doc.embedded.keys()).should.equal([])
 
 	def test_single_event(self):

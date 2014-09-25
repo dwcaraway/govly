@@ -1,7 +1,7 @@
 import unittest, sure, logging, tempfile, os, json
 import app as vitals
 from dougrain import Document
-from tests import hal_loads
+from jsonschema import Draft4Validator
 
 logger = logging.getLogger(__name__)
 
@@ -21,11 +21,24 @@ class LinkRelationTest(unittest.TestCase):
 		os.close(self.db_fd)
 		os.unlink(self.db_path)
 
-	def test_empty_link_relations(self):
+	def test_list_all(self):
 		"""
 		Get all members of Link Relations collection and verify that it's an empty data set
 		"""
 		resp = self.test_client.get('/rels/')
-		doc = hal_loads(resp.data)
+		data = json.loads(resp.data)
 
 		(resp.status_code).should.equal(200)
+		(len(data.keys())).should.equal(2)
+		#Loop over the link relations dict, validating the schemas	
+		#TODO find way of validating the schema, not sure that below works
+		for rel_key in data.keys():
+			(Draft4Validator.check_schema(data[rel_key])).should.be(None)
+
+	def test_rel_not_found(self):
+		"""Expect error object and message if rel not found"""
+		resp = self.test_client.get('/rels/badrelname')
+		data = json.loads(resp.data)
+
+		(resp.status_code).should.equal(404)
+		data['message'].should_not.be.different_of("Rel badrelname doesn't exist")
