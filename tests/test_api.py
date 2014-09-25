@@ -59,6 +59,25 @@ class EventTest(ApiTest):
 		(doc.embedded.keys()).should.equal(['r:event'])
 		doc.embedded['r:event']
 
+	def test_links(self):
+		"""
+		A large event collection should return links to navigate the collection 
+		"""
+		for x in range(100):
+			event = Event('http://www.foo.com/%d' % x, 'Test%d' % x, 'chicago', datetime.now())
+			vitals.db.session.add(event)
+		vitals.db.session.commit()
+
+		resp = self.test_client.get('/api/events')
+		doc = hal_loads(resp.data)
+
+		(doc.links['next'].url()).should.equal('/api/events?page=2')
+		doc.links['last'].url().should.equal('/api/events?page=5')
+		doc.links['first'].url().should.equal('/api/events?page=1')
+		doc.links['self'].url().should.equal('/api/events?page=1')
+		(doc.embedded.keys()).should.equal(['r:event'])
+		doc.embedded['r:event']
+
 class SourceTest(ApiTest):
 	"""Test of API 'Source' resource"""
 

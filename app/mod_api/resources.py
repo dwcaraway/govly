@@ -16,12 +16,15 @@ class EndpointsList(Resource):
 class EventsList(Resource):
 	"""Events that are happening"""
 
-	def get(self, complete=False, q='', start=1, limit=20, order='asc'):
+	def get(self, complete=False, q='', page=1, per_page=20, order='asc'):
 		""" Returns a collection of events matching specified criteria """
-		events = Event.query.all()
-		response = Builder("/api/events?page=1").add_curie('r', "/api/rels/{rel}")
+		pagination = Event.query.paginate(page=page, per_page=per_page)
+		response = Builder("/api/events?page=%d" % pagination.page).add_curie('r', "/api/rels/{rel}") \
+		.add_link('next', '/api/events?page=%d' % pagination.next_num).add_link('prev', '/api/events?page=%d' \
+		 % pagination.prev_num).add_link('first', '/api/events?page=1').add_link('last', '/api/events?page=%d' \
+		  % pagination.pages)
 
-		for event in events:
+		for event in pagination.items:
 			response = response.embed('r:event', Builder('/api/rel'))
 
 		return response.as_object()
