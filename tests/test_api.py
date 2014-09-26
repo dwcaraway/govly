@@ -4,6 +4,7 @@ from app.model import db, Event, Source
 from dougrain import Document
 from tests import hal_loads
 from app import create_application
+from jsonschema import Draft4Validator
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,8 @@ class ApiTest(unittest.TestCase):
 		
 		self.vitals = create_application(config)
 		self.test_client = self.vitals.test_client()
+		
+		#Push a context so that database knows what application to attach to
 		self.ctx = self.vitals.test_request_context()
 		self.ctx.push()
 
@@ -30,7 +33,20 @@ class ApiTest(unittest.TestCase):
 		os.close(self.db_fd)
 		os.unlink(self.db_path)
 
+		#Remove the context so that we can create a new app and reassign the db
 		self.ctx.pop()
+
+
+class EndpointsTests(ApiTest):
+	"""Tests the root endpoint"""	
+
+	def test_endpoints(self):
+		resp = self.test_client.get('/api/')
+		doc = hal_loads(resp.data)
+
+		resp.status_code.should.equal(200)
+		doc.links['r:events'].url().should.equal('/api/events')
+		doc.links['r:sources'].url().should.equal('/api/sources')
 
 
 class EventListTest(ApiTest):
@@ -146,3 +162,52 @@ class SourceTest(ApiTest):
 		(resp.status_code).should.equal(200)
 		(doc.links['self'].url()).should.equal('/api/sources')
 		(doc.embedded.keys()).should.equal([])
+
+
+class LinkRelationTest(ApiTest):
+	"""Test of API 'LinkRelation' resource"""
+
+	def setUp(self):
+		"""Construct temporary database and test client for testing routing and responses"""
+		self.db_fd, self.db_path = tempfile.mkstemp()
+		config = {
+		'SQLALCHEMY_DATABASE_URI':'sqlite:///%s' % self.db_path,
+		'TESTING': True
+		}
+		self.vitals = create_application(config)
+		self.test_client = self.vitals.test_client()
+
+	def tearDown(self):
+		"""Removes temporary database at end of each test"""
+		os.close(self.db_fd)
+		os.unlink(self.db_path)
+
+	def test_list_all(self):
+		"""
+		Get all members of Link Relations collection and verify that it's an empty data set
+		"""
+		resp = self.test_client.get('/rels/')
+		data = json.loads(resp.data)
+
+		(resp.status_code).should.equal(200)
+		(len(data.keys())).should.equal(2)
+
+	def test_select_all(self):
+		"""
+		Select all link relations and check them
+		"""
+		resp = self.test_client.get('/rels/')
+		data = json.loads(resp.data)
+
+		for rel_id in data.keys():
+			resp = self.test_client.get('/rels/%s' % rel_id)
+			schema = json.loads(resp.data)
+			(Draft4Validator.check_schema(data)).should.be(None)
+
+	def test_rel_not_found(self):
+		"""Expect error object and message if rel not found"""
+		resp = self.test_client.get('/rels/badrelname')
+		data = json.loads(resp.data)
+
+		(resp.status_code).should.equal(404)
+		data['message'].should_not.be.different_of("Rel badrelname doesn't exist")

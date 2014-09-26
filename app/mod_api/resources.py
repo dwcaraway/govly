@@ -15,7 +15,10 @@ class Endpoints(Resource):
 	"""Index of all endpoints"""
 
 	def get(self):
-		return {}
+		return Builder('/').add_curie('r', '/api/rels/{rel}') \
+		.add_link('r:events', '/api/events') \
+		.add_link('r:sources', '/api/sources') \
+		.as_object()
 
 class EventsList(Resource):
 	"""Events that are happening"""
