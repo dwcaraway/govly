@@ -58,8 +58,8 @@ class EventListTest(ApiTest):
 		doc = hal_loads(resp.data)
 		curie_url = doc.links.curies['r'].url()
 		curie_variables = doc.links.curies['r'].variables
-		(curie_url).should.equal('/api/rels/')
-		(curie_variables).should.equal(['rel'])
+		curie_url.should.equal('/api/rels/')
+		curie_variables.should.equal(['rel'])
 
 	def test_empty_events(self):
 		"""
@@ -71,10 +71,10 @@ class EventListTest(ApiTest):
 		logger.debug("total events = %d" % len(Event.query.all()))
 		logger.debug('events= %s' % resp.data)
 
-		(resp.status_code).should.equal(200)
-		(doc.properties['total']).should.equal(0)
-		(doc.links['self'].url()).should.equal('/api/events?page=1')
-		(doc.embedded.keys()).should.equal([])
+		resp.status_code.should.equal(200)
+		doc.properties['total'].should.equal(0)
+		doc.links['self'].url().should.equal('/api/events?page=1')
+		doc.embedded.keys().should.equal([])
 
 	def test_single_event(self):
 		"""
@@ -88,7 +88,7 @@ class EventListTest(ApiTest):
 		resp = self.test_client.get('/api/events')
 		doc = hal_loads(resp.data)
 
-		(doc.embedded.keys()).should.equal(['r:event'])
+		doc.embedded.keys().should.equal(['r:event'])
 		doc.embedded['r:event']
 
 	def test_links(self):
@@ -103,12 +103,12 @@ class EventListTest(ApiTest):
 		resp = self.test_client.get('/api/events')
 		doc = hal_loads(resp.data)
 
-		(doc.links['next'].url()).should.equal('/api/events?page=2')
+		doc.links['next'].url().should.equal('/api/events?page=2')
 		doc.links['last'].url().should.equal('/api/events?page=5')
 		doc.links['first'].url().should.equal('/api/events?page=1')
 		doc.links['self'].url().should.equal('/api/events?page=1')
 		doc.properties['total'].should.equal(100)
-		(doc.embedded.keys()).should.equal(['r:event'])
+		doc.embedded.keys().should.equal(['r:event'])
 		doc.embedded['r:event']
 
 	def test_bad_page(self):
@@ -121,10 +121,10 @@ class EventListTest(ApiTest):
 			db.session.commit()
 
 		resp = self.test_client.get('/api/events?page=0')
-		(resp.status_code).should.equal(404)
+		resp.status_code.should.equal(404)
 
 		resp = self.test_client.get('/api/events?page=6')
-		(resp.status_code).should.equal(404)
+		resp.status_code.should.equal(404)
 
 	def test_create_event(self):
 		"""
@@ -133,11 +133,11 @@ class EventListTest(ApiTest):
 		resp = self.test_client.post('/api/events', data=dict())
 		doc = hal_loads(resp.data)
 
-		(resp.status_code).should.equal(201)	
+		resp.status_code.should.equal(201)	
 
 		len(Event.query.all()).should.equal(1)
 
-		(doc.properties['id']).should.equal(Event.query.first().id)
+		doc.properties['id'].should.equal(Event.query.first().id)
 
 class SourceTest(ApiTest):
 	"""Test of API 'Source' resource"""
@@ -149,8 +149,8 @@ class SourceTest(ApiTest):
 
 		curie_url = doc.links.curies['r'].url()
 		curie_variables = doc.links.curies['r'].variables
-		(curie_url).should.equal('/api/rels/')
-		(curie_variables).should.equal(['rel'])
+		curie_url.should.equal('/api/rels/')
+		curie_variables.should.equal(['rel'])
 
 	def test_empty_sources(self):
 		"""
@@ -159,9 +159,9 @@ class SourceTest(ApiTest):
 		resp = self.test_client.get('/api/sources')
 		doc = hal_loads(resp.data)
 
-		(resp.status_code).should.equal(200)
-		(doc.links['self'].url()).should.equal('/api/sources')
-		(doc.embedded.keys()).should.equal([])
+		resp.status_code.should.equal(200)
+		doc.links['self'].url().should.equal('/api/sources')
+		doc.embedded.keys().should.equal([])
 
 
 class LinkRelationTest(ApiTest):
@@ -186,28 +186,28 @@ class LinkRelationTest(ApiTest):
 		"""
 		Get all members of Link Relations collection and verify that it's an empty data set
 		"""
-		resp = self.test_client.get('/rels/')
+		resp = self.test_client.get('/api/rels/')
 		data = json.loads(resp.data)
 
-		(resp.status_code).should.equal(200)
-		(len(data.keys())).should.equal(2)
+		resp.status_code.should.equal(200)
+		len(data.keys()).should.equal(4)
 
 	def test_select_all(self):
 		"""
 		Select all link relations and check them
 		"""
-		resp = self.test_client.get('/rels/')
+		resp = self.test_client.get('/api/rels/')
 		data = json.loads(resp.data)
 
 		for rel_id in data.keys():
-			resp = self.test_client.get('/rels/%s' % rel_id)
+			resp = self.test_client.get('/api/rels/%s' % rel_id)
 			schema = json.loads(resp.data)
-			(Draft4Validator.check_schema(data)).should.be(None)
+			Draft4Validator.check_schema(data).should.be(None)
 
 	def test_rel_not_found(self):
 		"""Expect error object and message if rel not found"""
-		resp = self.test_client.get('/rels/badrelname')
+		resp = self.test_client.get('/api/rels/badrelname')
 		data = json.loads(resp.data)
 
-		(resp.status_code).should.equal(404)
+		resp.status_code.should.equal(404)
 		data['message'].should_not.be.different_of("Rel badrelname doesn't exist")

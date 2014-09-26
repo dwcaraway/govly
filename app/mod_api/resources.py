@@ -101,6 +101,14 @@ RELS = {
         "email": {"type": "string"}
     },
     "required": ["email"]
+},
+"events":
+{
+	"to":"do"
+},
+"sources":
+{
+	"to":"do"
 }
 }
 
