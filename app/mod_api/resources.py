@@ -1,8 +1,12 @@
 # Import flask dependencies
 from flask import Blueprint, render_template, jsonify
-from app import app, Event, Source
+from app.model import Event, Source, db
 from dougrain import Builder
+from datetime import datetime
 from flask.ext.restful import reqparse, abort, Api, Resource
+import logging
+
+logger = logging.getLogger(__name__)
 
 mod_api = Blueprint('api', __name__, url_prefix='/api')
 api = Api(mod_api)
@@ -27,12 +31,16 @@ class EventsList(Resource):
 		self.get_req_parse.add_argument('order', type=str, help='Sort order of events response. Ascending sorts from \
 			most distrant past event first to present/future event; descending does the opposite', default='asc')
 
+		self.post_req_parse = reqparse.RequestParser()
+
 		super(EventsList, self).__init__()
 
 	def get(self):
 		""" Returns a collection of events matching specified criteria """
 		
 		args = self.get_req_parse.parse_args()
+
+		logger.debug("event_count=%d " % len(Event.query.all()))
 
 		pagination = Event.query.paginate(page=args.page, per_page=args.per_page)
 		response = Builder("/api/events?page=%d" % pagination.page).add_curie('r', "/api/rels/{rel}").set_property('total', pagination.total)
@@ -51,6 +59,14 @@ class EventsList(Resource):
 
 		return response.as_object()
 
+	def post(self):
+		""" Creates a new event """
+		event = Event('http://www.foo.com', 'Test', 'Dayton, OH', datetime.now())	
+		db.session.add(event)
+		db.session.commit()
+
+		return Builder('/events/%d' % event.id).set_property('id', event.id).as_object(), 201
+
 class SourcesList(Resource):
 	"""Sources of events"""
 
@@ -61,5 +77,5 @@ class SourcesList(Resource):
 
 api.add_resource(EventsList, '/events', endpoint = 'events')
 api.add_resource(SourcesList, '/sources', endpoint = 'sources')
-api.add_resource(Endpoints, '/')
+api.add_resource(Endpoints, '/', endpoint="endpoints")
 

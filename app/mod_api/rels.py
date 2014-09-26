@@ -1,6 +1,5 @@
 # Import flask dependencies
 from flask import Blueprint, render_template, jsonify
-from app import app
 from flask.ext.restful import Resource, Api, abort
 
 mod_rel = Blueprint('rels', __name__, url_prefix='/rels')

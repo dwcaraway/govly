@@ -1,75 +1,35 @@
-# Import flask and template operators
-from flask import Flask, render_template, send_from_directory
-from flask.ext.sqlalchemy import SQLAlchemy
-import logging
+import os
+from app.config import DevelopmentConfig
+    
+def create_application(config_object=DevelopmentConfig):
+    from flask import Flask
+    application = Flask(__name__)
+    application.config.from_object(config_object)
+    application.config.from_envvar('vitals_settings', True)
 
-# Define the WSGI application object
-app = Flask(__name__)
+    from app.model import db
+    db.init_app(application)
 
-# Define the database functions
-db = SQLAlchemy(app)
-#TODO move these database models elsewhere
-class Event(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    url = db.Column(db.String(80))
-    retrieved = db.Column(db.DateTime)
-    title = db.Column(db.String(120))
-    description = db.Column(db.String(800))
-    location = db.Column(db.String(250))
-    start = db.Column(db.DateTime)
-    end = db.Column(db.DateTime)
-    source_id = db.Column(db.Integer, db.ForeignKey('source.id'))
+    from app.routes import index
+    application.add_url_rule('/', 'index', index)
 
-    def __init__(self, url, title, location, start, description=None, end=None):
-        self.url = url
-        self.title = title
-        self.description = description
-        self.location = location
-        self.start = start
-        self.end = end
+    from app.error import not_found, internal_error
+    application.error_handler_spec[None][404] = not_found
+    application.error_handler_spec[None][500] = internal_error
 
-    def __repr__(self):
-        return '<Event %r>' % self.title
+    # Import a module / component using its blueprint handler variable (mod_api)
+    from app.mod_api.resources import mod_api as api_module
+    from app.mod_api.rels import mod_rel as rel_module
 
-class Source(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    events = db.relationship('Event', backref='source',
-                                lazy='dynamic')
+    # Register blueprint(s)
+    application.register_blueprint(api_module)
+    application.register_blueprint(rel_module)
 
-    def __repr__(self):
-        return '<Source %r>' % self.id
+    # Create a user to test with
+    @application.before_first_request
+    def create_user():
+        db.create_all()
+        # user_datastore.create_user(name='Nick Gerakines', email='nick@gerakines.net', password='password')
+        db.session.commit()
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True)
-    email = db.Column(db.String(120), unique=True)
-
-    def __init__(self, username, email):
-        self.username = username
-        self.email = email
-
-    def __repr__(self):
-        return '<User %r>' % self.username
-
-# Configurations
-app.config.from_object('app.config')
-
-@app.route('/')
-def index():
-	return render_template('index.html')
-
-# Sample HTTP error handling
-@app.errorhandler(404)
-def not_found(error):
-    return render_template('404.html'), 404
-
-# Import a module / component using its blueprint handler variable (mod_api)
-from app.mod_api.resources import mod_api as api_module
-from app.mod_api.rels import mod_rel as rel_module
-
-# Register blueprint(s)
-app.register_blueprint(api_module)
-app.register_blueprint(rel_module)
-
-# Create database schema if not already existing
-db.create_all()
+    return application

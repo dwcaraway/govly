@@ -1,21 +1,27 @@
-#The name and port of the server. Required for subdomain support.
-#SERVER_NAME = '127.0.0.1:8089'
+class Config(object):
+    """
+    Configuration base, for all environments.
+    """
+    DEBUG = False
+    TESTING = False
+    DATABASE_URI = 'sqlite:////tmp/test.db'
+    BOOTSTRAP_FONTAWESOME = True
+    SECRET_KEY = "secret"
+    CSRF_ENABLED = True
+    SECURITY_PASSWORD_HASH = 'bcrypt'
+    SECURITY_REGISTERABLE = True
+    SECURITY_PASSWORD_SALT = 'lotsofsalt'
+    SECURITY_CHANGEABLE = True
+    SECURITY_RECOVERABLE = True
 
-# Statement for enabling the development environment
-DEBUG = True
 
-# Application threads. A common general assumption is
-# using 2 per available processor cores - to handle
-# incoming requests using one and performing background
-# operations using the other.
-THREADS_PER_PAGE = 2
+class ProductionConfig(Config):
+    DATABASE_URI = 'mysql://user@localhost/foo'
 
-# Use a secure, unique and absolutely secret key for
-# signing the data. 
-CSRF_SESSION_KEY = "secret"
 
-# Secret key for signing cookies
-SECRET_KEY = "secret"
+class DevelopmentConfig(Config):
+    DEBUG = True
 
-# Database
-SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/test.db'
+
+class TestingConfig(Config):
+    TESTING = True

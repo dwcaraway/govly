@@ -18,6 +18,8 @@ class ApiTest(unittest.TestCase):
 
 	def tearDown(self):
 		"""Removes temporary database at end of each test"""
+		vitals.db.session.remove()
+		vitals.db.drop_all()
 		os.close(self.db_fd)
 		os.unlink(self.db_path)
 
@@ -40,6 +42,9 @@ class EventListTest(ApiTest):
 		"""
 		resp = self.test_client.get('/api/events')
 		doc = hal_loads(resp.data)
+
+		logger.debug("total events = %d" % len(Event.query.all()))
+		logger.debug('events= %s' % resp.data)
 
 		(resp.status_code).should.equal(200)
 		(doc.properties['total']).should.equal(0)
@@ -76,6 +81,7 @@ class EventListTest(ApiTest):
 		doc.links['last'].url().should.equal('/api/events?page=5')
 		doc.links['first'].url().should.equal('/api/events?page=1')
 		doc.links['self'].url().should.equal('/api/events?page=1')
+		doc.properties['total'].should.equal(100)
 		(doc.embedded.keys()).should.equal(['r:event'])
 		doc.embedded['r:event']
 
@@ -93,6 +99,19 @@ class EventListTest(ApiTest):
 
 		resp = self.test_client.get('/api/events?page=6')
 		(resp.status_code).should.equal(404)
+
+	def test_create_event(self):
+		"""
+		Create an event
+		"""
+		resp = self.test_client.post('/api/events', data=dict())
+		doc = hal_loads(resp.data)
+
+		(resp.status_code).should.equal(201)	
+
+		len(Event.query.all()).should.equal(1)
+
+		(doc.properties['id']).should.equal(Event.query.first().id)
 
 class SourceTest(ApiTest):
 	"""Test of API 'Source' resource"""
