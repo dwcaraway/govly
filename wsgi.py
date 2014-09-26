@@ -1,6 +1,8 @@
 #!/usr/bin/python
 import os
-from app import app as application
+from app import create_application
+
+application = create_application()
 
 virtenv = os.environ['OPENSHIFT_PYTHON_DIR'] + '/virtenv/'
 virtualenv = os.path.join(virtenv, 'bin/activate_this.py')
