@@ -25,11 +25,9 @@ def create_application(config_object=DevelopmentConfig):
     application.register_blueprint(api_module)
     application.register_blueprint(rel_module)
 
-    # Create a user to test with
     @application.before_first_request
     def create_user():
         db.create_all()
-        # user_datastore.create_user(name='Nick Gerakines', email='nick@gerakines.net', password='password')
         db.session.commit()
 
     return application
