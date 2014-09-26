@@ -163,6 +163,29 @@ class SourceTest(ApiTest):
 		doc.links['self'].url().should.equal('/api/sources')
 		doc.embedded.keys().should.equal([])
 
+class BusinessesTest(ApiTest):
+	"""Test of API 'Businesses' resource"""
+
+	def test_link_relation_curie(self):
+		"""Verify that resource has a link relation curie in HAL response"""
+		resp = self.test_client.get('/api/businesses')
+		doc = hal_loads(resp.data)
+
+		curie_url = doc.links.curies['r'].url()
+		curie_variables = doc.links.curies['r'].variables
+		curie_url.should.equal('/api/rels/')
+		curie_variables.should.equal(['rel'])
+
+	def test_empty_sources(self):
+		"""
+		Get all members of Businesses collection and verify that it's an empty data set
+		"""
+		resp = self.test_client.get('/api/businesses')
+		doc = hal_loads(resp.data)
+
+		resp.status_code.should.equal(200)
+		doc.links['self'].url().should.equal('/api/businesses')
+		doc.embedded.keys().should.equal([])
 
 class LinkRelationTest(ApiTest):
 	"""Test of API 'LinkRelation' resource"""

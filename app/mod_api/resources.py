@@ -78,6 +78,27 @@ class SourcesList(Resource):
 		response = Builder('/api/sources').add_curie('r', "/api/rels/{rel}")
 		return response.as_object() 
 
+class BusinessesList(Resource):
+	"""Businesses in the area"""
+
+	def __init__(self):
+		self.get_req_parse = reqparse.RequestParser()
+		#TODO test for q parameter and then uncomment below
+		#self.getparser.add_argument('q', type=str, help='Free-text search string', default="")
+		self.get_req_parse.add_argument('page', type=int, help='Page number of results', default=1)
+		self.get_req_parse.add_argument('per_page', type=int, help='Max number of items (up to 200) per page', default=20)
+		#TODO test for complete parameter and then uncomment
+		self.get_req_parse.add_argument('order', type=str, help='Sort alphabetically by business name, ASC is ascending, DESC is descending', default='asc')
+
+		self.post_req_parse = reqparse.RequestParser()
+
+		super(BusinessesList, self).__init__()
+
+	def get(self):
+		""" Returns a collection of businesses matching specified criteria """
+		response = Builder('/api/businesses').add_curie('r', "/api/rels/{rel}")
+		return response.as_object() 
+
 RELS = {
 	"event":
 {
@@ -132,7 +153,8 @@ class LinkRelations(Resource):
 
 api.add_resource(EventsList, '/events', endpoint = 'events')
 api.add_resource(SourcesList, '/sources', endpoint = 'sources')
+api.add_resource(BusinessesList, '/businesses', endpoint = 'businesses')
 api.add_resource(Endpoints, '/', endpoint="endpoints")
-api.add_resource(LinkRelationsList, '/rels/')
-api.add_resource(LinkRelations, '/rels/<string:rel_id>')
+api.add_resource(LinkRelationsList, '/rels/', endpoint='relationships')
+api.add_resource(LinkRelations, '/rels/<string:rel_id>', endpoint="relationship")
 
