@@ -1,8 +1,9 @@
 import unittest, sure, logging, tempfile, os, json
 from datetime import datetime
-from app.model import Event, Source
+from app.model import db, Event, Source
 from dougrain import Document
 from tests import hal_loads
+from app import create_application
 
 logger = logging.getLogger(__name__)
 
@@ -10,20 +11,26 @@ class ApiTest(unittest.TestCase):
 	def setUp(self):
 		"""Construct temporary database and test client for testing routing and responses"""
 		self.db_fd, self.db_path = tempfile.mkstemp()
+		
 		config = {
 		'SQLALCHEMY_DATABASE_URI':'sqlite:///%s' % self.db_path,
 		'TESTING': True
 		}
-		from app import create_application
+		
 		self.vitals = create_application(config)
 		self.test_client = self.vitals.test_client()
+		self.ctx = self.vitals.test_request_context()
+		self.ctx.push()
 
 	def tearDown(self):
 		"""Removes temporary database at end of each test"""
-		self.vitals.db.session.remove()
-		self.vitals.db.drop_all()
+		db.session.remove()
+		db.drop_all()
+		
 		os.close(self.db_fd)
 		os.unlink(self.db_path)
+
+		self.ctx.pop()
 
 
 class EventListTest(ApiTest):
@@ -58,8 +65,9 @@ class EventListTest(ApiTest):
 		Call to Event collection with single event
 		"""
 		event = Event('http://www.foo.com', 'Test', 'chicago', datetime.now())
-		vitals.db.session.add(event)
-		vitals.db.session.commit()
+		
+		db.session.add(event)
+		db.session.commit()
 
 		resp = self.test_client.get('/api/events')
 		doc = hal_loads(resp.data)
@@ -73,8 +81,8 @@ class EventListTest(ApiTest):
 		"""
 		for x in range(100):
 			event = Event('http://www.foo.com/%d' % x, 'Test%d' % x, 'chicago', datetime.now())
-			vitals.db.session.add(event)
-		vitals.db.session.commit()
+			db.session.add(event)
+			db.session.commit()
 
 		resp = self.test_client.get('/api/events')
 		doc = hal_loads(resp.data)
@@ -93,8 +101,8 @@ class EventListTest(ApiTest):
 		"""
 		for x in range(5):
 			event = Event('http://www.foo.com/%d' % x, 'Test%d' % x, 'chicago', datetime.now())
-			vitals.db.session.add(event)
-		vitals.db.session.commit()
+			db.session.add(event)
+			db.session.commit()
 
 		resp = self.test_client.get('/api/events?page=0')
 		(resp.status_code).should.equal(404)

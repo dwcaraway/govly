@@ -10,6 +10,9 @@ def create_application(config_object=DevelopmentConfig):
     from app.model import db
     db.init_app(application)
 
+    with application.app_context():
+        db.create_all()
+
     from app.routes import index
     application.add_url_rule('/', 'index', index)
 
@@ -26,7 +29,7 @@ def create_application(config_object=DevelopmentConfig):
     application.register_blueprint(rel_module)
 
     @application.before_first_request
-    def create_user():
+    def create_db():
         db.create_all()
         db.session.commit()
 

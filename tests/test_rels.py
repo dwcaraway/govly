@@ -1,5 +1,5 @@
 import unittest, sure, logging, tempfile, os, json
-import app as vitals
+from app import create_application
 from dougrain import Document
 from jsonschema import Draft4Validator
 
@@ -11,10 +11,12 @@ class LinkRelationTest(unittest.TestCase):
 	def setUp(self):
 		"""Construct temporary database and test client for testing routing and responses"""
 		self.db_fd, self.db_path = tempfile.mkstemp()
-		vitals.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s' % self.db_path
-		vitals.app.config['TESTING'] = True
-		self.test_client = vitals.app.test_client()
-		vitals.db.create_all()
+		config = {
+		'SQLALCHEMY_DATABASE_URI':'sqlite:///%s' % self.db_path,
+		'TESTING': True
+		}
+		self.vitals = create_application(config)
+		self.test_client = self.vitals.test_client()
 
 	def tearDown(self):
 		"""Removes temporary database at end of each test"""
