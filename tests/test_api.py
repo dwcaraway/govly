@@ -86,7 +86,10 @@ class EventListTest(ApiTest):
 		doc = hal_loads(resp.data)
 
 		doc.embedded.keys().should.equal(['r:event'])
-		doc.embedded['r:event']
+		event_doc = doc.embedded['r:event']
+		event_doc.properties.should.equal({'title':'Test'})
+
+
 
 	def test_links(self):
 		"""
@@ -184,6 +187,36 @@ class BusinessesTest(ApiTest):
 		doc.links['self'].url().should.equal('/api/businesses?page=1')
 		doc.properties['total'].should.equal(0)
 		doc.embedded.keys().should.equal([])
+
+	def test_single_business(self):
+		"""
+		Call to Businesses collection with single event
+		"""
+		biz = Business()
+		
+		db.session.add(biz)
+		db.session.commit()
+
+		resp = self.test_client.get('/api/businesses')
+		doc = hal_loads(resp.data)
+
+		doc.embedded.keys().should.equal([])
+
+class BussinessTest(ApiTest):
+	def test_get(self):
+		"""
+		Get single business
+		"""
+		biz = Business()
+		
+		db.session.add(biz)
+		db.session.commit()
+
+		resp = self.test_client.get('/api/business/%d'%biz.id)
+		resp.status_code.should.equal(200)
+
+		doc = hal_loads(resp.data)
+		doc.properties.should.equal({'name':'bar'})	
 
 class LinkRelationTest(ApiTest):
 	"""Test of API 'LinkRelation' resource"""
