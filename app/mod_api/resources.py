@@ -1,6 +1,6 @@
 # Import flask dependencies
 from flask import Blueprint, render_template, jsonify
-from app.model import Event, Source, db
+from app.model import Event, Source, db, Business
 from dougrain import Builder
 from datetime import datetime
 from flask.ext.restful import reqparse, abort, Api, Resource
@@ -42,8 +42,6 @@ class EventsList(Resource):
 		""" Returns a collection of events matching specified criteria """
 		
 		args = self.get_req_parse.parse_args()
-
-		logger.debug("event_count=%d " % len(Event.query.all()))
 
 		pagination = Event.query.paginate(page=args.page, per_page=args.per_page)
 		response = Builder("/api/events?page=%d" % pagination.page).add_curie('r', "/api/rels/{rel}").set_property('total', pagination.total)
@@ -96,8 +94,25 @@ class BusinessesList(Resource):
 
 	def get(self):
 		""" Returns a collection of businesses matching specified criteria """
-		response = Builder('/api/businesses').add_curie('r', "/api/rels/{rel}")
-		return response.as_object() 
+
+		args = self.get_req_parse.parse_args()
+
+		pagination = Business.query.paginate(page=args.page, per_page=args.per_page)
+		response = Builder("/api/businesses?page=%d" % pagination.page).add_curie('r', "/api/rels/{rel}").set_property('total', pagination.total)
+
+		if pagination.has_prev:
+			response = response.add_link('prev', '/api/businesses?page=%d' % pagination.prev_num)		 
+
+		if pagination.has_next:
+			response = response.add_link('next', '/api/businesses?page=%d' % pagination.next_num)
+
+		if pagination.total > 0:
+			response = response.add_link('first', '/api/businesses?page=1').add_link('last', '/api/events?page=%d' % pagination.pages)
+
+		for event in pagination.items:
+			response = response.embed('r:business', Builder('/api/rel'))
+
+		return response.as_object()
 
 RELS = {
 	"event":

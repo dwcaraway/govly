@@ -1,6 +1,6 @@
 import unittest, sure, logging, tempfile, os, json
 from datetime import datetime
-from app.model import db, Event, Source
+from app.model import db, Event, Source, Business
 from dougrain import Document
 from tests import hal_loads
 from app import create_application
@@ -67,9 +67,6 @@ class EventListTest(ApiTest):
 		"""
 		resp = self.test_client.get('/api/events')
 		doc = hal_loads(resp.data)
-
-		logger.debug("total events = %d" % len(Event.query.all()))
-		logger.debug('events= %s' % resp.data)
 
 		resp.status_code.should.equal(200)
 		doc.properties['total'].should.equal(0)
@@ -176,7 +173,7 @@ class BusinessesTest(ApiTest):
 		curie_url.should.equal('/api/rels/')
 		curie_variables.should.equal(['rel'])
 
-	def test_empty_sources(self):
+	def test_empty_businesses(self):
 		"""
 		Get all members of Businesses collection and verify that it's an empty data set
 		"""
@@ -184,7 +181,8 @@ class BusinessesTest(ApiTest):
 		doc = hal_loads(resp.data)
 
 		resp.status_code.should.equal(200)
-		doc.links['self'].url().should.equal('/api/businesses')
+		doc.links['self'].url().should.equal('/api/businesses?page=1')
+		doc.properties['total'].should.equal(0)
 		doc.embedded.keys().should.equal([])
 
 class LinkRelationTest(ApiTest):
