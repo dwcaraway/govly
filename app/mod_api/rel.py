@@ -37,6 +37,14 @@ RELS = {
 "sources":
     {
     "to": "do"
+    },
+"businesses":
+    {
+    "to": "do"
+    },
+"business":
+    {
+    "to": "do"
     }
 }
 

@@ -20,7 +20,7 @@ class Endpoints(Resource):
 
     def get(self):
         """Starting endpoint for all available endpoints"""
-        return Builder('/').add_curie('r', '/api/rels/{rel}') \
+        return Builder('/').add_curie('r', '/rels/{rel}') \
             .add_link('r:events', '/api/events') \
             .add_link('r:sources', '/api/sources') \
             .add_link('r:businesses', '/api/businesses')\
@@ -156,7 +156,7 @@ class Businesses(Resource):
 api.add_resource(EventsList, '/events', endpoint='events')
 api.add_resource(SourcesList, '/sources', endpoint='sources')
 api.add_resource(BusinessesList, '/businesses', endpoint='businesses')
-api.add_resource(Businesses, '/businesses/<string:id>', endpoint='business')
+api.add_resource(Businesses, '/businesses/<int:id>', endpoint='business')
 api.add_resource(Endpoints, '/', endpoint="endpoints")
 
 

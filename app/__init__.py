@@ -22,10 +22,12 @@ def create_application(config_object=DevelopmentConfig):
     # Import a module / component using its blueprint handler variable (mod_api)
     from app.mod_api.resource import mod_api as api_module
     from app.mod_api.rel import mod_rel as rel_module
+    from app.mod_hal import mod_hal
 
     # Register blueprint(s)
     application.register_blueprint(api_module)
     application.register_blueprint(rel_module)
+    application.register_blueprint(mod_hal)
 
     @application.before_first_request
     def create_db():
