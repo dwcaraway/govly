@@ -1,3 +1,5 @@
+import os
+
 class Config(object):
     """
     Configuration base, for all environments.
@@ -16,7 +18,7 @@ class Config(object):
 
 
 class ProductionConfig(Config):
-    DATABASE_URI = 'mysql://user@localhost/foo'
+    DATABASE_URI = os.getenv('OPENSHIFT_POSTGRESQL_DB_URL', default='mysql://user@localhost/foo')
 
 
 class DevelopmentConfig(Config):
