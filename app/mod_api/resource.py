@@ -1,10 +1,13 @@
 # Import flask dependencies
-from flask import Blueprint, render_template, jsonify
-from app.model import Event, Source, db, Business
-from dougrain import Builder
 from datetime import datetime
-from flask.ext.restful import reqparse, abort, Api, Resource
 import logging
+
+from flask import Blueprint, request
+from dougrain import Builder
+from flask.ext.restful import reqparse, Api, Resource, abort
+
+from app.model import Event, db, Business
+
 
 logger = logging.getLogger(__name__)
 
@@ -16,9 +19,12 @@ class Endpoints(Resource):
     """Index of all endpoints"""
 
     def get(self):
+        """Starting endpoint for all available endpoints"""
         return Builder('/').add_curie('r', '/api/rels/{rel}') \
             .add_link('r:events', '/api/events') \
             .add_link('r:sources', '/api/sources') \
+            .add_link('r:businesses', '/api/businesses')\
+            .set_property('welcome', 'Welcome to the Vitals API!')\
             .as_object()
 
 
@@ -57,11 +63,10 @@ class EventsList(Resource):
             response = response.add_link('next', '/api/events?page=%d' % pagination.next_num)
 
         if pagination.total > 0:
-            response = response.add_link('first', '/api/events?page=1').add_link('last',
-                                                                                 '/api/events?page=%d' % pagination.pages)
-
+            response = response.add_link('first', '/api/events?page=1')\
+                .add_link('last','/api/events?page=%d' % pagination.pages)
         for event in pagination.items:
-            response = response.embed('r:event', Builder('/api/rel'))
+            response = response.add_link('r:event', '/api/events/%d' % event.id)
 
         return response.as_object()
 
@@ -120,72 +125,38 @@ class BusinessesList(Resource):
         if pagination.total > 0:
             response = response.add_link('first', '/api/businesses?page=1').add_link('last',
                                                                                      '/api/events?page=%d' % pagination.pages)
-
-        for event in pagination.items:
-            response = response.embed('r:business', Builder('/api/rel'))
+        for business in pagination.items:
+            response = response.add_link('r:business', '/api/businesses/%d' % business)
 
         return response.as_object()
 
+class Businesses(Resource):
+    """Endpoint for individual businesses"""
 
-RELS = {
-"event":
-    {
-        "$schema": "http://json-schema.org/schema#",
+    def __init__(self):
+        self.get_req_parse = reqparse.RequestParser()
+        self.get_req_parse.add_argument('id', type=int, help='unique id of the business')
 
-        "type": "object",
-        "properties": {
-            "name": {"type": "string"},
-            "email": {"type": "string"}
-        },
-        "required": ["email"]
-    },
+    def get(self, id):
+        """Get business by id"""
+        args = self.get_req_parse.parse_args()
 
-"source":
-    {
-        "$schema": "http://json-schema.org/schema#",
+        biz = Business.query.get(id)
 
-        "type": "object",
-        "properties": {
-            "name": {"type": "string"},
-            "email": {"type": "string"}
-        },
-        "required": ["email"]
-    },
-"events":
-    {
-    "to": "do"
-    },
-"sources":
-    {
-    "to": "do"
-    }
-}
-
-
-class LinkRelationsList(Resource):
-    """Link relations for resources of the API"""
-
-    def get(self):
-        """Gets all link relations"""
-        return RELS
-
-
-class LinkRelations(Resource):
-    """Individual link relations"""
-
-    def get(self, rel_id):
-        schema = RELS.get(rel_id)
-
-        if schema is None:
-            abort(404, message="Rel {} doesn't exist".format(rel_id))
+        if biz is None:
+            abort(404, message="Business %d doesn't exist" % id)
         else:
-            return RELS[rel_id]
+            b = Builder(request.path).add_curie('r', '/rels/{rel}')\
+            .add_link('r:events', '/api/businesses?page=1').set_property('id', biz.id)
+
+            return b.as_object()
+
 
 
 api.add_resource(EventsList, '/events', endpoint='events')
 api.add_resource(SourcesList, '/sources', endpoint='sources')
 api.add_resource(BusinessesList, '/businesses', endpoint='businesses')
+api.add_resource(Businesses, '/businesses/<string:id>', endpoint='business')
 api.add_resource(Endpoints, '/', endpoint="endpoints")
-api.add_resource(LinkRelationsList, '/rels/', endpoint='relationships')
-api.add_resource(LinkRelations, '/rels/<string:rel_id>', endpoint="relationship")
+
 
