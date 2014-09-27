@@ -6,7 +6,7 @@ class Config(object):
     """
     DEBUG = False
     TESTING = False
-    DATABASE_URI = 'sqlite:////tmp/test.db'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/test.db'
     BOOTSTRAP_FONTAWESOME = True
     SECRET_KEY = "secret"
     CSRF_ENABLED = True
@@ -18,7 +18,7 @@ class Config(object):
 
 
 class ProductionConfig(Config):
-    DATABASE_URI = "%s/vitals" % os.getenv('OPENSHIFT_POSTGRESQL_DB_URL')
+    SQLALCHEMY_DATABASE_URI = "%s/vitals" % os.getenv('OPENSHIFT_POSTGRESQL_DB_URL')
     #TODO remove the DEBUG = True statement before customers are on this!
     DEBUG = True
 
