@@ -6,3 +6,4 @@ liveandletdie==0.0.2
 dougrain==0.5.1
 jsonschema==2.4.0
 Flask-Migrate==1.2.0
+blinker==1.3

@@ -14,6 +14,13 @@ logger = logging.getLogger(__name__)
 mod_api = Blueprint('api', __name__, url_prefix='/api')
 api = Api(mod_api)
 
+def log_exception(sender, exception, **extra):
+    """ Log an exception to our logging framework """
+    sender.logger.debug('Got exception during processing: %s', exception)
+
+from flask import got_request_exception
+got_request_exception.connect(log_exception, mod_api)
+
 
 class Endpoints(Resource):
     """Index of all endpoints"""
@@ -25,7 +32,7 @@ class Endpoints(Resource):
             .add_link('r:sources', '/api/sources') \
             .add_link('r:businesses', '/api/businesses')\
             .set_property('welcome', 'Welcome to the Vitals API!')\
-            .as_object()
+            .as_object() 
 
 
 class EventsList(Resource):

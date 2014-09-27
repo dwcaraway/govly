@@ -19,6 +19,8 @@ class Config(object):
 
 class ProductionConfig(Config):
     DATABASE_URI = os.getenv('OPENSHIFT_POSTGRESQL_DB_URL', default='mysql://user@localhost/foo')
+    #TODO remove the DEBUG = True statement before customers are on this!
+    DEBUG = True
 
 
 class DevelopmentConfig(Config):
