@@ -50,6 +50,7 @@ class EndpointsTests(ApiTest):
         resp.status_code.should.equal(200)
         doc.links['r:events'].url().should.equal('/api/events')
         doc.links['r:sources'].url().should.equal('/api/sources')
+        doc.links['r:businesses'].url().should.equal('/api/businesses')
 
 
 class EventListTest(ApiTest):
@@ -161,7 +162,8 @@ class SourceTest(ApiTest):
         doc = hal_loads(resp.data)
 
         resp.status_code.should.equal(200)
-        doc.links['self'].url().should.equal('/api/sources')
+        doc.links['self'].url().should.equal('/api/sources?page=1')
+        doc.properties['total'].should.equal(0)
         doc.embedded.keys().should.equal([])
 
 class BusinessesTest(ApiTest):

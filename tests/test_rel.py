@@ -34,7 +34,7 @@ class LinkRelationTest(ApiTest):
         resp.status_code.should.equal(200)
         logger.debug("%s"% resp.data)
         data = json.loads(resp.data)
-        len(data.keys()).should.equal(4)
+        len(data.keys()).should.equal(6)
 
     def test_select_all(self):
         """

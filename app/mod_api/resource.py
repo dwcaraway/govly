@@ -6,7 +6,7 @@ from flask import Blueprint, request
 from dougrain import Builder
 from flask.ext.restful import reqparse, Api, Resource, abort
 
-from app.model import Event, db, Business
+from app.model import Event, db, Business, Source
 
 
 logger = logging.getLogger(__name__)
@@ -82,11 +82,44 @@ class EventsList(Resource):
 class SourcesList(Resource):
     """Sources of events"""
 
+    def __init__(self):
+        self.get_req_parse = reqparse.RequestParser()
+        #TODO test for q parameter and then uncomment below
+        #self.getparser.add_argument('q', type=str, help='Free-text search string', default="")
+        self.get_req_parse.add_argument('page', type=int, help='Page number of results', default=1)
+        self.get_req_parse.add_argument('per_page', type=int, help='Max number of items (up to 200) per page',
+                                        default=20)
+        #TODO test for complete parameter and then uncomment
+        self.get_req_parse.add_argument('order', type=str,
+                                        help='Sort alphabetically by business name, ASC is ascending, DESC is descending',
+                                        default='asc')
+
+        self.post_req_parse = reqparse.RequestParser()
+
+        super(SourcesList, self).__init__()
+
     def get(self):
         """ Returns a collection of sources matching specified criteria """
-        response = Builder('/api/sources').add_curie('r', "/api/rels/{rel}")
-        return response.as_object()
+        args = self.get_req_parse.parse_args()
 
+        pagination = Source.query.paginate(page=args.page, per_page=args.per_page)
+
+        response = Builder("/api/sources?page=%d" % pagination.page).add_curie('r', "/api/rels/{rel}").set_property(
+            'total', pagination.total)
+
+        if pagination.has_prev:
+            response = response.add_link('prev', '/api/sources?page=%d' % pagination.prev_num)
+
+        if pagination.has_next:
+            response = response.add_link('next', '/api/sources?page=%d' % pagination.next_num)
+
+        if pagination.total > 0:
+            response = response.add_link('first', '/api/sources?page=1').add_link('last',
+                                                                                     '/api/events?page=%d' % pagination.pages)
+        for business in pagination.items:
+            response = response.add_link('r:business', '/api/sources/%d' % business)
+
+        return response.as_object()
 
 class BusinessesList(Resource):
     """Businesses in the area"""
