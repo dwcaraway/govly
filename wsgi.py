@@ -1,8 +1,9 @@
 #!/usr/bin/python
 import os
 from app import create_application
+from app.config import ProductionConfig
 
-application = create_application()
+application = create_application(config_object=ProductionConfig)
 
 virtenv = os.environ['OPENSHIFT_PYTHON_DIR'] + '/virtenv/'
 virtualenv = os.path.join(virtenv, 'bin/activate_this.py')
