@@ -1,4 +1,7 @@
 from app.config import DevelopmentConfig
+import logging
+
+logger = logging.getLogger(__name__)
     
 def create_application(config_object=DevelopmentConfig):
     from flask import Flask
@@ -10,6 +13,7 @@ def create_application(config_object=DevelopmentConfig):
     db.init_app(application)
 
     with application.app_context():
+        logger.debug('initializing the database')
         db.create_all()
 
     from app.route import index
@@ -28,10 +32,5 @@ def create_application(config_object=DevelopmentConfig):
     application.register_blueprint(api_module)
     application.register_blueprint(rel_module)
     application.register_blueprint(mod_hal)
-
-    @application.before_first_request
-    def create_db():
-        db.create_all()
-        db.session.commit()
 
     return application
