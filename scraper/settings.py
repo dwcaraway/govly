@@ -11,3 +11,6 @@ ITEM_PIPELINES = {
     'scraper.pipelines.DatabasePipeline': 1000
 }
 
+#LOG_FILE='scrapy.log'
+LOG_LEVEL='WARNING'
+

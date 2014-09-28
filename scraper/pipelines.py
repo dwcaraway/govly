@@ -20,19 +20,19 @@ class DatabasePipeline():
 
     	with self.app.app_context():
 	        b = Business()
-	        b.name=item['name']
-	        b.phone=item['phone']
-	        b.website=item['website']
-	        b.facebook=item['facebook']
-	        b.twitter=item['twitter']
-	        b.logo=item['logo']
-	        b.category=item['category']
-	        b.description=item['description']
-	        b.address1=item['address1']
-	        b.address2=item['address2']
-	        b.city=item['city']
-	        b.state=item['state']
-	        b.zip=item['zip']
+	        b.name=item.get('name')
+	        b.phone=item.get('phone')
+	        b.website=item.get('website')
+	        b.facebook=item.get('facebook')
+	        b.twitter=item.get('twitter')
+	        b.logo=item.get('logo')
+	        b.category=item.get('category')
+	        b.description=item.get('description')
+	        b.address1=item.get('address1')
+	        b.address2=item.get('address2')
+	        b.city=item.get('city')
+	        b.state=item.get('state')
+	        b.zip=item.get('zip')
 
 	        db.session.add(b)
 	        db.session.commit()

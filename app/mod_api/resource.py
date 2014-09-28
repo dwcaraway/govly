@@ -123,8 +123,8 @@ class SourcesList(Resource):
         if pagination.total > 0:
             response = response.add_link('first', '/api/sources?page=1').add_link('last',
                                                                                      '/api/events?page=%d' % pagination.pages)
-        for business in pagination.items:
-            response = response.add_link('r:business', '/api/sources/%d' % business)
+        for source in pagination.items:
+            response = response.add_link('r:source', '/api/sources/%d' % source.id)
 
         return response.as_object()
 
@@ -166,7 +166,7 @@ class BusinessesList(Resource):
             response = response.add_link('first', '/api/businesses?page=1').add_link('last',
                                                                                      '/api/events?page=%d' % pagination.pages)
         for business in pagination.items:
-            response = response.add_link('r:business', '/api/businesses/%d' % business)
+            response = response.add_link('r:business', '/api/businesses/%d' % business.id)
 
         return response.as_object()
 
