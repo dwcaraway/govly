@@ -8,7 +8,6 @@ NEWSPIDER_MODULE = 'scraper.spiders'
 USER_AGENT = 'dayton-healthcheck'
 
 ITEM_PIPELINES = {
-    'scraper.pipelines.DaytonLocalPipeline':300,
-    'scraper.pipelines.DatabaseOutputPipeline': 1000
+    'scraper.pipelines.DatabasePipeline': 1000
 }
 
