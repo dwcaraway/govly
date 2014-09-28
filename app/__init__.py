@@ -29,4 +29,9 @@ def create_application(config_object=DevelopmentConfig):
     application.register_blueprint(rel_module)
     application.register_blueprint(mod_hal)
 
+
+    @application.before_first_request
+    def create_db():
+        db.create_all()
+
     return application

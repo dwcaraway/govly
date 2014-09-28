@@ -27,6 +27,7 @@ class ApiTest(unittest.TestCase):
         #Push a context so that database knows what application to attach to
         self.ctx = self.vitals.test_request_context()
         self.ctx.push()
+        db.create_all()
 
     def tearDown(self):
         """Removes temporary database at end of each test"""

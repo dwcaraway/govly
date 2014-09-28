@@ -19,11 +19,9 @@ class Config(object):
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = "%s/vitals" % os.getenv('OPENSHIFT_POSTGRESQL_DB_URL')
-    #TODO remove the DEBUG = True statement before customers are on this!
-    DEBUG = True
-
 
 class DevelopmentConfig(Config):
+    SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitals'
     DEBUG = True
 
 
