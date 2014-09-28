@@ -12,10 +12,6 @@ def create_application(config_object=DevelopmentConfig):
     from app.model import db
     db.init_app(application)
 
-    with application.app_context():
-        logger.debug('initializing the database')
-        db.create_all()
-
     from app.route import index
     application.add_url_rule('/', 'index', index)
 
