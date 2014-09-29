@@ -5,7 +5,7 @@ import unittest
 import tempfile
 import os
 from app import create_application
-from app.model import db, Business
+from app.model import db, Business, Source
 
 class PipelinesTest(unittest.TestCase):
     def setUp(self):
@@ -88,28 +88,33 @@ class PipelinesTest(unittest.TestCase):
             len(Business.query.all()).should.equal(1)
 
     def test_existing(self):
-        pipe = DatabasePipeline(self.vitals)
+        """An existing business should be updated"""
 
-        b = Business()
-        b.uid
-
-        item = DaytonlocalItem()
-        item['name']='myname'
-        item['phone'] = 'myphone'
-        item['website'] = 'mywebsite'
-        item['facebook'] = 'myfacebook'
-        item['twitter'] = 'mytwitter'
-        item['logo'] = 'mylogo'
-        item['category'] = 'mycategory'
-        item['address1'] = 'myaddress1'
-        item['address2'] = 'myaddress2'
-        item['city'] = 'mycity'
-        item['state'] = 'mystate'
-        item['zip'] = 'myzip'
-
-        ret = pipe.process_item(item, None)
-
-        ret.should.be(item) 
+        biz_uid = None
 
         with self.vitals.app_context():
-            len(Business.query.all()).should.equal(1)
+            b = Business()
+            s = Source()
+            s.name = 'daytonlocal.com'
+            
+            db.session.add(s)
+            db.session.commit()
+
+            b.name = 'oldname'
+            b.source_data_id='123'
+            b.source_id = s.id
+
+            db.session.add(b)
+            db.session.commit()
+
+            biz_uid = b.id
+
+            item = DaytonlocalItem()
+            item['name']='newname'
+            item['data_uid'] = '123'
+
+            pipe = DatabasePipeline(self.vitals)
+            pipe.process_item(item, None)
+
+            b = Business.query.get(biz_uid)
+            b.name.should.equal('newname')

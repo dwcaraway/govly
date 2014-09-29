@@ -1,6 +1,9 @@
 from app.model import db, Business, Source
 from app import create_application
 from app.config import DevelopmentConfig
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Define your item pipelines here
 #
@@ -17,17 +20,29 @@ class DatabasePipeline():
             self.app = app
 
         with app.app_context():
-            s = Source.query.filter_by(name='daytonlocal').first()
+            logger.debug('Source Count: %d', len(Source.query.all()))
+            s = Source.query.filter_by(name='daytonlocal.com').first()
+            if s is None:
+                logger.debug("Source daytonlocal.com not found. Creating it.")
+                s = Source()
+                s.name = 'daytonlocal.com'
+                db.session.add(s)
+                db.session.commit()
+
+            self.sid = s.id
+
 
     def process_item(self, item, spider):
 
         with self.app.app_context():
+            logger.debug('Business Count: %d, item_data_id=%s, sid=%d', len(Business.query.all()), item.get('data_uid', '-1'), self.sid)
 
-            b = Business.query.filter_by(source_data_id=item.get('uid')).first()
+            b = Business.query.filter_by(source_data_id=item.get('data_uid', '-1'), source_id=self.sid).first()
             if b is None:
+                logger.debug('business not found, creating new one')
                 b = Business()
-                b['source_data_id'] = item.get('uid')
-                b['source_data_url'] = item.get('data_source_url')
+                b.source_data_id = item.get('uid')
+                b.source_data_url = item.get('data_source_url')
 
             b.name=item.get('name')
             b.phone=item.get('phone')
