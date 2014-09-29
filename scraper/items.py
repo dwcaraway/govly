@@ -20,6 +20,7 @@ class DaytonlocalItem(Item):
     twitter = Field()
     category = Field()
     data_source_url = Field()
+    data_uid = Field()
     retrieved_on = Field()
 
 class DaytonChamberItem(Item):

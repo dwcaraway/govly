@@ -38,6 +38,7 @@ class Event(db.Model):
 
 class Source(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
     events = db.relationship('Event', backref='source',
                                 lazy='dynamic')
     businesses = db.relationship('Business', backref='source',
@@ -70,6 +71,8 @@ class Business(db.Model):
     created = db.Column(db.DateTime)
     updated = db.Column(db.DateTime)
 
+    source_data_id = db.Column(db.String(15))
+    source_data_url = db.Column(db.String(400))
     source_id = db.Column(db.Integer, db.ForeignKey('source.id'))
 
     def __repr__(self):

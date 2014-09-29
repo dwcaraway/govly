@@ -86,3 +86,30 @@ class PipelinesTest(unittest.TestCase):
 
         with self.vitals.app_context():
             len(Business.query.all()).should.equal(1)
+
+    def test_existing(self):
+        pipe = DatabasePipeline(self.vitals)
+
+        b = Business()
+        b.uid
+
+        item = DaytonlocalItem()
+        item['name']='myname'
+        item['phone'] = 'myphone'
+        item['website'] = 'mywebsite'
+        item['facebook'] = 'myfacebook'
+        item['twitter'] = 'mytwitter'
+        item['logo'] = 'mylogo'
+        item['category'] = 'mycategory'
+        item['address1'] = 'myaddress1'
+        item['address2'] = 'myaddress2'
+        item['city'] = 'mycity'
+        item['state'] = 'mystate'
+        item['zip'] = 'myzip'
+
+        ret = pipe.process_item(item, None)
+
+        ret.should.be(item) 
+
+        with self.vitals.app_context():
+            len(Business.query.all()).should.equal(1)

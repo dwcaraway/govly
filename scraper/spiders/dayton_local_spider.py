@@ -9,9 +9,8 @@ import lxml
 import datetime
 from scraper.items import DaytonlocalItem
 import phonenumbers
+import urllib2
 
-facebook_matcher = re.compile('.*GoHere=(.*facebook.*)')
-twitter_matcher = re.compile('.*GoHere=(.*twitter.*)')
 category_matcher = re.compile('.*[.]com/(.*)[.]asp')
 
 class DaytonLocalSpider(Spider):
@@ -24,6 +23,7 @@ class DaytonLocalSpider(Spider):
     def parse(self, response):
         sel = Selector(response)
         links = sel.css('#MainContentArea div.clearc a').xpath('@href').extract()
+        links = filter(lambda a: a!= u'#top', links)
         return [Request(url=link, callback=self.paginate) for link in links if not link.startswith('#')]
 
     def paginate(self, response):
@@ -53,6 +53,11 @@ class DaytonLocalSpider(Spider):
         for card in sel.xpath('//div[contains(@class, "vcard")]'):
 
             item['data_source_url'] = response.url
+            resp_href = sel.css('div.dright a').xpath('@href').extract()
+            parsed_href = urlparse.urlparse(resp_href[0])
+            uid = urlparse.parse_qs(parsed_href.query)['id'][0]
+            item['data_uid'] = uid
+
             item['retrieved_on'] = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
 
             name = card.xpath('//*[contains(@class, "fn")]//strong/text()').extract()
@@ -89,29 +94,34 @@ class DaytonLocalSpider(Spider):
             if special_divs:
                 phone = special_divs[0].xpath('text()').extract()
                 try:
-                    p = phonenumbers.parse(phone[0], 'US')
+                    p = phonenumbers.parse(phone[1], 'US')
                     p = phonenumbers.normalize_digits_only(p)
                     item['phone'] = p
                 except Exception, e:
                     item['phone'] = None
                     print e
 
-            if len(special_divs) >=3:
-                descr = special_divs[2].xpath('text()').extract()
+            if len(special_divs) >=2:
+                descr = special_divs[1].xpath('text()').extract()
                 item['description'] = descr[0] if descr else None
 
-            item['facebook'] = None
-            item['twitter'] = None
+            try:
+                facebook_href = 'http://www.daytonlocal.com/redirect.asp?id=%s&lnk=fb' % uid
+                item['facebook'] = urllib2.urlopen(facebook_href).geturl()
+            except Exception:
+                pass
+
+            try:
+                twitter_href = 'http://www.daytonlocal.com/redirect.asp?id=%s&lnk=tw' % uid
+                item['twitter'] = urllib2.urlopen(twitter_href).geturl()
+            except Exception:
+                pass
+
             item['category'] = None
 
-            #social media links
-            hrefs = special_divs[1].xpath('a/ @href').extract()
-            for href in hrefs:
-                if 'facebook' in href:
-                    item['facebook'] = facebook_matcher.match(href).group(1)
-                elif 'twitter' in href:
-                    item['twitter'] = twitter_matcher.match(href).group(1)
-                else:
+            if len(special_divs) >=3:
+                hrefs = special_divs[2].xpath('a/ @href').extract()
+                for href in hrefs:
                     match = category_matcher.match(href)
                     if match:
                         item['category'] = match.group(1).split('/')
