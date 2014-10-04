@@ -15,6 +15,6 @@ ITEM_PIPELINES = {
 LOG_LEVEL='WARNING'
 
 #Feed output
-FEED_URI = 'scraped_business.json'
+FEED_URI = './scrapeddata/scraped_business.json'
 FEED_FORMAT = 'json'
 

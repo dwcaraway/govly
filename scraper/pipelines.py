@@ -19,7 +19,7 @@ class DatabasePipeline():
         else:
             self.app = app
 
-        with app.app_context():
+        with self.app.app_context():
             logger.debug('Source Count: %d', len(Source.query.all()))
             s = Source.query.filter_by(name='daytonlocal.com').first()
             if s is None:

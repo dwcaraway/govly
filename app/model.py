@@ -22,8 +22,8 @@ class Event(db.Model):
     longitude =db.Column(db.Float)
     projection = db.Column(db.String(15))
 
-    created = db.Column(db.DateTime)
-    updated = db.Column(db.DateTime)
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
     def __init__(self, url, title, location, start, description=None, end=None):
         self.url = url
@@ -68,12 +68,12 @@ class Business(db.Model):
     longitude =db.Column(db.Float)
     projection = db.Column(db.String(15))
 
-    created = db.Column(db.DateTime)
-    updated = db.Column(db.DateTime)
-
     source_data_id = db.Column(db.String(15))
     source_data_url = db.Column(db.String(400))
     source_id = db.Column(db.Integer, db.ForeignKey('source.id'))
+
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
     def __repr__(self):
         return '<Business %r>' % self.name
@@ -82,6 +82,9 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True)
     email = db.Column(db.String(120), unique=True)
+
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
     def __init__(self, username, email):
         self.username = username
