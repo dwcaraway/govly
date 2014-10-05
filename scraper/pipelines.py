@@ -1,9 +1,8 @@
 from app.model import db, Business, Source
 from app import create_application
 from app.config import DevelopmentConfig
-import logging
+from scrapy import log
 
-logger = logging.getLogger(__name__)
 
 # Define your item pipelines here
 #
@@ -20,10 +19,10 @@ class DatabasePipeline():
             self.app = app
 
         with self.app.app_context():
-            logger.debug('Source Count: %d', len(Source.query.all()))
+            log.msg('Source Count: %d' % len(Source.query.all()), level=log.DEBUG)
             s = Source.query.filter_by(name='daytonlocal.com').first()
             if s is None:
-                logger.debug("Source daytonlocal.com not found. Creating it.")
+                log.msg("Source daytonlocal.com not found. Creating it.", level=log.DEBUG)
                 s = Source()
                 s.name = 'daytonlocal.com'
                 db.session.add(s)
@@ -35,14 +34,15 @@ class DatabasePipeline():
     def process_item(self, item, spider):
 
         with self.app.app_context():
-            logger.debug('Business Count: %d, item_data_id=%s, sid=%d', len(Business.query.all()), item.get('data_uid', '-1'), self.sid)
+            log.msg('Business Count: %d, item_data_id=%s, sid=%d' % (len(Business.query.all()), item.get('data_uid', '-1'), self.sid), level=log.DEBUG)
 
             b = Business.query.filter_by(source_data_id=item.get('data_uid', '-1'), source_id=self.sid).first()
             if b is None:
-                logger.debug('business not found, creating new one')
+                log.msg('business not found, creating new one', level=log.DEBUG)
                 b = Business()
-                b.source_data_id = item.get('uid')
-                b.source_data_url = item.get('data_source_url')
+                b.source_data_id = item.get('data_uid')
+            
+            b.source_data_url = item.get('data_source_url')
 
             b.name=item.get('name')
             b.phone=item.get('phone')
@@ -57,6 +57,7 @@ class DatabasePipeline():
             b.city=item.get('city')
             b.state=item.get('state')
             b.zip=item.get('zip')
+            b.source_id = self.sid
 
             db.session.add(b)
             db.session.commit()

@@ -18,3 +18,4 @@ LOG_LEVEL='WARNING'
 FEED_URI = './scrapeddata/scraped_business.json'
 FEED_FORMAT = 'json'
 
+STATS_ENABLED = True
