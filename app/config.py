@@ -18,7 +18,8 @@ class Config(object):
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = "%s/vitals" % os.getenv('OPENSHIFT_POSTGRESQL_DB_URL')
+    # SQLALCHEMY_DATABASE_URI = "%s/vitals" % os.getenv('OPENSHIFT_POSTGRESQL_DB_URL')
+    SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitals'
 
 class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitals'
