@@ -50,7 +50,7 @@ class DatabasePipeline():
             b.facebook=item.get('facebook')
             b.twitter=item.get('twitter')
             b.logo=item.get('logo')
-            b.category= ', '.join(item.get('category', [])) #make comma-separated string
+            b.category= item.get('category')
             b.description=item.get('description')
             b.address1=item.get('address1')
             b.address2=item.get('address2')
