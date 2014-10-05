@@ -1,1 +1,3 @@
+echo 'Installing the yum package dependencies...'
 yum install libxslt-devel libxml2-devel python-devel
+echo 'Package dependencies installed'

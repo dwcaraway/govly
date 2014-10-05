@@ -11,9 +11,10 @@ psycopg2
 
 #Scraper libraries
 scrapy
+zope.interface
+cryptography
 requests
 cssselect
 phonenumbers
-#service-identity
-#sqlalchemy
-#lxml
+service-identity
+lxml

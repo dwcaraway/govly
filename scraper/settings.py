@@ -18,3 +18,6 @@ LOG_LEVEL='WARNING'
 FEED_URI = './scrapeddata/scraped_business.json'
 FEED_FORMAT = 'json'
 
+LOG_ENABLED=True
+LOG_LEVEL='WARNING'
+LOG_FILE='./scrapeddata/scrapy.log'
