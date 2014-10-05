@@ -125,19 +125,19 @@ class DaytonLocalSpider(Spider):
 
             try:
                 fb_href = response.xpath("//a/@href[contains(., 'lnk=fb')]").extract()
-                if fb_href:
-                    item['facebook'] = urllib2.urlopen(facebook_href).geturl()
+                if len(fb_href) > 0:
+                    item['facebook'] = urllib2.urlopen(fb_href[0]).geturl()
                     if item['data_uid'] is None:
-                        item['data_uid'] = get_uid_from_href(fb_href)
+                        item['data_uid'] = get_uid_from_href(fb_href[0])
             except:
                 log.msg('no twitter for %s' % response.url, level=log.DEBUG)
             
             try:
                 twitter_href = response.xpath("//a/@href[contains(., 'lnk=tw')]").extract()
-                if twitter_href:
-                    item['twitter'] = urllib2.urlopen(twitter_href).geturl()
+                if len(twitter_href) > 0:
+                    item['twitter'] = urllib2.urlopen(twitter_href[0]).geturl()
                     if item['data_uid'] is None:
-                        item['data_uid'] = get_uid_from_href(twitter_href)
+                        item['data_uid'] = get_uid_from_href(twitter_href[0])
             except Exception:
                 log.msg('no twitter for %s' % response.url, level=log.DEBUG)
 
@@ -163,7 +163,11 @@ class DaytonLocalSpider(Spider):
 if __name__ == '__main__':
     #Run data extraction test on individual page
     urls = ['http://www.daytonlocal.com/listings/gounaris-denslow-abboud.asp',
-            'http://www.daytonlocal.com/listings/indian-ripple-dental.asp']
+            'http://www.daytonlocal.com/listings/indian-ripple-dental.asp',
+            'http://www.daytonlocal.com/listings/dayton-gastroenterology.asp'
+            'http://www.daytonlocal.com/listings/dayton-parent-magazine.asp',
+            'http://www.daytonlocal.com/listings/decoy-art-studio.asp'
+            ]
     import requests
     from scrapy.http import Request, HtmlResponse
 
