@@ -108,7 +108,7 @@ class EventListTest(ApiTest):
 
         doc.links['next'].url().should.equal('/api/events?page=2')
         doc.links['last'].url().should.equal('/api/events?page=5')
-        doc.links['first'].url().should.equal('/api/events?page=1')
+        doc.links.keys().shouldnot.contain('first')
         doc.links['self'].url().should.equal('/api/events?page=1')
         len(doc.links['r:event']).should.equal(20)
         doc.properties['total'].should.equal(100)
@@ -209,8 +209,9 @@ class BusinessesTest(ApiTest):
 
         doc = hal_loads(resp.data)
 
-        doc.links['first'].url().should.equal('/api/businesses?page=1')
-        doc.links['last'].url().should.equal('/api/businesses?page=1')
+        #Should not have 'first' and 'last' links
+        doc.links.keys().shouldnot.contain('first')
+        doc.links.keys().shouldnot.contain('last')
         doc.embedded.keys().should.equal([])
 
     def test_large_business_collection(self):
@@ -224,7 +225,7 @@ class BusinessesTest(ApiTest):
         resp = self.test_client.get('/api/businesses')
         doc = hal_loads(resp.data)
 
-        doc.links['first'].url().should.equal('/api/businesses?page=1')
+        doc.links.keys().shouldnot.contain('first')
         doc.links['last'].url().should.equal('/api/businesses?page=5')
 
 class BusinessTest(ApiTest):

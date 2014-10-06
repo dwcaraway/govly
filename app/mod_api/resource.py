@@ -69,9 +69,10 @@ class EventsList(Resource):
         if pagination.has_next:
             response = response.add_link('next', '/api/events?page=%d' % pagination.next_num)
 
-        if pagination.total > 0:
-            response = response.add_link('first', '/api/events?page=1')\
-                .add_link('last','/api/events?page=%d' % pagination.pages)
+        if pagination.total > 1 and pagination.has_prev:
+            response = response.add_link('first', '/api/events?page=1')
+        if pagination.total > 1 and pagination.has_next:
+            response = response.add_link('last','/api/events?page=%d' % pagination.pages)
         for event in pagination.items:
             response = response.add_link('r:event', '/api/events/%d' % event.id)
 
@@ -120,9 +121,11 @@ class SourcesList(Resource):
         if pagination.has_next:
             response = response.add_link('next', '/api/sources?page=%d' % pagination.next_num)
 
-        if pagination.total > 0:
-            response = response.add_link('first', '/api/sources?page=1').add_link('last',
-                                                                                     '/api/events?page=%d' % pagination.pages)
+        if pagination.total > 1 and pagination.has_prev:
+            response = response.add_link('first', '/api/sources?page=1')
+
+        if pagination.total > 1 and pagination.has_next:
+            response = response.add_link('last','/api/sources?page=%d' % pagination.pages)
         for source in pagination.items:
             response = response.add_link('r:source', '/api/sources/%d' % source.id)
 
@@ -162,9 +165,11 @@ class BusinessesList(Resource):
         if pagination.has_next:
             response = response.add_link('next', '/api/businesses?page=%d' % pagination.next_num)
 
-        if pagination.total > 0:
-            response = response.add_link('first', '/api/businesses?page=1').add_link('last',
-                                                                                     '/api/businesses?page=%d' % pagination.pages)
+        if pagination.total > 1 and pagination.has_prev:
+            response = response.add_link('first', '/api/businesses?page=1')
+        if pagination.total > 1 and pagination.has_next:
+            response = response.add_link('last', '/api/businesses?page=%d' % pagination.pages)
+
         for business in pagination.items:
             response = response.add_link('r:business', '/api/businesses/%d' % business.id)
 
