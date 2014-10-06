@@ -4,7 +4,7 @@ import tempfile
 import os
 from datetime import datetime
 
-from app.model import db, Event, Business
+from app.model import db, Event, Business, Source
 from tests import hal_loads
 from app import create_application
 
@@ -142,8 +142,8 @@ class EventListTest(ApiTest):
 
         doc.properties['id'].should.equal(Event.query.first().id)
 
-class SourceTest(ApiTest):
-    """Test of API 'Source' resource"""
+class SourcesTest(ApiTest):
+    """Test of API 'Sources' resource"""
 
     def test_link_relation_curie(self):
         """Verify that resource has a link relation curie in HAL response"""
@@ -166,6 +166,23 @@ class SourceTest(ApiTest):
         doc.links['self'].url().should.equal('/api/sources?page=1')
         doc.properties['total'].should.equal(0)
         doc.embedded.keys().should.equal([])
+
+class SourceTest(ApiTest):
+    def test_get(self):
+        """
+        Get single source
+        """
+        src = Source()
+
+        db.session.add(src)
+        db.session.commit()
+
+        resp = self.test_client.get('/api/sources/%d'%src.id)
+        resp.status_code.should.equal(200)
+
+        doc = hal_loads(resp.data)
+        doc.links['r:sources'].url().should.equal('/api/sources')
+        doc.properties.should.equal({'id':src.id, 'created_on':src.created_on.isoformat(), 'updated_on': src.updated_on.isoformat()})
 
 class BusinessesTest(ApiTest):
     """Test of API 'Businesses' resource"""

@@ -131,6 +131,31 @@ class SourcesList(Resource):
 
         return response.as_object()
 
+class Sources(Resource):
+
+    def __init__(self):
+        self.get_req_parse = reqparse.RequestParser()
+        self.get_req_parse.add_argument('id', type=int, help='unique id of the Source')
+
+    def get(self, id):
+        """Get sources by id"""
+        src = Source.query.get(id)
+
+        if src is None:
+            abort(404, message="Source %d doesn't exist" % id)
+        else:
+            b = Builder(request.path).add_curie('r', '/rels/{rel}')\
+            .add_link('r:sources', '/api/sources')
+
+            for key, value in src.__dict__.iteritems():
+
+                if isinstance(value, date):   
+                    b = b.set_property(key, value.isoformat())
+                elif value and key != '_sa_instance_state':
+                    b = b.set_property(key, value)
+
+            return b.as_object() 
+
 class BusinessesList(Resource):
     """Businesses in the area"""
 
@@ -180,11 +205,10 @@ class Businesses(Resource):
 
     def __init__(self):
         self.get_req_parse = reqparse.RequestParser()
-        self.get_req_parse.add_argument('id', type=int, help='unique id of the business')
+        self.get_req_parse.add_argument('id', type=int, help='unique id of the business', required=True)
 
     def get(self, id):
         """Get business by id"""
-        args = self.get_req_parse.parse_args()
 
         biz = Business.query.get(id)
 
@@ -194,10 +218,6 @@ class Businesses(Resource):
             b = Builder(request.path).add_curie('r', '/rels/{rel}')\
             .add_link('r:businesses', '/api/businesses?page=1')
 
-            obj = b.as_object()
-
-            logger.debug('biz.id: %s', biz.id)
-
             for key, value in biz.__dict__.iteritems():
 
                 if isinstance(value, date):   
@@ -205,10 +225,11 @@ class Businesses(Resource):
                 elif value and key != '_sa_instance_state':
                     b = b.set_property(key, value)
 
-            return obj
+            return b.as_object()
 
 api.add_resource(EventsList, '/events', endpoint='events')
 api.add_resource(SourcesList, '/sources', endpoint='sources')
+api.add_resource(Sources, '/sources/<int:id>', endpoint='source')
 api.add_resource(BusinessesList, '/businesses', endpoint='businesses')
 api.add_resource(Businesses, '/businesses/<int:id>', endpoint='business')
 api.add_resource(Endpoints, '/', endpoint="endpoints")

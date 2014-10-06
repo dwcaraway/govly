@@ -44,6 +44,9 @@ class Source(db.Model):
     businesses = db.relationship('Business', backref='source',
                                 lazy='dynamic')
 
+    created_on = db.Column(db.DateTime, default=db.func.now())
+    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+
     def __repr__(self):
         return '<Source %r>' % self.id
 
