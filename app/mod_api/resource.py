@@ -1,13 +1,13 @@
 # Import flask dependencies
 from datetime import datetime
+from datetime import date
 import logging
 
-from flask import Blueprint, request
+from flask import Blueprint, request 
 from dougrain import Builder
 from flask.ext.restful import reqparse, Api, Resource, abort
 
 from app.model import Event, db, Business, Source
-
 
 logger = logging.getLogger(__name__)
 
@@ -87,7 +87,7 @@ class EventsList(Resource):
 
 
 class SourcesList(Resource):
-    """Sources of events"""
+    """Sources of data"""
 
     def __init__(self):
         self.get_req_parse = reqparse.RequestParser()
@@ -164,7 +164,7 @@ class BusinessesList(Resource):
 
         if pagination.total > 0:
             response = response.add_link('first', '/api/businesses?page=1').add_link('last',
-                                                                                     '/api/events?page=%d' % pagination.pages)
+                                                                                     '/api/businesses?page=%d' % pagination.pages)
         for business in pagination.items:
             response = response.add_link('r:business', '/api/businesses/%d' % business.id)
 
@@ -187,11 +187,20 @@ class Businesses(Resource):
             abort(404, message="Business %d doesn't exist" % id)
         else:
             b = Builder(request.path).add_curie('r', '/rels/{rel}')\
-            .add_link('r:events', '/api/businesses?page=1').set_property('id', biz.id)
+            .add_link('r:businesses', '/api/businesses?page=1')
 
-            return b.as_object()
+            obj = b.as_object()
 
+            logger.debug('biz.id: %s', biz.id)
 
+            for key, value in biz.__dict__.iteritems():
+
+                if isinstance(value, date):   
+                    b = b.set_property(key, value.isoformat())
+                elif value and key != '_sa_instance_state':
+                    b = b.set_property(key, value)
+
+            return obj
 
 api.add_resource(EventsList, '/events', endpoint='events')
 api.add_resource(SourcesList, '/sources', endpoint='sources')

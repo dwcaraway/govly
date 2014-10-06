@@ -204,14 +204,35 @@ class BusinessesTest(ApiTest):
         resp = self.test_client.get('/api/businesses')
         doc = hal_loads(resp.data)
 
+        #There should only be links
+        doc.links['r:business'].url().should.equal('/api/businesses/%d' % biz.id)
+
+        doc = hal_loads(resp.data)
+
+        doc.links['first'].url().should.equal('/api/businesses?page=1')
+        doc.links['last'].url().should.equal('/api/businesses?page=1')
         doc.embedded.keys().should.equal([])
+
+    def test_large_business_collection(self):
+        """
+        Create a bunch of businesses and verify the links are correct
+        """
+        for i in range(100):
+            db.session.add(Business())
+        db.session.commit()
+
+        resp = self.test_client.get('/api/businesses')
+        doc = hal_loads(resp.data)
+
+        doc.links['first'].url().should.equal('/api/businesses?page=1')
+        doc.links['last'].url().should.equal('/api/businesses?page=5')
 
 class BusinessTest(ApiTest):
     def test_get(self):
         """
         Get single business
         """
-        biz = Business(name='bar')
+        biz = Business()
 
         db.session.add(biz)
         db.session.commit()
@@ -220,5 +241,6 @@ class BusinessTest(ApiTest):
         resp.status_code.should.equal(200)
 
         doc = hal_loads(resp.data)
-        doc.links['r:events'].url().should.equal('/api/businesses?page=1')
-        doc.properties.should.equal({'id':biz.id})
+        doc.links['r:businesses'].url().should.equal('/api/businesses?page=1')
+        doc.properties.should.equal({'id':biz.id, 'created_on':biz.created_on.isoformat(), 'updated_on': biz.updated_on.isoformat()})
+
