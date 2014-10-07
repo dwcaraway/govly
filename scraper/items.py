@@ -5,10 +5,11 @@
 
 from scrapy.item import Item, Field
 
-class DaytonlocalItem(Item):
+class BusinessItem(Item):
     name = Field()
     website = Field()
     logo = Field()
+    address_single_entry = Field() #An address in a single text field instead of parsed out
     address1 = Field()
     address2 = Field()
     city = Field()
@@ -21,15 +22,3 @@ class DaytonlocalItem(Item):
     category = Field()
     data_source_url = Field()
     data_uid = Field()
-    retrieved_on = Field()
-
-class DaytonChamberItem(Item):
-    name = Field()
-    website = Field()
-    address = Field()
-    phone = Field()
-    category = Field()
-    data_source_url = Field()
-    retrieved_on = Field()
-    contact_name = Field()
-    contact_title = Field()

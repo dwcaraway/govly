@@ -1,12 +1,8 @@
 __author__ = 'dwcaraway'
 
 from scrapy.spider import Spider
-from scrapy.selector import Selector
 from scrapy.http import FormRequest
-import datetime
-from scraper.items import DaytonChamberItem
-import phonenumbers
-
+from scraper.items import BusinessItem
 
 class DaytonChamberSpider(Spider):
     name = "dayton_chamber"
@@ -25,19 +21,15 @@ class DaytonChamberSpider(Spider):
         """
         Takes the data out of the members entries
         """
-
-        sel = Selector(response)
-
         items = []
 
-        containers = sel.xpath('//div[@id="membersearchresults"]//div[@id="container"]')
+        containers = response.xpath('//div[@id="membersearchresults"]//div[@id="container"]')
 
         for container in containers:
 
-            item = DaytonChamberItem()
+            item = BusinessItem()
 
             item['data_source_url'] = response.url
-            item['retrieved_on'] = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
 
             rows = container.css('div.row')
 
@@ -46,12 +38,7 @@ class DaytonChamberSpider(Spider):
             for row in rows:
                 key = row.css('div.leftcol').xpath('./text()').extract()
 
-                #TODO remove
-                print "key = %s"% key
-
                 if len(key) == 0:
-                    #TODO remove
-                    print "no key found"
                     # No key, so don't bother looking for a value
                     continue
 
@@ -65,9 +52,6 @@ class DaytonChamberSpider(Spider):
                     value = row.css('div.rightcol').xpath('./text()').extract()
 
                 if len(value) == 0:
-                    #TODO remove
-                    print "no value found"
-
                     #No value, so don't bother storing
                     continue
 
@@ -83,26 +67,9 @@ class DaytonChamberSpider(Spider):
             item['contact_title'] = row_dict.get('Contact Title:', None)
             item['address']= row_dict.get('Address:', None)
             item['website'] = row_dict.get('Website:', None)
-
-            #Normalize phone numbers
-            try:
-                p_original = row_dict.get('Phone Number:', None)
-                p = phonenumbers.parse(p_original, 'US')
-                p = phonenumbers.normalize_digits_only(p)
-                item['phone'] = p
-            except Exception:
-                #Non-standard phone, so just going to store the original
-                item['phone'] = p_original
-
-            #TODO remove
-            # from scrapy.shell import inspect_response
-            # inspect_response(response)
+            item['phone'] = row_dict.get('Phone Number:', None)
 
             items.append(item)
-
-            #TODO remove
-            print row_dict
-            break
 
         return items
 

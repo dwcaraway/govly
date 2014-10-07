@@ -2,6 +2,8 @@ from app.model import db, Business, Source
 from app import create_application
 from app.config import DevelopmentConfig
 from scrapy import log
+import phonenumbers
+from address import AddressParser, Address
 
 
 # Define your item pipelines here
@@ -9,7 +11,46 @@ from scrapy import log
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-class DatabasePipeline():
+class PhoneNormalizationPipeline:
+    """Normalizes a phone"""
+
+    def process_item(self, item, spider):
+        p_original = item.get('phone')
+
+        #Normalize phone numbers
+        try:
+            p = phonenumbers.parse(p_original, 'US')
+            p = phonenumbers.normalize_digits_only(p)
+            item['phone'] = p
+        except Exception:
+            #Non-standard phone, so set to none.
+            item['phone'] = None
+
+        return item
+
+class AddressNormalizationPipeline:
+    """Parses a single line address into address 1 / 2, city, state, zip"""
+
+    def __init__(self):
+        self.ap = AddressParser()
+
+    def process_item(self, item, spider):
+        if not item['address_single_entry']:
+            #no need to extract address
+            return item
+
+        try:
+            address = self.ap.parse_address(item['address_single_entry'])
+            item['address1']= '%s %s %s %s' % (address.house_number, address.street_prefix, address.street, address.street_suffix)
+            item['city'] = address.city
+            item['state'] = address.state
+            item['zip'] = address.zip
+        except Exception:
+            return item
+
+        return item
+
+class DatabasePipeline:
     """Sends processed items to storage"""
 
     def __init__(self, app=None):
@@ -19,7 +60,6 @@ class DatabasePipeline():
             self.app = app
 
         with self.app.app_context():
-            log.msg('Source Count: %d' % len(Source.query.all()), level=log.DEBUG)
             s = Source.query.filter_by(name='daytonlocal.com').first()
             if s is None:
                 log.msg("Source daytonlocal.com not found. Creating it.", level=log.DEBUG)
@@ -34,9 +74,12 @@ class DatabasePipeline():
     def process_item(self, item, spider):
 
         with self.app.app_context():
-            log.msg('Business Count: %d, item_data_id=%s, sid=%d' % (len(Business.query.all()), item.get('data_uid', '-1'), self.sid), level=log.DEBUG)
-
             b = Business.query.filter_by(source_data_id=item.get('data_uid', '-1'), source_id=self.sid).first()
+
+            if b is None:
+                #Try to get by phone
+                b = Business.query.filter_by(phone=item.get('phone', '-1'), source_id=self.sid).first()
+
             if b is None:
                 log.msg('business not found, creating new one', level=log.DEBUG)
                 b = Business()

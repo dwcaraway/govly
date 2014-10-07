@@ -7,7 +7,7 @@ import urlparse
 import re
 import lxml
 import datetime
-from scraper.items import DaytonlocalItem
+from scraper.items import BusinessItem
 import phonenumbers
 import urllib2
 from scrapy import log
@@ -55,7 +55,7 @@ class DaytonLocalSpider(Spider):
         sel = Selector(response)
         logo = sel.xpath('//*[@id="MainContentArea"]//div[contains(@class, "dright")]/a/img/ @src').extract()
 
-        item = DaytonlocalItem()
+        item = BusinessItem()
 
         items = []
 

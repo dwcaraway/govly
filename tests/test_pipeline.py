@@ -1,6 +1,6 @@
 __author__ = 'DavidWCaraway'
 from scraper.pipelines import DatabasePipeline
-from scraper.items import DaytonlocalItem
+from scraper.items import BusinessItem
 import unittest
 import tempfile
 import os
@@ -38,7 +38,7 @@ class PipelinesTest(unittest.TestCase):
         with self.vitals.app_context(): 
             len(Business.query.all()).should.equal(0)
 
-        item = DaytonlocalItem()
+        item = BusinessItem()
         item['name']='myname'
         item['phone'] = 'myphone'
         item['website'] = 'mywebsite'
@@ -66,7 +66,7 @@ class PipelinesTest(unittest.TestCase):
         with self.vitals.app_context(): 
             len(Business.query.all()).should.equal(0)
 
-        item = DaytonlocalItem()
+        item = BusinessItem()
         item['name']='myname'
         item['phone'] = 'myphone'
         item['website'] = 'mywebsite'
@@ -109,7 +109,7 @@ class PipelinesTest(unittest.TestCase):
 
             biz_uid = b.id
 
-            item = DaytonlocalItem()
+            item = BusinessItem()
             item['name']='newname'
             item['data_uid'] = '123'
 
@@ -118,3 +118,38 @@ class PipelinesTest(unittest.TestCase):
 
             b = Business.query.get(biz_uid)
             b.name.should.equal('newname')
+
+    def test_existing_by_phone(self):
+            """If a business doesn't have a data_uid
+            then check to see if phone exists. if so,
+            treat business as existing
+            """
+            
+            biz_uid = None
+
+            with self.vitals.app_context():
+                b = Business()
+                s = Source()
+                s.name = 'daytonchamber.org'
+                
+                db.session.add(s)
+                db.session.commit()
+
+                b.name = 'oldname'
+                b.source_data_id='123'
+                b.source_id = s.id
+
+                db.session.add(b)
+                db.session.commit()
+
+                biz_uid = b.id
+
+                item = BusinessItem()
+                item['name']='newname'
+                item['data_uid'] = '123'
+
+                pipe = DatabasePipeline(self.vitals)
+                pipe.process_item(item, None)
+
+                b = Business.query.get(biz_uid)
+                b.name.should.equal('newname')
