@@ -17,10 +17,7 @@ import sqlalchemy as sa
 def upgrade():
     op.add_column('source', sa.Column('created_on', sa.DateTime))
     op.add_column('source', sa.Column('updated_on', sa.DateTime))
-    pass
-
 
 def downgrade():
     op.drop_column('source', 'created_on')
     op.drop_column('source', 'updated_on')
-    pass

@@ -1,5 +1,5 @@
 __author__ = 'DavidWCaraway'
-from scraper.pipelines import DatabasePipeline
+from scraper.pipelines import DatabasePipeline, AddressNormalizationPipeline
 from scraper.items import BusinessItem
 from scrapy.spider import Spider
 import unittest
@@ -8,7 +8,24 @@ import os
 from app import create_application
 from app.model import db, Business, Source
 
-class PipelinesTest(unittest.TestCase):
+# class AddressNormalizationPipelineTest(unittest.TestCase):
+#     """Test conversion of single line address into multi-line"""
+
+#     def testBasicParsing(self):
+#          s       b = BusinessItem()
+#         p = AddressNormalizationPipeline()
+
+#         b['address_single_entry'] = "123 cupcake Lane, Dayton, Ohio 45440"
+#         i = p.process_item(b, None)
+
+#         i['raw_address'].should.equal(b['address_single_entry'])
+#         i['address2'].should.equal('')
+#         i['city'].should.equal('dayton')
+#         i['state'].should.equal('ohio')
+#         i['zip'].should.equal('45440')
+
+
+class DatabasePipelineTest(unittest.TestCase):
     def setUp(self):
         """Construct temporary database and test client for testing routing and responses"""
         self.db_fd, self.db_path = tempfile.mkstemp()

@@ -34,21 +34,27 @@ class AddressNormalizationPipeline:
 
     def __init__(self):
         self.ap = AddressParser()
+        #lambda expression to convert None to empty string
+        self.xstr = lambda x: x if x else ''
 
     def process_item(self, item, spider):
-        if not item['address_single_entry']:
-            #no need to extract address
-            return item
+        # if not item['address_single_entry']:
+        #     #no need to extract address
+        #     return item
 
-        try:
-            address = self.ap.parse_address(item['address_single_entry'])
-            item['address1']= '%s %s %s %s' % (address.house_number, address.street_prefix, address.street, address.street_suffix)
-            item['address2']= '%s %s' % (address.appartment, address.building)
-            item['city'] = address.city
-            item['state'] = address.state
-            item['zip'] = address.zip
-        except Exception:
-            return item
+        # try:
+        #     address = self.ap.parse_address(item['address_single_entry'])
+
+        #     for property in 
+        #     address1 = 
+
+        #     item['address1']= '{0} {1} {2} {3}'.format(address.house_number, address.street_prefix, address.street, address.street_suffix)
+        #     item['address2']= '{0} {1}'.format(address.appartment, address.building)
+        #     item['city'] = self.xstr(address.city)
+        #     item['state'] = self.xstr(address.state)
+        #     item['zip'] = self.xstr(address.zip)
+        # except Exception:
+        #     return item
 
         return item
 
@@ -93,6 +99,7 @@ class DatabasePipeline:
             b.logo=item.get('logo')
             b.category= item.get('category')
             b.description=item.get('description')
+            b.raw_address = item.get('address_single_entry')
             b.address1=item.get('address1')
             b.address2=item.get('address2')
             b.city=item.get('city')

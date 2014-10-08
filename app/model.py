@@ -65,6 +65,7 @@ class Business(db.Model):
     category = db.Column(db.String(200))
     description = db.Column(db.String(1200))
 
+    raw_address = db.Column(db.String(300))
     address1 = db.Column(db.String(300))
     address2 = db.Column(db.String(300))
     city = db.Column(db.String(100))
@@ -72,7 +73,6 @@ class Business(db.Model):
     zip = db.Column(db.String(15))
     latitude = db.Column(db.Float)
     longitude =db.Column(db.Float)
-    projection = db.Column(db.String(15))
 
     source_data_id = db.Column(db.String(15))
     source_data_url = db.Column(db.String(400))

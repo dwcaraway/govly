@@ -35,6 +35,9 @@ class DaytonChamberSpider(Spider):
 
             row_dict = {}
 
+            # from scrapy.shell import inspect_response
+            # inspect_response(response, self)
+
             for row in rows:
                 key = row.css('div.leftcol').xpath('./text()').extract()
 
@@ -47,7 +50,7 @@ class DaytonChamberSpider(Spider):
                 if key == 'Business Name:':
                     value = row.css('div.rightcol').xpath('./strong/text()').extract()
                 elif key == 'Website:':
-                    value = row.xpath('./a/ @href').extract()
+                    value = row.css('div.rightcol').xpath('./a/ @href').extract()
                 else:
                     value = row.css('div.rightcol').xpath('./text()').extract()
 
@@ -63,9 +66,7 @@ class DaytonChamberSpider(Spider):
 
             item['name'] = row_dict.get('Business Name:', None)
             item['category'] = row_dict.get('Business Category:', None)
-            item['contact_name'] = row_dict.get('Contact Name:', None)
-            item['contact_title'] = row_dict.get('Contact Title:', None)
-            item['address']= row_dict.get('Address:', None)
+            item['address_single_entry']= row_dict.get('Address:', None)
             item['website'] = row_dict.get('Website:', None)
             item['phone'] = row_dict.get('Phone Number:', None)
 
@@ -78,7 +79,7 @@ if __name__ == '__main__':
     from scrapy.http.response.xml import XmlResponse
 
 
-    with open('./text.html', 'r') as f:
+    with open('./chamber_example.html', 'r') as f:
         request = Request(url='http://localhost')
         response = XmlResponse(url='http://localhost', request=request, body=f.read(), encoding='utf-8')
 
