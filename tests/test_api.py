@@ -172,7 +172,7 @@ class SourceTest(ApiTest):
         """
         Get single source
         """
-        src = Source()
+        src = Source(name='foo')
 
         db.session.add(src)
         db.session.commit()
@@ -182,7 +182,7 @@ class SourceTest(ApiTest):
 
         doc = hal_loads(resp.data)
         doc.links['r:sources'].url().should.equal('/api/sources')
-        doc.properties.should.equal({'id':src.id, 'created_on':src.created_on.isoformat(), 'updated_on': src.updated_on.isoformat()})
+        doc.properties.should.equal({'name': 'foo', 'id':src.id, 'created_on':src.created_on.isoformat(), 'updated_on': src.updated_on.isoformat()})
 
 class BusinessesTest(ApiTest):
     """Test of API 'Businesses' resource"""

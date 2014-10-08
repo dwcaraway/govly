@@ -108,16 +108,7 @@ class DaytonLocalSpider(Spider):
             special_divs = card.xpath('div[contains(@class, "clearl")]')
 
             if special_divs:
-                phone = special_divs[0].xpath('text()').extract()
-                try:
-                    p = phonenumbers.parse(phone[1], 'US')
-                    p = phonenumbers.normalize_digits_only(p)
-                    item['phone'] = p
-                except IndexError:
-                    item['phone'] = None
-                    log.msg("phone number not found at url: %s" % response.url, level=log.DEBUG)
-                except Exception:
-                    log.msg("Unable to parse phone: %s" % phone, level=log.DEBUG)
+                item['phone'] = special_divs[0].xpath('text()').extract()[1]
 
             if len(special_divs) >=2:
                 descr = special_divs[1].xpath('text()').extract()

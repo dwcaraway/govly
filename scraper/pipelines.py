@@ -3,8 +3,7 @@ from app import create_application
 from app.config import DevelopmentConfig
 from scrapy import log
 import phonenumbers
-from address import AddressParser, Address
-
+from address import AddressParser
 
 # Define your item pipelines here
 #
@@ -22,10 +21,12 @@ class PhoneNormalizationPipeline:
             p = phonenumbers.parse(p_original, 'US')
             p = phonenumbers.normalize_digits_only(p)
             item['phone'] = p
-        except Exception:
-            #Non-standard phone, so set to none.
+        except IndexError:
             item['phone'] = None
-
+            log.msg("phone number not found at url: %s" % item['data_source_url'], level=log.DEBUG)
+        except Exception:
+            item['phone'] = None
+            log.msg("Unable to parse phone: %s" % p_original, level=log.DEBUG)
         return item
 
 class AddressNormalizationPipeline:
@@ -42,6 +43,7 @@ class AddressNormalizationPipeline:
         try:
             address = self.ap.parse_address(item['address_single_entry'])
             item['address1']= '%s %s %s %s' % (address.house_number, address.street_prefix, address.street, address.street_suffix)
+            item['address2']= '%s %s' % (address.appartment, address.building)
             item['city'] = address.city
             item['state'] = address.state
             item['zip'] = address.zip
@@ -59,21 +61,17 @@ class DatabasePipeline:
         else:
             self.app = app
 
+    def process_item(self, item, spider):
         with self.app.app_context():
-            s = Source.query.filter_by(name='daytonlocal.com').first()
+            s = Source.query.filter_by(name=spider.name).first()
             if s is None:
-                log.msg("Source daytonlocal.com not found. Creating it.", level=log.DEBUG)
-                s = Source()
-                s.name = 'daytonlocal.com'
+                log.msg("Source %s not found. Creating it." % spider.name, level=log.DEBUG)
+                s = Source(name = spider.name)
                 db.session.add(s)
                 db.session.commit()
 
             self.sid = s.id
 
-
-    def process_item(self, item, spider):
-
-        with self.app.app_context():
             b = Business.query.filter_by(source_data_id=item.get('data_uid', '-1'), source_id=self.sid).first()
 
             if b is None:

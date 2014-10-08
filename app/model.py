@@ -25,7 +25,7 @@ class Event(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-    def __init__(self, url, title, location, start, description=None, end=None):
+    def __init__(self, url=None, title=None, location=None, start=None, description=None, end=None):
         self.url = url
         self.title = title
         self.description = description
@@ -46,6 +46,9 @@ class Source(db.Model):
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+
+    def __init__(self, name):
+        self.name = name
 
     def __repr__(self):
         return '<Source %r>' % self.id
@@ -77,6 +80,10 @@ class Business(db.Model):
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+
+    def __init__(self, name=None, phone=None):
+        self.name = name
+        self.phone = phone
 
     def __repr__(self):
         return '<Business %r>' % self.name
