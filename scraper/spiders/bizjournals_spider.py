@@ -6,6 +6,7 @@ from scrapy.contrib.loader import ItemLoader
 from urlparse import urljoin
 from scraper.items import BusinessItem
 from scrapy.contrib.loader.processor import MapCompose, TakeFirst
+from scrapy import log
 from scrapy.shell import inspect_response
 
 class BusinessLoader(ItemLoader):
@@ -46,10 +47,16 @@ class BizJournalsSpider(Spider):
 
         #url string for the last page, of format <category_name>/page/<int>
         last_page_link = response.xpath('//div[@class="last"]/a/ @href').extract()
-        last_page = int(last_page_link[0].rsplit('/', 1)[1])
-
-        current_resource = response.url.rsplit('/', 1)[-1]
+        last_page = None
         try:
+            last_page = int(last_page_link[0].rsplit('/', 1)[1])
+        except IndexError:
+            last_page = 1
+            log.msg('Unable to find last_page link on {0}'.format(response.url), level=log.WARNING)
+
+
+        try:
+            current_resource = response.url.rsplit('/', 1)[-1]
             next_page = int(current_resource)+1
         except Exception:
             #Not an int so must be on page 1
