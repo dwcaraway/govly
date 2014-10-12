@@ -63,7 +63,7 @@ class Business(db.Model):
     twitter = db.Column(db.String(400))
     logo = db.Column(db.String(400))
     category = db.Column(db.String(200))
-    description = db.Column(db.String(1200))
+    description = db.Column(db.String(2000))
 
     raw_address = db.Column(db.String(300))
     address1 = db.Column(db.String(300))

@@ -5,8 +5,16 @@ from scrapy import Request
 from scrapy.contrib.loader import ItemLoader
 from urlparse import urljoin
 from scraper.items import BusinessItem
-from scrapy.contrib.loader.processor import MapCompose
+from scrapy.contrib.loader.processor import MapCompose, TakeFirst
 from scrapy.shell import inspect_response
+
+class BusinessLoader(ItemLoader):
+
+    default_item_class = BusinessItem
+    default_input_processor = MapCompose(unicode.strip)
+    default_output_processor = TakeFirst()
+
+    city_in = MapCompose(unicode.strip, lambda x: x.rstrip(','))
 
 
 class BizJournalsSpider(Spider):
@@ -62,17 +70,17 @@ class BizJournalsSpider(Spider):
         #Assume url pattern is /<city>/<category>/<duid>/<name>.html
         split_url = response.url.split('/')
 
-        l = ItemLoader(item=BusinessItem(), response=response)
+        l = BusinessLoader(response=response)
         l.add_xpath('name', "//div[@id='b2sec-alpha']/h2/text()")
         l.add_xpath("website", "//div[@class='b2secDetails-URL']//a/ @href")
-        l.add_xpath("address1", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][1]/ text()", MapCompose(unicode.strip))
-        l.add_xpath("city", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[1]/ text()", MapCompose(lambda x: x.rstrip(',')))
+        l.add_xpath("address1", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][1]/ text()")
+        l.add_xpath("city", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[1]/ text()")
         l.add_xpath("state", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[2]/ text()")
         l.add_xpath("zip", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[3]/ text()")
-        l.add_xpath("phone", "//div[@class='b2Local-greenTextmed']/ text()", MapCompose(unicode.strip))
+        l.add_xpath("phone", "//div[@class='b2Local-greenTextmed']/ text()")
         l.add_xpath("description", "//div[@id='b2sec-alpha']/p[4]/ text()")
-        l.add_value("data_uid", split_url[-2])
-        l.add_value("category", split_url[-3])
-        l.add_value("data_source_url", response.url)
+        l.add_value("data_uid", unicode(split_url[-2]))
+        l.add_value("category", unicode(split_url[-3]))
+        l.add_value("data_source_url", unicode(response.url))
 
         return l.load_item()
