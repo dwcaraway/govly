@@ -3,10 +3,12 @@ __author__ = 'dwcaraway'
 from scrapy.spider import Spider
 from scrapy import Request
 from scrapy.contrib.loader import ItemLoader
-from urlparse import urljoin
+from urlparse import urljoin, urlparse
 from scraper.items import BusinessItem
 from scrapy.contrib.loader.processor import MapCompose, TakeFirst
 from scrapy import log
+import string
+import re
 from scrapy.shell import inspect_response
 
 class BusinessLoader(ItemLoader):
@@ -17,25 +19,26 @@ class BusinessLoader(ItemLoader):
 
     city_in = MapCompose(unicode.strip, lambda x: x.rstrip(','))
 
+class CincyChamberSpider(Spider):
+    """Spider for Cincinnati Chamber of Commerce business index"""
+    name = "cincy_chamber"
+    allowed_domains = ["cincinnatichamber.com"]
 
-class BizJournalsSpider(Spider):
-    """Spider for bizjournals local business index"""
-    name = "bizjournals"
-    allowed_domains = ["bizjournals.com"]
+    #Create list of starting urls
     start_urls = [
-        "http://businessdirectory.bizjournals.com/dayton",
-        "http://businessdirectory.bizjournals.com/cincinnati",
-        "http://businessdirectory.bizjournals.com/columbus",
-        "http://businessdirectory.bizjournals.com/louisville"
+        "http://www.cincinnatichamber.com/search/searchforbusiness.aspx?DOSEARCH=Y&COMPNAME={0}#".format(letter) for letter in string.lowercase
     ]
 
     def parse(self, response):
         """This will extract links to all categorized lists of businesses and return that list"""
+        urlparse(response.url)
 
-        #Categories is a list [] of URL strings
-        category_links = response.xpath('//table[@class="b2Local-table"]//a/ @href').extract()
+        #Check if over 500 results
+        is_over_500 = len(response.xpath('//span[@id="ctl00_ctl00_body_maincontentblock_lOnlyTopCompaniesReturned"]').extract()) > 0
+        if is_over_500:
+            return [Request(url=response.url+letter, callback=self.parse) for letter in string.lowercase]
 
-        return [Request(url=urljoin(response.url, category), callback=self.paginate) for category in category_links]
+        return []
 
     def paginate(self, response):
         """Walks paginated index of businesses, creating requests to extract them"""
@@ -52,7 +55,7 @@ class BizJournalsSpider(Spider):
             last_page = int(last_page_link[0].rsplit('/', 1)[1])
         except IndexError:
             last_page = 1
-            log.msg('Unable to find last_page link on {0}'.format(response.url), level=log.DEBUG)
+            log.msg('Unable to find last_page link on {0}'.format(response.url), level=log.WARNING)
 
 
         try:

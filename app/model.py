@@ -64,6 +64,7 @@ class Business(db.Model):
     logo = db.Column(db.String(400))
     category = db.Column(db.String(200))
     description = db.Column(db.String(2000))
+    email = db.Column(db.String(400))
 
     raw_address = db.Column(db.String(300))
     address1 = db.Column(db.String(300))
