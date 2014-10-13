@@ -71,7 +71,11 @@ class CincyChamberSpider(Spider):
         """Extracts data from a business page"""
 
         #grab the BusinessItem passed in from the caller
-        i = response.meta['item']
+        i = None
+        try:
+            i = response.meta['item']
+        except Exception:
+            i = BusinessItem()
 
         log.msg('passed in item={0}'.format(i), log.DEBUG)
 
@@ -84,7 +88,7 @@ class CincyChamberSpider(Spider):
 
         #List of strings which, when joined, form the address. form is <address1>, <optional: address2>, <city and state and zip>
         address_fields = response.xpath('//*[@id="ctl00_ctl00_body_maincontentblock_lblcoAddress"]/ text()').extract()
-        m = re.match(pattern=u'(\w+),\s+(\w+)[\xa0]+(\S+)$', string=address_fields[-1])
+        m = re.match(pattern=u'^([\w\s]*),\s+([\w\s]+)[\xa0]+(\S+)$', string=address_fields[-1])
 
         l.add_value('address1', address_fields[0])
 
