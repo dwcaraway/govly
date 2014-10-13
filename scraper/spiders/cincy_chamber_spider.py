@@ -26,71 +26,72 @@ class CincyChamberSpider(Spider):
 
     #Create list of starting urls
     start_urls = [
-        "http://www.cincinnatichamber.com/search/searchforbusiness.aspx?DOSEARCH=Y&COMPNAME={0}#".format(letter) for letter in string.lowercase
+        "http://www.cincinnatichamber.com/search/searchforbusiness.aspx?DOSEARCH=Y&COMPNAME={0}".format(letter) for letter in string.lowercase
     ]
 
     def parse(self, response):
         """This will extract links to all categorized lists of businesses and return that list"""
-        urlparse(response.url)
 
         #Check if over 500 results
         is_over_500 = len(response.xpath('//span[@id="ctl00_ctl00_body_maincontentblock_lOnlyTopCompaniesReturned"]').extract()) > 0
         if is_over_500:
             return [Request(url=response.url+letter, callback=self.parse) for letter in string.lowercase]
 
-        return []
-
-    def paginate(self, response):
-        """Walks paginated index of businesses, creating requests to extract them"""
-
-        #list of url strings for business pages to extract items from
-        business_links = response.xpath('//td[@class="results_td_address"]//a/ @href').extract()
-        business_requests = [Request(url=urljoin('http://businessdirectory.bizjournals.com/', business_link),
-                                     callback=self.extract) for business_link in business_links]
-
-        #url string for the last page, of format <category_name>/page/<int>
-        last_page_link = response.xpath('//div[@class="last"]/a/ @href').extract()
-        last_page = None
-        try:
-            last_page = int(last_page_link[0].rsplit('/', 1)[1])
-        except IndexError:
-            last_page = 1
-            log.msg('Unable to find last_page link on {0}'.format(response.url), level=log.WARNING)
+        #Extract string of form 'You are viewing page 1 of 25'. Get the last number to figure out how much to paginate
+        viewing_page_str = unicode.strip(response.xpath('//*[@id="ctl00_ctl00_body_maincontentblock_pnlResults"]/i/ text()').extract()[0])
+        last_page= int(re.search(pattern=r"(\d+)$", string=viewing_page_str).group(1))
+        return [Request(url='{0}&page={1}'.format(response.url, page), callback=self.after_parse) for page in range(0, last_page)]
 
 
-        try:
-            current_resource = response.url.rsplit('/', 1)[-1]
-            next_page = int(current_resource)+1
-        except Exception:
-            #Not an int so must be on page 1
-            next_page = 2
+    def after_parse(self, response):
+        """This extracts the email, phone and website data and then calls a child page to extract the rest of the business info"""
 
-        #Guessing that we can grab the remaining category pages using the <category>/page/<int> pattern
-        page_requests = []
+        extraction_requests = []
 
-        for page in range(next_page, last_page+1):
-            page_requests.append(Request(url='http://businessdirectory.bizjournals.com/'+
-                                             urljoin(last_page_link[0], str(page)), callback=self.paginate))
+        for container in response.xpath('//tr[@align="center"]'):
+            detail_url = container.xpath('./td[1]/a/ @href').extract()[0]
 
-        return page_requests+business_requests
+            l = BusinessLoader(selector=container, response=response)
+            l.add_xpath('phone', './td[1]/span/ text()')
+            l.add_xpath('website', './td[2]/a/ @href')
+            l.add_xpath('email', "substring-after(./td[4]/a/ @href,'mailto:')")
+            l.add_xpath('name', './td[2]/a/ text()')
+
+            extraction_requests.append(Request(url = urljoin(response.url, detail_url), meta={'item':l.load_item()}, callback=self.extract))
+
+        return extraction_requests
 
     def extract(self, response):
         """Extracts data from a business page"""
 
+        try:
+            #grab the BusinessItem passed in from the caller
+            i = response.meta['item']
+        except Exception:
+            i = BusinessItem()
+
+        l = BusinessLoader(item=i, response=response)
+
         #Assume url pattern is /<city>/<category>/<duid>/<name>.html
-        split_url = response.url.split('/')
+        data_uid = re.match(pattern=u'.*COMPANYID=(\d+)$', string=response.url).group(1)
 
         l = BusinessLoader(response=response)
-        l.add_xpath('name', "//div[@id='b2sec-alpha']/h2/text()")
-        l.add_xpath("website", "//div[@class='b2secDetails-URL']//a/ @href")
-        l.add_xpath("address1", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][1]/ text()")
-        l.add_xpath("city", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[1]/ text()")
-        l.add_xpath("state", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[2]/ text()")
-        l.add_xpath("zip", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[3]/ text()")
-        l.add_xpath("phone", "//div[@class='b2Local-greenTextmed']/ text()")
-        l.add_xpath("description", "//div[@id='b2sec-alpha']/p[4]/ text()")
-        l.add_value("data_uid", unicode(split_url[-2]))
-        l.add_value("category", unicode(split_url[-3]))
+        l.add_xpath('description', '//*[@id="ctl00_ctl00_body_maincontentblock_lblProductandServices"]/ text()')
+
+        #List of strings which, when joined, form the address. form is <address1>, <optional: address2>, <city and state and zip>
+        address_fields = response.xpath('//*[@id="ctl00_ctl00_body_maincontentblock_lblcoAddress"]/ text()').extract()
+        m = re.match(pattern=u'(\w+), (\w+)[\xa0]+(\w+)$', string=address_fields[-1])
+
+        l.add_value('address1', address_fields[0])
+
+        if len(address_fields) is 3:
+            l.add_value('address2', address_fields[1])
+
+        l.add_value('city', m.group(1))
+        l.add_value('state', m.group(2))
+        l.add_value('zip', m.group(3))
+
+        l.add_value("data_uid", unicode(data_uid))
         l.add_value("data_source_url", unicode(response.url))
 
         return l.load_item()

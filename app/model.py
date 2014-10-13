@@ -61,6 +61,7 @@ class Business(db.Model):
     website = db.Column(db.String(400))
     facebook = db.Column(db.String(400))
     twitter = db.Column(db.String(400))
+    linkedin = db.Column(db.String(400))
     logo = db.Column(db.String(400))
     category = db.Column(db.String(200))
     description = db.Column(db.String(2000))

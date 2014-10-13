@@ -20,6 +20,7 @@ class BusinessItem(Item):
     description = Field()
     facebook = Field()
     twitter = Field()
+    linkedin = Field()
     category = Field()
     data_source_url = Field()
     data_uid = Field()
