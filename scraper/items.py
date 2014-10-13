@@ -16,6 +16,7 @@ class BusinessItem(Item):
     state = Field()
     zip = Field()
     phone = Field()
+    email = Field()
     description = Field()
     facebook = Field()
     twitter = Field()
