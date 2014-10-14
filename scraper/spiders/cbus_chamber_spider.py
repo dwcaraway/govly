@@ -35,7 +35,14 @@ class CbusChamberSpider(Spider):
         category_links = response.xpath('//li[@class="ListingCategories_AllCategories_CATEGORY"]/a/ @href').extract()
         category_names = response.xpath('//li[@class="ListingCategories_AllCategories_CATEGORY"]/a/ text()').extract()
 
-        return [Request(url=urljoin(base=response.url, url=category_links[x]), meta={'category', category_names[x]}, callback=self.extract) for x in range(len(category_links))]
+        requests = []
+        for category_link, category_name in zip(category_links, category_names):
+            full_url = urljoin(base=response.url, url=category_link)
+            requests.append(Request(url=full_url,
+                                    meta={'item': BusinessItem(category=category_name)},
+                                    callback=self.extract))
+
+        return requests
 
     def extract(self, response):
         """This extracts part of the information and then calls a child page to extract the rest of the business info"""
@@ -45,9 +52,8 @@ class CbusChamberSpider(Spider):
         for container in response.xpath("//div[contains(concat(' ', @class, ' '), ' ListingResults_All_CONTAINER ')]"):
             detail_url = container.xpath('.//span[@itemprop="name"]/a/ @href').extract()[0]
 
-            l = BusinessLoader(selector=container, response=response)
+            l = BusinessLoader(item = response.meta.get('item'), selector=container, response=response)
             l.add_xpath('name', './/span[@itemprop="name"]/a/ text()')
-            l.add_value('category', response.meta.get('category'))
 
             street = response.xpath('.//span[@itemprop="street-address"]/ text()').extract()[0]
             addrs = street.split(', ')
