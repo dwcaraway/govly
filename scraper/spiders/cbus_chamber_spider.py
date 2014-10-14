@@ -7,7 +7,7 @@ from urlparse import urljoin
 from scraper.items import BusinessItem
 from scrapy.contrib.loader.processor import MapCompose, TakeFirst
 from scrapy import log
-import string
+from scrapy.shell import inspect_response
 import re
 
 class BusinessLoader(ItemLoader):
@@ -17,47 +17,52 @@ class BusinessLoader(ItemLoader):
     default_output_processor = TakeFirst()
 
     city_in = MapCompose(unicode.strip, lambda x: x.rstrip(','))
+    logo_in = MapCompose(unicode.strip, lambda x: x if x.startswith('http') else urljoin('http://web.columbus.org/', x))
 
-class CincyChamberSpider(Spider):
-    """Spider for Cincinnati Chamber of Commerce business index"""
-    name = "cincy_chamber"
-    allowed_domains = ["cincinnatichamber.com"]
+class CbusChamberSpider(Spider):
+    """Spider for Columbus, OH Chamber of Commerce business index"""
+    name = "cbus_chamber"
+    allowed_domains = ["columbus.org"]
 
     #Create list of starting urls
     start_urls = [
-        "http://www.cincinnatichamber.com/search/searchforbusiness.aspx?DOSEARCH=Y&COMPNAME={0}".format(letter) for letter in string.lowercase
+        "http://web.columbus.org/allcategories"
     ]
 
     def parse(self, response):
-        """This will extract links to all categorized lists of businesses and return that list"""
+        """This will extract links to all categorized lists of businesses"""
 
-        log.msg('Cincy chamber parse() called on url {0}'.format(response.url), log.DEBUG)
+        category_links = response.xpath('//li[@class="ListingCategories_AllCategories_CATEGORY"]/a/ @href').extract()
+        category_names = response.xpath('//li[@class="ListingCategories_AllCategories_CATEGORY"]/a/ text()').extract()
 
-        #Check if over 500 results
-        is_over_500 = len(response.xpath('//span[@id="ctl00_ctl00_body_maincontentblock_lOnlyTopCompaniesReturned"]').extract()) > 0
-        if is_over_500:
-            log.msg('Over 500 results for {0}'.format(response.url), log.DEBUG)
-            return [Request(url=response.url+letter, callback=self.parse) for letter in string.lowercase]
-
-        #Extract string of form 'You are viewing page 1 of 25'. Get the last number to figure out how much to paginate
-        viewing_page_str = unicode.strip(response.xpath('//*[@id="ctl00_ctl00_body_maincontentblock_pnlResults"]/i/ text()').extract()[0])
-        last_page= int(re.search(pattern=r"(\d+)$", string=viewing_page_str).group(1))
-        return [Request(url='{0}&page={1}'.format(response.url, page), callback=self.after_parse) for page in range(0, last_page)]
-
+        return [Request(url=urljoin(base=response.url, url=category_links[x]), meta={'category', category_names[x]}, callback=self.after_parse) for x in range(len(category_links))]
 
     def after_parse(self, response):
-        """This extracts the email, phone and website data and then calls a child page to extract the rest of the business info"""
+        """This extracts part of the information and then calls a child page to extract the rest of the business info"""
 
         extraction_requests = []
 
-        for container in response.xpath('//tr[@align="center"]'):
-            detail_url = container.xpath('./td[1]/a/ @href').extract()[0]
+        for container in response.xpath("//div[contains(concat(' ', @class, ' '), ' ListingResults_All_CONTAINER ')]"):
+            detail_url = container.xpath('.//span[@itemprop="name"]/a/ @href').extract()[0]
 
             l = BusinessLoader(selector=container, response=response)
-            l.add_xpath('phone', './td[1]/span/ text()')
-            l.add_xpath('website', './td[2]/a/ @href')
-            l.add_xpath('email', "substring-after(./td[4]/a/ @href,'mailto:')")
-            l.add_xpath('name', './td[1]/a/ text()')
+            l.add_xpath('name', './/span[@itemprop="name"]/a/ text()')
+            l.add_value('category', response.meta.get('category'))
+
+            street = response.xpath('.//span[@itemprop="street-address"]/ text()').extract()[0]
+            addrs = street.split(', ')
+
+            l.add_value('address1', addrs[0])
+
+            if len(addrs) > 1:
+                l.add_value('address2', addrs[1])
+
+            l.add_xpath('city', './/span[@itemprop="locality"]/ text()')
+            l.add_xpath('state', './/span[@itemprop="region"]/ text()')
+            l.add_xpath('zip', './/span[@itemprop="postal-code"]/ text()')
+            l.add_xpath('phone', ".//div[contains(concat(' ', @class, ' '), 'PHONE')]/ text()")
+            l.add_xpath('logo', ".//img[contains(concat(' ', @class, ' '), 'LOGOIMG')]/ @src")
+
             item = l.load_item()
 
             log.msg('business details extracted from index: {0}'.format(item))
