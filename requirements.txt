@@ -9,6 +9,7 @@ alembic
 blinker==1.3
 psycopg2
 uwsgi
+Pillow
 
 #Scraper libraries
 scrapy
