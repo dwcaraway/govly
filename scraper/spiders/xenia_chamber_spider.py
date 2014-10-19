@@ -2,7 +2,8 @@ __author__ = 'dwcaraway'
 
 from scrapy.spider import Spider
 from scrapy import Request
-from scrapy.contrib.loader import ItemLoader
+from scrapy.contrib.loader import ItemLoader 
+from scrapy.shell import inspect_response
 from scraper.items import BusinessItem
 from scrapy.contrib.loader.processor import MapCompose, TakeFirst
 from scrapy import log
@@ -35,7 +36,7 @@ class XeniaChamberSpider(Spider):
             url = node.xpath('./strong/a/ @href').extract()[0]
             data_uid = re.match(pattern=u'.*CoID=(\d+)$', string=url).group(1).lstrip('0')
             category = node.xpath('./preceding-sibling::h2[1]/ text()').extract()[0]
-            meta = {'item': BusinessItem(category=category, data_uid=data_uid, data_source_url=url)}
+            meta = {'item': BusinessItem(category=category, source_data_id=data_uid, source_url=url)}
             requests.append(Request(url=url, callback=self.extract, meta=meta))
 
         return requests
@@ -44,26 +45,21 @@ class XeniaChamberSpider(Spider):
         """This extracts part of the information and then calls a child page to extract the rest of the business info"""
 
         l = BusinessLoader(item = response.meta.get('item'), response=response)
-        l.add_xpath('name', './/span[@itemprop="name"]/a/ text()')
+        l.add_xpath('name', '//*[@id="gl_content-wide-left"]/h1/ text()')
+        l.add_xpath('address1', '//*[@id="gl_content-wide-left"]/table//table//tr[1]/td[1]/text()[1]')
 
-        street = response.xpath('.//span[@itemprop="street-address"]/ text()').extract()[0]
-        addrs = street.split(', ')
+        city_state_zip_raw = response.xpath('//*[@id="gl_content-wide-left"]/table//table//tr[1]/td[1]/text()[2]').extract()
+        if len(city_state_zip_raw) > 0:
+            m = re.match('\s*(\w+\s*\w*),\s+(\w+)\s*(\d*)\s*', city_state_zip_raw[0])
+            
+            l.add_value('city', m.group(1))
+            l.add_value('state', m.group(2))
+            l.add_value('zip', m.group(3))
 
-        l.add_value('address1', addrs[0])
-
-        if len(addrs) > 1:
-            l.add_value('address2', addrs[1])
-
-        l.add_xpath('city', './/span[@itemprop="locality"]/ text()')
-        l.add_xpath('state', './/span[@itemprop="region"]/ text()')
-        l.add_xpath('zip', './/span[@itemprop="postal-code"]/ text()')
-        l.add_xpath('phone', ".//div[contains(concat(' ', @class, ' '), 'PHONE')]/ text()")
-        l.add_xpath('image_urls', ".//img[contains(concat(' ', @class, ' '), 'LOGOIMG')]/ @src")
+        l.add_xpath('phone', '//*[@id="gl_content-wide-left"]/table//table//tr[1]/td[2]/text()[2]')
+        l.add_xpath('latitude', '//*[@id="lat"]/ @value')
+        l.add_xpath('longitude', '//*[@id="lon"]/ @value')
 
         item = l.load_item()
-
-        log.msg('business details extracted from index: {0}'.format(item), log.DEBUG)
-
-        items.append(item)
 
         return item

@@ -30,10 +30,16 @@ class PhoneNormalizationPipeline:
         return item
 
 class CreateSourcePipeline:
+    def __init__(self, app=None):
+        if app is None:
+            self.app = create_application()
+        else:
+            self.app = app
+
     def process_item(self, item , spider):
         #TODO source lookup in BusinessItemLoader (once) and cache
         #assumes that note more than one source per spider which is fine
-        if item['source_id']:
+        if item.get('source_id'):
             return item
 
         with self.app.app_context():
@@ -46,13 +52,14 @@ class CreateSourcePipeline:
 
             item['source_id'] = s.id
 
+        return item
+
 
 class DatabasePipeline:
     """Sends processed items to storage"""
 
     def __init__(self, app=None):
         if app is None:
-            print "new application created!"
             self.app = create_application()
         else:
             self.app = app
@@ -66,7 +73,6 @@ class DatabasePipeline:
                 b = Business.query.filter_by(phone=item['phone'], source_id=item['source_id']).first()
 
             if b is None:
-                print "creating new business"
                 log.msg('business not found, creating new one', level=log.DEBUG)
                 b = Business()
                 db.session.add(b)
