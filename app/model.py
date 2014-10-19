@@ -1,6 +1,10 @@
 from flask.ext.sqlalchemy import SQLAlchemy
+import json
 # Define the database functions
 db = SQLAlchemy()
+
+def get_string_repr(obj):
+    return json.dumps({key:str(value) for key, value in obj.__dict__.iteritems() if not key.startswith('_')})
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -34,7 +38,7 @@ class Event(db.Model):
         self.end = end
 
     def __repr__(self):
-        return '<Event %r>' % self.title
+        return get_string_repr(self)
 
 class Source(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -51,7 +55,7 @@ class Source(db.Model):
         self.name = name
 
     def __repr__(self):
-        return '<Source %r>' % self.id
+        return get_string_repr(self)
 
 class Business(db.Model):
     """A data model for a business"""
@@ -88,7 +92,7 @@ class Business(db.Model):
         self.phone = phone
 
     def __repr__(self):
-        return '<Business %r>' % self.name
+        return get_string_repr(self)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -103,4 +107,4 @@ class User(db.Model):
         self.email = email
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return get_string_repr(self)
