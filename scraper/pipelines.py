@@ -29,45 +29,13 @@ class PhoneNormalizationPipeline:
             log.msg("Unable to parse phone: %s" % p_original, level=log.DEBUG)
         return item
 
-class AddressNormalizationPipeline:
-    """Parses a single line address into address 1 / 2, city, state, zip"""
+class CreateSourcePipeline:
+    def process_item(self, item , spider):
+        #TODO source lookup in BusinessItemLoader (once) and cache
+        #assumes that note more than one source per spider which is fine
+        if item['source_id']:
+            return item
 
-    def __init__(self):
-        self.ap = AddressParser()
-        #lambda expression to convert None to empty string
-        self.xstr = lambda x: x if x else ''
-
-    def process_item(self, item, spider):
-        # if not item['address_single_entry']:
-        #     #no need to extract address
-        #     return item
-
-        # try:
-        #     address = self.ap.parse_address(item['address_single_entry'])
-
-        #     for property in 
-        #     address1 = 
-
-        #     item['address1']= '{0} {1} {2} {3}'.format(address.house_number, address.street_prefix, address.street, address.street_suffix)
-        #     item['address2']= '{0} {1}'.format(address.appartment, address.building)
-        #     item['city'] = self.xstr(address.city)
-        #     item['state'] = self.xstr(address.state)
-        #     item['zip'] = self.xstr(address.zip)
-        # except Exception:
-        #     return item
-
-        return item
-
-class DatabasePipeline:
-    """Sends processed items to storage"""
-
-    def __init__(self, app=None):
-        if app is None:
-            self.app = create_application(DevelopmentConfig)
-        else:
-            self.app = app
-
-    def process_item(self, item, spider):
         with self.app.app_context():
             s = Source.query.filter_by(name=spider.name).first()
             if s is None:
@@ -76,38 +44,38 @@ class DatabasePipeline:
                 db.session.add(s)
                 db.session.commit()
 
-            self.sid = s.id
+            item['source_id'] = s.id
 
-            b = Business.query.filter_by(source_data_id=item.get('data_uid', '-1'), source_id=self.sid).first()
 
-            if b is None:
+class DatabasePipeline:
+    """Sends processed items to storage"""
+
+    def __init__(self, app=None):
+        if app is None:
+            print "new application created!"
+            self.app = create_application()
+        else:
+            self.app = app
+
+    def process_item(self, item, spider):
+        with self.app.app_context():
+            b = Business.query.filter_by(source_data_id=item.get('source_data_id', '-1'), source_id=item['source_id']).first()
+
+            if b is None and item.get('phone'):
                 #Try to get by phone
-                b = Business.query.filter_by(phone=item.get('phone', '-1'), source_id=self.sid).first()
+                b = Business.query.filter_by(phone=item['phone'], source_id=item['source_id']).first()
 
             if b is None:
+                print "creating new business"
                 log.msg('business not found, creating new one', level=log.DEBUG)
                 b = Business()
-                b.source_data_id = item.get('data_uid')
-            
-            b.source_data_url = item.get('data_source_url')
+                db.session.add(b)
+                # b.source
+                # b.source_data_id = item.get('source_data_id')
 
-            b.name=item.get('name')
-            b.phone=item.get('phone')
-            b.website=item.get('website')
-            b.facebook=item.get('facebook')
-            b.twitter=item.get('twitter')
-            b.logo=item.get('logo')
-            b.category= item.get('category')
-            b.description=item.get('description')
-            b.raw_address = item.get('address_single_entry')
-            b.address1=item.get('address1')
-            b.address2=item.get('address2')
-            b.city=item.get('city')
-            b.state=item.get('state')
-            b.zip=item.get('zip')
-            b.source_id = self.sid
+            for key, value in item.iteritems():
+                setattr(b, key, value)
 
-            db.session.add(b)
             db.session.commit()
 
         return item

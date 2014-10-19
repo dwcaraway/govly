@@ -8,13 +8,18 @@ from scrapy.item import Item, Field
 class BusinessItem(Item):
     name = Field()
     website = Field()
-    logo = Field()
-    address_single_entry = Field() #An address in a single text field instead of parsed out
+
+    image_urls = Field()
+    images = Field()
+
+    raw_address = Field() #An address in a single text field instead of parsed out
     address1 = Field()
     address2 = Field()
     city = Field()
     state = Field()
     zip = Field()
+    lat = Field()
+    long = Field()
     phone = Field()
     email = Field()
     description = Field()
@@ -22,5 +27,7 @@ class BusinessItem(Item):
     twitter = Field()
     linkedin = Field()
     category = Field()
-    data_source_url = Field()
-    data_uid = Field()
+    source_url = Field()
+    source_data_id = Field()
+
+    source_id = Field()

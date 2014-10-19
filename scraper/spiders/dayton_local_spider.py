@@ -67,12 +67,12 @@ class DaytonLocalSpider(Spider):
             if(len(raw_text) > 0):
                 #Use the style element to find the uid using the map_canvas_(somenumber)
                 r = uid_matcher.search(raw_text[0])
-                item['data_uid'] = r.groups()[0]
+                item['source_data_id'] = r.groups()[0]
             else:
                 #If business has a website link over their logo, grab the id
                 resp_href = sel.css('div.dright a').xpath('@href').extract()
                 if resp_href:
-                    item['data_uid'] = get_uid_from_href(resp_href[0])
+                    item['source_data_id'] = get_uid_from_href(resp_href[0])
 
             item['retrieved_on'] = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
 
@@ -82,7 +82,7 @@ class DaytonLocalSpider(Spider):
             website = card.xpath('//*[contains(@class, "fn")]//a/ @href').extract()
             item['website'] = website[0] if website else None
 
-            item['logo'] = urlparse.urljoin('http://www.daytonlocal.com', logo[0]) if logo else None
+            item['image_urls'] = urlparse.urljoin('http://www.daytonlocal.com', logo[0]) if logo else None
 
             address1 = card.xpath('//span[contains(@class, "street-address")]/text()').extract()
             item['address1'] = address1[0] if address1 else None
@@ -118,8 +118,8 @@ class DaytonLocalSpider(Spider):
                 fb_href = response.xpath("//a/@href[contains(., 'lnk=fb')]").extract()
                 if len(fb_href) > 0:
                     item['facebook'] = urllib2.urlopen(fb_href[0]).geturl()
-                    if item['data_uid'] is None:
-                        item['data_uid'] = get_uid_from_href(fb_href[0])
+                    if item['source_data_id'] is None:
+                        item['source_data_id'] = get_uid_from_href(fb_href[0])
             except:
                 log.msg('no twitter for %s' % response.url, level=log.DEBUG)
             
@@ -127,8 +127,8 @@ class DaytonLocalSpider(Spider):
                 twitter_href = response.xpath("//a/@href[contains(., 'lnk=tw')]").extract()
                 if len(twitter_href) > 0:
                     item['twitter'] = urllib2.urlopen(twitter_href[0]).geturl()
-                    if item['data_uid'] is None:
-                        item['data_uid'] = get_uid_from_href(twitter_href[0])
+                    if item['source_data_id'] is None:
+                        item['source_data_id'] = get_uid_from_href(twitter_href[0])
             except Exception:
                 log.msg('no twitter for %s' % response.url, level=log.DEBUG)
 

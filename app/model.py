@@ -4,7 +4,8 @@ import json
 db = SQLAlchemy()
 
 def get_string_repr(obj):
-    return json.dumps({key:str(value) for key, value in obj.__dict__.iteritems() if not key.startswith('_')})
+    #Using str for value since datetime is not json serializable
+    return json.dumps({key:str(value) for key, value in obj.__dict__.iteritems() if not key.startswith('_') and value})
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)

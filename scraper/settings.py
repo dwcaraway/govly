@@ -8,9 +8,18 @@ NEWSPIDER_MODULE = 'scraper.spiders'
 USER_AGENT = 'dayton-healthcheck'
 
 ITEM_PIPELINES = {
-    'scraper.pipelines.PhoneNormalizationPipeline':50,
-    'scraper.pipelines.AddressNormalizationPipeline':100,
+    'scrapy.contrib.pipeline.images.ImagesPipeline': 1,
+    'scraper.pipelines.PhoneNormalizationPipeline':1,
+    'scraper.pipelines.CreateSourcePipeline':1,
     'scraper.pipelines.DatabasePipeline': 1000
+}
+
+#Image Download Support
+IMAGES_STORE = './scrapeddata/images'
+IMAGES_EXPIRES = 90
+IMAGES_THUMBS = {
+    'small': (50, 50),
+    'big': (270, 270),
 }
 
 #LOG_FILE='scrapy.log'

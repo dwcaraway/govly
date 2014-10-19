@@ -1,41 +1,28 @@
 __author__ = 'DavidWCaraway'
-from scraper.pipelines import DatabasePipeline, AddressNormalizationPipeline
+from scraper.pipelines import DatabasePipeline
 from scraper.items import BusinessItem
 from scrapy.spider import Spider
 import unittest
 import tempfile
 import os
+import random
+import sure
 from app import create_application
 from app.model import db, Business, Source
 
-# class AddressNormalizationPipelineTest(unittest.TestCase):
-#     """Test conversion of single line address into multi-line"""
+class TestConfig:
 
-#     def testBasicParsing(self):
-#          s       b = BusinessItem()
-#         p = AddressNormalizationPipeline()
+    TESTING = True
+    SQLALCHEMY_ECHO = False
 
-#         b['address_single_entry'] = "123 cupcake Lane, Dayton, Ohio 45440"
-#         i = p.process_item(b, None)
-
-#         i['raw_address'].should.equal(b['address_single_entry'])
-#         i['address2'].should.equal('')
-#         i['city'].should.equal('dayton')
-#         i['state'].should.equal('ohio')
-#         i['zip'].should.equal('45440')
-
+    def __init__(self, db_path):
+        self.SQLALCHEMY_DATABASE_URI = 'sqlite:///%s' % db_path
 
 class DatabasePipelineTest(unittest.TestCase):
     def setUp(self):
         """Construct temporary database and test client for testing routing and responses"""
         self.db_fd, self.db_path = tempfile.mkstemp()
-
-        config = {
-        'SQLALCHEMY_DATABASE_URI':'sqlite:///%s' % self.db_path,
-        'TESTING': True
-        }
-
-        self.vitals = create_application(config)
+        self.vitals = create_application(TestConfig(self.db_path))
 
         #Push a context so that database knows what application to attach to
         with self.vitals.app_context():
@@ -69,6 +56,7 @@ class DatabasePipelineTest(unittest.TestCase):
         item['city'] = 'mycity'
         item['state'] = 'mystate'
         item['zip'] = 'myzip'
+        item['source_id'] = '-1'
 
         ret = pipe.process_item(item, Spider(name='foo'))
 
@@ -95,6 +83,7 @@ class DatabasePipelineTest(unittest.TestCase):
         item['city'] = 'mycity'
         item['state'] = 'mystate'
         item['zip'] = 'myzip'
+        item['source_id'] = '-1' 
 
         ret = pipe.process_item(item, Spider(name='foo'))
 
@@ -126,7 +115,8 @@ class DatabasePipelineTest(unittest.TestCase):
 
             item = BusinessItem()
             item['name']='newname'
-            item['data_uid'] = '123'
+            item['source_data_id'] = '123'
+            item['source_id']=s.id
 
             pipe = DatabasePipeline(self.vitals)
             pipe.process_item(item, Spider(name='daytonlocal.com'))
@@ -135,7 +125,7 @@ class DatabasePipelineTest(unittest.TestCase):
             b.name.should.equal('newname')
 
     def test_existing_by_phone(self):
-            """If a business doesn't have a data_uid
+            """If a business doesn't have a source_data_id
             then check to see if phone exists for that source id. if so,
             treat business as existing and modify rather than create 
             a new business.
@@ -149,23 +139,24 @@ class DatabasePipelineTest(unittest.TestCase):
                 db.session.commit()
 
                 b = Business()
-                b.name = 'oldname'
+
+                random_name = 'oldname{0}'.format(random.randint(1, 99))
+                b.name = random_name
                 b.phone = '12342342345'
                 b.source_id = s.id
                 db.session.add(b)
                 db.session.commit()
 
                 #Create a scraped BusinessItem with matching src and phone
-                item = BusinessItem()
-                item['name']='newname'
-                item['phone'] = '12342342345'
+                item = BusinessItem(name='newname', phone='12342342345', source_id=s.id)
 
                 pipe = DatabasePipeline(self.vitals)
                 pipe.process_item(item, Spider(name='daytonchamber.org'))
 
                 #Business should have been modified. If not, then
                 # a new business was mistakenly created.
-                b = Business.query.filter_by(name='newname').first()
-                b.phone.should.equal('12342342345')
+                b = Business.query.filter_by(phone='12342342345').first()
+                b.shouldnot.equal(None)
+                b.name.should.equal('newname')
                 len(Business.query.all()).should.equal(1)
 

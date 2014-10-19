@@ -67,7 +67,7 @@ class CbusChamberSpider(Spider):
             l.add_xpath('state', './/span[@itemprop="region"]/ text()')
             l.add_xpath('zip', './/span[@itemprop="postal-code"]/ text()')
             l.add_xpath('phone', ".//div[contains(concat(' ', @class, ' '), 'PHONE')]/ text()")
-            l.add_xpath('logo', ".//img[contains(concat(' ', @class, ' '), 'LOGOIMG')]/ @src")
+            l.add_xpath('image_urls', ".//img[contains(concat(' ', @class, ' '), 'LOGOIMG')]/ @src")
 
             item = l.load_item()
 

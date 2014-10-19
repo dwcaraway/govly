@@ -7,21 +7,24 @@ from datetime import datetime
 from app.model import db, Event, Business, Source
 from tests import hal_loads
 from app import create_application
+import sure
 
 
 logger = logging.getLogger(__name__)
+
+class TestConfig:
+
+    TESTING = True
+
+    def __init__(self, db_path):
+        self.SQLALCHEMY_DATABASE_URI = 'sqlite:///%s' % db_path
 
 class ApiTest(unittest.TestCase):
     def setUp(self):
         """Construct temporary database and test client for testing routing and responses"""
         self.db_fd, self.db_path = tempfile.mkstemp()
 
-        config = {
-        'SQLALCHEMY_DATABASE_URI':'sqlite:///%s' % self.db_path,
-        'TESTING': True
-        }
-
-        self.vitals = create_application(config)
+        self.vitals = create_application(TestConfig(self.db_path))
         self.test_client = self.vitals.test_client()
 
         #Push a context so that database knows what application to attach to

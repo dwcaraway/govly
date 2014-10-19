@@ -108,7 +108,7 @@ class CincyChamberSpider(Spider):
             elif 'facebook.com' in link:
                 l.add_value('facebook', unicode(link))
 
-        l.add_value("data_uid", unicode(data_uid))
+        l.add_value("source_data_id", unicode(data_uid))
         l.add_value("data_source_url", unicode(response.url))
 
         return l.load_item()
