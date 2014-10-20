@@ -9,20 +9,12 @@ import random
 import sure
 from app import create_application
 from app.model import db, Business, Source
-
-class TestConfig:
-
-    TESTING = True
-    SQLALCHEMY_ECHO = False
-
-    def __init__(self, db_path):
-        self.SQLALCHEMY_DATABASE_URI = 'sqlite:///%s' % db_path
+from app.config import TestingConfig
 
 class DatabasePipelineTest(unittest.TestCase):
     def setUp(self):
         """Construct temporary database and test client for testing routing and responses"""
-        self.db_fd, self.db_path = tempfile.mkstemp()
-        self.vitals = create_application(TestConfig(self.db_path))
+        self.vitals = create_application(TestingConfig())
 
         #Push a context so that database knows what application to attach to
         with self.vitals.app_context():
@@ -34,13 +26,17 @@ class DatabasePipelineTest(unittest.TestCase):
             db.drop_all()
             db.session.remove()
 
-        os.close(self.db_fd)
-        os.unlink(self.db_path)
-
     def test_basic(self):
         pipe = DatabasePipeline(self.vitals)
 
+        sid = None
+        
         with self.vitals.app_context(): 
+            s = Source(name='testsrc')
+            db.session.add(s)
+            db.session.commit()
+            sid = s.id
+
             len(Business.query.all()).should.equal(0)
 
         item = BusinessItem()
@@ -56,7 +52,7 @@ class DatabasePipelineTest(unittest.TestCase):
         item['city'] = 'mycity'
         item['state'] = 'mystate'
         item['zip'] = 'myzip'
-        item['source_id'] = '-1'
+        item['source_id'] = sid
 
         ret = pipe.process_item(item, Spider(name='foo'))
 
@@ -68,7 +64,13 @@ class DatabasePipelineTest(unittest.TestCase):
     def test_missing_desc(self):
         pipe = DatabasePipeline(self.vitals)
 
+        sid = None
+
         with self.vitals.app_context(): 
+            s = Source(name='testsrc')
+            db.session.add(s)
+            db.session.commit()
+            sid = s.id
             len(Business.query.all()).should.equal(0)
 
         item = BusinessItem()
@@ -83,7 +85,7 @@ class DatabasePipelineTest(unittest.TestCase):
         item['city'] = 'mycity'
         item['state'] = 'mystate'
         item['zip'] = 'myzip'
-        item['source_id'] = '-1' 
+        item['source_id'] = sid
 
         ret = pipe.process_item(item, Spider(name='foo'))
 

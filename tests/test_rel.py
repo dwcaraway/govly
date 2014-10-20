@@ -2,6 +2,7 @@ import json, os, tempfile, logging
 from jsonschema import Draft4Validator
 from app import create_application
 from tests.test_api import ApiTest
+from app.config import TestingConfig
 
 __author__ = 'DavidWCaraway'
 
@@ -13,18 +14,15 @@ class LinkRelationTest(ApiTest):
 
     def setUp(self):
         """Construct temporary database and test client for testing routing and responses"""
-        self.db_fd, self.db_path = tempfile.mkstemp()
-        config = {
-        'SQLALCHEMY_DATABASE_URI':'sqlite:///%s' % self.db_path,
-        'TESTING': True
-        }
-        self.vitals = create_application(config)
+        self.vitals = create_application(TestingConfig())
         self.test_client = self.vitals.test_client()
 
     def tearDown(self):
         """Removes temporary database at end of each test"""
-        os.close(self.db_fd)
-        os.unlink(self.db_path)
+        pass
+        # db.session.remove()
+        # db.drop_all()
+        # self.ctx.pop()
 
     def test_list_all(self):
         """

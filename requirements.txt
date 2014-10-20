@@ -10,6 +10,7 @@ blinker==1.3
 psycopg2
 uwsgi
 Pillow
+SQLAlchemy-Searchable
 
 #Scraper libraries
 scrapy

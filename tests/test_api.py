@@ -8,23 +8,16 @@ from app.model import db, Event, Business, Source
 from tests import hal_loads
 from app import create_application
 import sure
-
+from app.config import TestingConfig
 
 logger = logging.getLogger(__name__)
-
-class TestConfig:
-
-    TESTING = True
-
-    def __init__(self, db_path):
-        self.SQLALCHEMY_DATABASE_URI = 'sqlite:///%s' % db_path
 
 class ApiTest(unittest.TestCase):
     def setUp(self):
         """Construct temporary database and test client for testing routing and responses"""
-        self.db_fd, self.db_path = tempfile.mkstemp()
+        # self.db_fd, self.db_path = tempfile.mkstemp()
 
-        self.vitals = create_application(TestConfig(self.db_path))
+        self.vitals = create_application(TestingConfig())
         self.test_client = self.vitals.test_client()
 
         #Push a context so that database knows what application to attach to
@@ -37,8 +30,8 @@ class ApiTest(unittest.TestCase):
         db.session.remove()
         db.drop_all()
 
-        os.close(self.db_fd)
-        os.unlink(self.db_path)
+        # os.close(self.db_fd)
+        # os.unlink(self.db_path)
 
         #Remove the context so that we can create a new app and reassign the db
         self.ctx.pop()
@@ -247,6 +240,29 @@ class BusinessesTest(ApiTest):
 
         doc.links.keys().shouldnot.contain('first')
         doc.links['last'].url().should.equal('/api/businesses?page=5')
+
+    def test_search_finds_by_name(self):
+        """
+        Perform free text search for businesses using the q parameter.
+        We first create a business, then we query for it where the match
+        is in the name.
+        """
+        s = Source('testsrc')
+        db.session.add(s)
+        db.session.commit()
+
+        b = Business(name="mr. bill")
+        b.source_id = s.id
+        db.session.add(b)
+        db.session.commit()
+
+        #Now
+        resp = self.test_client.get('/api/businesses?q=bill')
+
+        print resp.data 
+
+        doc = hal_loads(resp.data)
+        doc.links['r:business'].url().should.equal('/api/businesses/1')
 
 class BusinessTest(ApiTest):
     def test_get(self):

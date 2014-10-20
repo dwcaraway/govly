@@ -8,6 +8,8 @@ from dougrain import Builder
 from flask.ext.restful import reqparse, Api, Resource, abort
 
 from app.model import Event, db, Business, Source
+from sqlalchemy_searchable import search
+
 
 logger = logging.getLogger(__name__)
 
@@ -162,7 +164,7 @@ class BusinessesList(Resource):
     def __init__(self):
         self.get_req_parse = reqparse.RequestParser()
         #TODO test for q parameter and then uncomment below
-        #self.getparser.add_argument('q', type=str, help='Free-text search string', default="")
+        self.get_req_parse.add_argument('q', type=str, help='Free-text search string', default="")
         self.get_req_parse.add_argument('page', type=int, help='Page number of results', default=1)
         self.get_req_parse.add_argument('per_page', type=int, help='Max number of items (up to 200) per page',
                                         default=20)
@@ -170,7 +172,6 @@ class BusinessesList(Resource):
         self.get_req_parse.add_argument('order', type=str,
                                         help='Sort alphabetically by business name, ASC is ascending, DESC is descending',
                                         default='asc')
-
         self.post_req_parse = reqparse.RequestParser()
 
         super(BusinessesList, self).__init__()
@@ -180,7 +181,9 @@ class BusinessesList(Resource):
 
         args = self.get_req_parse.parse_args()
 
-        pagination = Business.query.paginate(page=args.page, per_page=args.per_page)
+        qq = search(Business.query, args.q) if args.q else Business.query 
+
+        pagination = qq.paginate(page=args.page, per_page=args.per_page)
         response = Builder("/api/businesses?page=%d" % pagination.page).add_curie('r', "/api/rels/{rel}").set_property(
             'total', pagination.total)
 

@@ -1,11 +1,25 @@
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy_searchable import make_searchable
+from sqlalchemy_utils.types import TSVectorType
+from datetime import datetime
 import json
 # Define the database functions
 db = SQLAlchemy()
 
+#enable full-text search of postgres
+make_searchable()
+
 def get_string_repr(obj):
     #Using str for value since datetime is not json serializable
-    return json.dumps({key:str(value) for key, value in obj.__dict__.iteritems() if not key.startswith('_') and value})
+    new_obj = {}
+    for key, value in obj.__dict__.iteritems():
+        if not key.startswith('_') and value:
+            if type(value) is datetime:
+                new_obj[key] = str(value)
+            else:
+                new_obj[key] = value
+
+    return json.dumps(new_obj)
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -84,6 +98,8 @@ class Business(db.Model):
     source_data_id = db.Column(db.String(15))
     source_data_url = db.Column(db.String(400))
     source_id = db.Column(db.Integer, db.ForeignKey('source.id'))
+
+    search_vector = db.Column(TSVectorType('name', 'category', 'description'))
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())

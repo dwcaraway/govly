@@ -6,8 +6,6 @@ class Config(object):
     """
     DEBUG = False
     TESTING = False
-    SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/test.db'
-    BOOTSTRAP_FONTAWESOME = True
     SECRET_KEY = "secret"
     CSRF_ENABLED = True
     SECURITY_PASSWORD_HASH = 'bcrypt'
@@ -18,13 +16,13 @@ class Config(object):
 
 
 class ProductionConfig(Config):
-    # SQLALCHEMY_DATABASE_URI = "%s/vitals" % os.getenv('OPENSHIFT_POSTGRESQL_DB_URL')
     SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitals'
 
 class DevelopmentConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitals'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitalsdev'
     DEBUG = True
 
 
 class TestingConfig(Config):
+    SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitalstest'
     TESTING = True
