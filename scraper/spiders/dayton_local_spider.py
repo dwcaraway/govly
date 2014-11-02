@@ -8,7 +8,6 @@ import re
 import lxml
 import datetime
 from scraper.items import BusinessItem
-import phonenumbers
 import urllib2
 from scrapy import log
 

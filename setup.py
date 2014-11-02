@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import os
 from pip.req import parse_requirements
 
@@ -18,5 +18,7 @@ setup(name='Vitals',
       author='David Caraway',
       author_email='dave@fogmine.com',
       url='http://www.fogmine.com',
+      packages = ['scraper', 'scraper.spiders','app'],
+      entry_points={'scrapy':['settings=scraper.settings']},
       install_requires=reqs
      )
