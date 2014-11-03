@@ -74,6 +74,7 @@ class Source(db.Model):
 
 class Business(db.Model):
     """A data model for a business"""
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
     phone = db.Column(db.String(25))

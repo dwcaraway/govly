@@ -259,8 +259,6 @@ class BusinessesTest(ApiTest):
         #Now
         resp = self.test_client.get('/api/businesses?q=bill')
 
-        print resp.data 
-
         doc = hal_loads(resp.data)
         doc.links['r:business'].url().should.equal('/api/businesses/1')
 
