@@ -74,7 +74,6 @@ db.Table('employment', db.Model.metadata,
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String(80))
-    retrieved = db.Column(db.DateTime)
     title = db.Column(db.String(120))
     description = db.Column(db.String(800))
     location = db.Column(db.String(250))
@@ -121,6 +120,13 @@ class Business(db.Model):
     """A data model for a business"""
 
     id = db.Column(db.Integer, primary_key=True)
+    duns = db.Column(db.String)
+    legalName = db.Column(db.String)
+    logo = db.Column(db.String)
+    naics = db.Column(db.String)
+    cage = db.Column(db.String)
+    taxID = db.Column(db.String)
+
     name = db.Column(db.String)
     phone = db.Column(db.String)
     logo = db.Column(db.String)
