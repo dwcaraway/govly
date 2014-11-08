@@ -251,7 +251,7 @@ class BusinessesTest(ApiTest):
         db.session.add(s)
         db.session.commit()
 
-        b = Business(name="mr. bill")
+        b = Business(legalName="mr. bill")
         b.source_id = s.id
         db.session.add(b)
         db.session.commit()

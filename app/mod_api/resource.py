@@ -181,9 +181,7 @@ class BusinessesList(Resource):
 
         args = self.get_req_parse.parse_args()
 
-        qq = search(Business.query, args.q) if args.q else Business.query 
-
-        pagination = qq.paginate(page=args.page, per_page=args.per_page)
+        pagination = Business.query.paginate(page=args.page, per_page=args.per_page)
         response = Builder("/api/businesses?page=%d" % pagination.page).add_curie('r', "/api/rels/{rel}").set_property(
             'total', pagination.total)
 

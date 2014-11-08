@@ -1,13 +1,13 @@
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.sqlalchemy import SQLAlchemy, BaseQuery
 from sqlalchemy_searchable import make_searchable
+from sqlalchemy_searchable import SearchQueryMixin
 from sqlalchemy_utils.types import TSVectorType
 from datetime import datetime
 import json
 # Define the database functions
 db = SQLAlchemy()
 
-#enable full-text search of postgres
-make_searchable()
+
 
 def get_string_repr(obj):
     #Using str for value since datetime is not json serializable
@@ -59,12 +59,11 @@ class Organization(db.Model):
 
     source_id = db.Column(db.Integer, db.ForeignKey('organization_sources.id'))
 
-    search_vector = db.Column(TSVectorType('name', 'description'))
-
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
     employees = db.relationship("Person", secondary="employment", backref="employers")
+    search_vector = db.Column(TSVectorType('legalName', 'description'))
 
 db.Table('employment', db.Model.metadata,
                 db.Column('employer_id', None, db.ForeignKey('organizations.id')),
@@ -116,8 +115,13 @@ class OrganizationSource(db.Model):
     def __repr__(self):
         return get_string_repr(self)
 
+class BusinessQuery(BaseQuery, SearchQueryMixin):
+    pass
+
 class Business(db.Model):
     """A data model for a business"""
+    query_class = BusinessQuery
+    __tablename__='businesses'
 
     id = db.Column(db.Integer, primary_key=True)
     duns = db.Column(db.String)
@@ -127,7 +131,6 @@ class Business(db.Model):
     cage = db.Column(db.String)
     taxID = db.Column(db.String)
 
-    name = db.Column(db.String)
     phone = db.Column(db.String)
     logo = db.Column(db.String)
     category = db.Column(db.String)
@@ -142,18 +145,14 @@ class Business(db.Model):
     latitude = db.Column(db.Float)
     longitude =db.Column(db.Float)
 
-    source_data_id = db.Column(db.String(15))
-    source_data_url = db.Column(db.String(400))
+    source_data_id = db.Column(db.String)
+    source_data_url = db.Column(db.String)
     source_id = db.Column(db.Integer, db.ForeignKey('organization_sources.id'))
 
-    search_vector = db.Column(TSVectorType('name', 'category', 'description'))
+    search_vector = db.Column(TSVectorType('legalName', 'description'))
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
-
-    def __init__(self, name=None, phone=None):
-        self.name = name
-        self.phone = phone
 
     def __repr__(self):
         return get_string_repr(self)
@@ -209,3 +208,6 @@ class OperatingHours(db.Model):
     opens = db.Column(db.String)
     dayOfWeek = db.Column(db.String)
     contact_id = db.Column(db.Integer, db.ForeignKey('contact_points.id'))
+
+#enable full-text search of postgres
+make_searchable()

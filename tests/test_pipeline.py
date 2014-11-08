@@ -40,7 +40,7 @@ class DatabasePipelineTest(unittest.TestCase):
             len(Business.query.all()).should.equal(0)
 
         item = BusinessItem()
-        item['name']='myname'
+        item['legalName']='myname'
         item['phone'] = 'myphone'
         item['website'] = 'mywebsite'
         item['facebook'] = 'myfacebook'
@@ -74,7 +74,7 @@ class DatabasePipelineTest(unittest.TestCase):
             len(Business.query.all()).should.equal(0)
 
         item = BusinessItem()
-        item['name']='myname'
+        item['legalName']='myname'
         item['phone'] = 'myphone'
         item['website'] = 'mywebsite'
         item['facebook'] = 'myfacebook'
@@ -106,7 +106,7 @@ class DatabasePipelineTest(unittest.TestCase):
             db.session.add(s)
             db.session.commit()
 
-            b.name = 'oldname'
+            b.legalName = 'oldname'
             b.source_data_id='123'
             b.source_id = s.id
 
@@ -116,7 +116,7 @@ class DatabasePipelineTest(unittest.TestCase):
             biz_uid = b.id
 
             item = BusinessItem()
-            item['name']='newname'
+            item['legalName']='newname'
             item['source_data_id'] = '123'
             item['source_id']=s.id
 
@@ -124,7 +124,7 @@ class DatabasePipelineTest(unittest.TestCase):
             pipe.process_item(item, Spider(name='daytonlocal.com'))
 
             b = Business.query.get(biz_uid)
-            b.name.should.equal('newname')
+            b.legalName.should.equal('newname')
 
     def test_existing_by_phone(self):
             """If a business doesn't have a source_data_id
@@ -143,14 +143,14 @@ class DatabasePipelineTest(unittest.TestCase):
                 b = Business()
 
                 random_name = 'oldname{0}'.format(random.randint(1, 99))
-                b.name = random_name
+                b.legalName = random_name
                 b.phone = '12342342345'
                 b.source_id = s.id
                 db.session.add(b)
                 db.session.commit()
 
                 #Create a scraped BusinessItem with matching src and phone
-                item = BusinessItem(name='newname', phone='12342342345', source_id=s.id)
+                item = BusinessItem(legalName='newname', phone='12342342345', source_id=s.id)
 
                 pipe = DatabasePipeline(self.vitals)
                 pipe.process_item(item, Spider(name='daytonchamber.org'))
@@ -159,6 +159,6 @@ class DatabasePipelineTest(unittest.TestCase):
                 # a new business was mistakenly created.
                 b = Business.query.filter_by(phone='12342342345').first()
                 b.shouldnot.equal(None)
-                b.name.should.equal('newname')
+                b.legalName.should.equal('newname')
                 len(Business.query.all()).should.equal(1)
 

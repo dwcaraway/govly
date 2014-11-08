@@ -6,7 +6,7 @@
 from scrapy.item import Item, Field
 
 class BusinessItem(Item):
-    name = Field()
+    legalName = Field()
     website = Field()
 
     image_urls = Field()
