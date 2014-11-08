@@ -8,7 +8,7 @@ import os
 import random
 import sure
 from app import create_application
-from app.model import db, Business, Source
+from app.model import db, Business, OrganizationSource
 from app.config import TestingConfig
 
 class DatabasePipelineTest(unittest.TestCase):
@@ -32,7 +32,7 @@ class DatabasePipelineTest(unittest.TestCase):
         sid = None
         
         with self.vitals.app_context(): 
-            s = Source(name='testsrc')
+            s = OrganizationSource(spider_name='testsrc')
             db.session.add(s)
             db.session.commit()
             sid = s.id
@@ -67,7 +67,7 @@ class DatabasePipelineTest(unittest.TestCase):
         sid = None
 
         with self.vitals.app_context(): 
-            s = Source(name='testsrc')
+            s = OrganizationSource(spider_name='testsrc')
             db.session.add(s)
             db.session.commit()
             sid = s.id
@@ -101,7 +101,7 @@ class DatabasePipelineTest(unittest.TestCase):
 
         with self.vitals.app_context():
             b = Business()
-            s = Source(name='daytonlocal.com')
+            s = OrganizationSource(spider_name='daytonlocal.com')
             
             db.session.add(s)
             db.session.commit()
@@ -136,7 +136,7 @@ class DatabasePipelineTest(unittest.TestCase):
             biz_uid = None
 
             with self.vitals.app_context():
-                s = Source(name='daytonchamber.org')
+                s = OrganizationSource(spider_name='daytonchamber.org')
                 db.session.add(s)
                 db.session.commit()
 

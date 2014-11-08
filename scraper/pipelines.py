@@ -1,4 +1,4 @@
-from app.model import db, Business, Source
+from app.model import db, Business, OrganizationSource
 from app import create_application
 from app.config import DevelopmentConfig
 from scrapy import log
@@ -43,10 +43,10 @@ class CreateSourcePipeline:
             return item
 
         with self.app.app_context():
-            s = Source.query.filter_by(name=spider.name).first()
+            s = OrganizationSource.query.filter_by(name=spider.name).first()
             if s is None:
                 log.msg("Source %s not found. Creating it." % spider.name, level=log.DEBUG)
-                s = Source(name = spider.name)
+                s = OrganizationSource(name = spider.name)
                 db.session.add(s)
                 db.session.commit()
 

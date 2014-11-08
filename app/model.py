@@ -57,6 +57,8 @@ class Organization(db.Model):
     lat = db.Column(db.String)
     lon = db.Column(db.String)
 
+    source_id = db.Column(db.Integer, db.ForeignKey('organization_sources.id'))
+
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
@@ -76,7 +78,7 @@ class Event(db.Model):
     location = db.Column(db.String(250))
     start = db.Column(db.DateTime)
     end = db.Column(db.DateTime)
-    source_id = db.Column(db.Integer, db.ForeignKey('source.id'))
+    source_id = db.Column(db.Integer, db.ForeignKey('organization_sources.id'))
 
     address1 = db.Column(db.String(300))
     address2 = db.Column(db.String(300))
@@ -101,19 +103,14 @@ class Event(db.Model):
     def __repr__(self):
         return get_string_repr(self)
 
-class Source(db.Model):
+class OrganizationSource(db.Model):
+    __tablename__='organization_sources'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    events = db.relationship('Event', backref='source',
-                                lazy='dynamic')
-    businesses = db.relationship('Business', backref='source',
-                                lazy='dynamic')
+    source_unique_id = db.Column(db.String)
+    source_data_url = db.Column(db.String)
+    spider_name = db.Column(db.String)
 
-    created_on = db.Column(db.DateTime, default=db.func.now())
-    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
-
-    def __init__(self, name):
-        self.name = name
+    organization = db.relationship("Organization", backref="sources")
 
     def __repr__(self):
         return get_string_repr(self)
@@ -124,11 +121,9 @@ class Business(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     phone = db.Column(db.String)
-    website = db.Column(db.String)
     logo = db.Column(db.String)
     category = db.Column(db.String)
     description = db.Column(db.String)
-    email = db.Column(db.String)
 
     raw_address = db.Column(db.String)
     address1 = db.Column(db.String)
@@ -141,7 +136,7 @@ class Business(db.Model):
 
     source_data_id = db.Column(db.String(15))
     source_data_url = db.Column(db.String(400))
-    source_id = db.Column(db.Integer, db.ForeignKey('source.id'))
+    source_id = db.Column(db.Integer, db.ForeignKey('organization_sources.id'))
 
     search_vector = db.Column(TSVectorType('name', 'category', 'description'))
 

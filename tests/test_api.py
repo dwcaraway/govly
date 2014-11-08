@@ -4,7 +4,7 @@ import tempfile
 import os
 from datetime import datetime
 
-from app.model import db, Event, Business, Source
+from app.model import db, Event, Business, OrganizationSource
 from tests import hal_loads
 from app import create_application
 import sure
@@ -168,7 +168,7 @@ class SourceTest(ApiTest):
         """
         Get single source
         """
-        src = Source(name='foo')
+        src = OrganizationSource(spider_name='foo')
 
         db.session.add(src)
         db.session.commit()
@@ -178,7 +178,7 @@ class SourceTest(ApiTest):
 
         doc = hal_loads(resp.data)
         doc.links['r:sources'].url().should.equal('/api/sources')
-        doc.properties.should.equal({'name': 'foo', 'id':src.id, 'created_on':src.created_on.isoformat(), 'updated_on': src.updated_on.isoformat()})
+        doc.properties.should.equal({'spider_name': 'foo', 'id':src.id})
 
 class BusinessesTest(ApiTest):
     """Test of API 'Businesses' resource"""
@@ -247,7 +247,7 @@ class BusinessesTest(ApiTest):
         We first create a business, then we query for it where the match
         is in the name.
         """
-        s = Source('testsrc')
+        s = OrganizationSource(spider_name='testsrc')
         db.session.add(s)
         db.session.commit()
 

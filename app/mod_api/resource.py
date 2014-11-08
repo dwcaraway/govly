@@ -7,7 +7,7 @@ from flask import Blueprint, request
 from dougrain import Builder
 from flask.ext.restful import reqparse, Api, Resource, abort
 
-from app.model import Event, db, Business, Source
+from app.model import Event, db, Business, OrganizationSource
 from sqlalchemy_searchable import search
 
 
@@ -112,7 +112,7 @@ class SourcesList(Resource):
         """ Returns a collection of sources matching specified criteria """
         args = self.get_req_parse.parse_args()
 
-        pagination = Source.query.paginate(page=args.page, per_page=args.per_page)
+        pagination = OrganizationSource.query.paginate(page=args.page, per_page=args.per_page)
 
         response = Builder("/api/sources?page=%d" % pagination.page).add_curie('r', "/api/rels/{rel}").set_property(
             'total', pagination.total)
@@ -141,7 +141,7 @@ class Sources(Resource):
 
     def get(self, id):
         """Get sources by id"""
-        src = Source.query.get(id)
+        src = OrganizationSource.query.get(id)
 
         if src is None:
             abort(404, message="Source %d doesn't exist" % id)
