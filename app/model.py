@@ -59,6 +59,8 @@ class Organization(db.Model):
 
     source_id = db.Column(db.Integer, db.ForeignKey('organization_sources.id'))
 
+    search_vector = db.Column(TSVectorType('name', 'description'))
+
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
