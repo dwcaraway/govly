@@ -7,7 +7,7 @@ from flask import Blueprint, request
 from dougrain import Builder
 from flask.ext.restful import reqparse, Api, Resource, abort
 
-from app.model import Event, db, Business, OrganizationSource
+from app.model import Event, db, Organization, OrganizationSource
 from sqlalchemy_searchable import search
 
 
@@ -181,7 +181,7 @@ class BusinessesList(Resource):
 
         args = self.get_req_parse.parse_args()
 
-        pagination = Business.query.paginate(page=args.page, per_page=args.per_page)
+        pagination = Organization.query.paginate(page=args.page, per_page=args.per_page)
         response = Builder("/api/businesses?page=%d" % pagination.page).add_curie('r', "/api/rels/{rel}").set_property(
             'total', pagination.total)
 
@@ -211,7 +211,7 @@ class Businesses(Resource):
     def get(self, id):
         """Get business by id"""
 
-        biz = Business.query.get(id)
+        biz = Organization.query.get(id)
 
         if biz is None:
             abort(404, message="Business %d doesn't exist" % id)

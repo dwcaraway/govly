@@ -8,7 +8,7 @@ import os
 import random
 import sure
 from app import create_application
-from app.model import db, Business, OrganizationSource
+from app.model import db, Organization, OrganizationSource, ContactPoint, Organization
 from app.config import TestingConfig
 
 class DatabasePipelineTest(unittest.TestCase):
@@ -37,7 +37,7 @@ class DatabasePipelineTest(unittest.TestCase):
             db.session.commit()
             sid = s.id
 
-            len(Business.query.all()).should.equal(0)
+            len(Organization.query.all()).should.equal(0)
 
         item = BusinessItem()
         item['legalName']='myname'
@@ -59,7 +59,7 @@ class DatabasePipelineTest(unittest.TestCase):
         ret.should.be(item) 
 
         with self.vitals.app_context():
-            len(Business.query.all()).should.equal(1)
+            len(Organization.query.all()).should.equal(1)
 
     def test_missing_desc(self):
         pipe = DatabasePipeline(self.vitals)
@@ -71,7 +71,7 @@ class DatabasePipelineTest(unittest.TestCase):
             db.session.add(s)
             db.session.commit()
             sid = s.id
-            len(Business.query.all()).should.equal(0)
+            len(Organization.query.all()).should.equal(0)
 
         item = BusinessItem()
         item['legalName']='myname'
@@ -92,7 +92,7 @@ class DatabasePipelineTest(unittest.TestCase):
         ret.should.be(item) 
 
         with self.vitals.app_context():
-            len(Business.query.all()).should.equal(1)
+            len(Organization.query.all()).should.equal(1)
 
     def test_existing(self):
         """An existing business should be updated"""
@@ -100,7 +100,7 @@ class DatabasePipelineTest(unittest.TestCase):
         biz_uid = None
 
         with self.vitals.app_context():
-            b = Business()
+            b = Organization()
             s = OrganizationSource(spider_name='daytonlocal.com')
             
             db.session.add(s)
@@ -123,7 +123,7 @@ class DatabasePipelineTest(unittest.TestCase):
             pipe = DatabasePipeline(self.vitals)
             pipe.process_item(item, Spider(name='daytonlocal.com'))
 
-            b = Business.query.get(biz_uid)
+            b = Organization.query.get(biz_uid)
             b.legalName.should.equal('newname')
 
     def test_existing_by_phone(self):
@@ -140,14 +140,13 @@ class DatabasePipelineTest(unittest.TestCase):
                 db.session.add(s)
                 db.session.commit()
 
-                b = Business()
-
                 random_name = 'oldname{0}'.format(random.randint(1, 99))
-                b.legalName = random_name
-                b.phone = '12342342345'
-                b.source_id = s.id
+                b = Organization(legalName=random_name, source_id=s.id)
                 db.session.add(b)
                 db.session.commit()
+
+                cc = ContactPoint(telephone='12342342345', organization_id=b.id)
+                db.session.add(cc)
 
                 #Create a scraped BusinessItem with matching src and phone
                 item = BusinessItem(legalName='newname', phone='12342342345', source_id=s.id)
@@ -157,8 +156,8 @@ class DatabasePipelineTest(unittest.TestCase):
 
                 #Business should have been modified. If not, then
                 # a new business was mistakenly created.
-                b = Business.query.filter_by(phone='12342342345').first()
-                b.shouldnot.equal(None)
-                b.legalName.should.equal('newname')
-                len(Business.query.all()).should.equal(1)
+                c = ContactPoint.query.filter_by(telephone='12342342345').first()
+                c.organization.shouldnot.equal(None)
+                c.organization.legalName.should.equal('newname')
+                len(Organization.query.all()).should.equal(1)
 

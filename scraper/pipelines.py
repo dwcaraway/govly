@@ -1,4 +1,4 @@
-from app.model import db, Business, OrganizationSource
+from app.model import db, Organization, OrganizationSource, ContactPoint
 from app import create_application
 from app.config import DevelopmentConfig
 from scrapy import log
@@ -66,18 +66,18 @@ class DatabasePipeline:
 
     def process_item(self, item, spider):
         with self.app.app_context():
-            b = Business.query.filter_by(source_data_id=item.get('source_data_id', '-1'), source_id=item['source_id']).first()
+            b = Organization.query.filter_by(source_data_id=item.get('source_data_id', '-1'), source_id=item['source_id']).first()
 
             if b is None and item.get('phone'):
                 #Try to get by phone
-                b = Business.query.filter_by(phone=item['phone'], source_id=item['source_id']).first()
+                c = ContactPoint.query.filter_by(telephone=item['phone']).first()
 
-            if b is None:
-                log.msg('business not found, creating new one', level=log.DEBUG)
-                b = Business()
-                db.session.add(b)
-                # b.source
-                # b.source_data_id = item.get('source_data_id')
+                if c is None:
+                    log.msg('business not found, creating new one', level=log.DEBUG)
+                    b = Organization()
+                    db.session.add(b)
+                else:
+                    b = c.organization
 
             for key, value in item.iteritems():
                 setattr(b, key, value)

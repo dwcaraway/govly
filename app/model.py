@@ -34,37 +34,6 @@ class Person(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-
-class Organization(db.Model):
-
-    __tablename__= 'organizations'
-
-    id = db.Column(db.Integer, primary_key=True)
-    duns = db.Column(db.String)
-    legalName = db.Column(db.String)
-    logo = db.Column(db.String)
-    naics = db.Column(db.String)
-    cage = db.Column(db.String)
-    taxID = db.Column(db.String)
-    description = db.Column(db.Text)
-
-    addressCountry = db.Column(db.String)
-    addressLocality = db.Column(db.String)
-    addressRegion = db.Column(db.String)
-    postOfficeBoxNumber = db.Column(db.String)
-    postalCode = db.Column(db.String)
-    streetAddress = db.Column(db.String)
-    lat = db.Column(db.String)
-    lon = db.Column(db.String)
-
-    source_id = db.Column(db.Integer, db.ForeignKey('organization_sources.id'))
-
-    created_on = db.Column(db.DateTime, default=db.func.now())
-    updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
-
-    employees = db.relationship("Person", secondary="employment", backref="employers")
-    search_vector = db.Column(TSVectorType('legalName', 'description'))
-
 db.Table('employment', db.Model.metadata,
                 db.Column('employer_id', None, db.ForeignKey('organizations.id')),
                 db.Column('employee_id', None, db.ForeignKey('people.id'))
@@ -115,13 +84,13 @@ class OrganizationSource(db.Model):
     def __repr__(self):
         return get_string_repr(self)
 
-class BusinessQuery(BaseQuery, SearchQueryMixin):
+class OrganizationQuery(BaseQuery, SearchQueryMixin):
     pass
 
-class Business(db.Model):
+class Organization(db.Model):
     """A data model for a business"""
-    query_class = BusinessQuery
-    __tablename__='businesses'
+    query_class = OrganizationQuery
+    __tablename__='organizations'
 
     id = db.Column(db.Integer, primary_key=True)
     duns = db.Column(db.String)
@@ -130,29 +99,31 @@ class Business(db.Model):
     naics = db.Column(db.String)
     cage = db.Column(db.String)
     taxID = db.Column(db.String)
-
-    phone = db.Column(db.String)
-    logo = db.Column(db.String)
-    category = db.Column(db.String)
     description = db.Column(db.String)
 
-    raw_address = db.Column(db.String)
-    address1 = db.Column(db.String)
-    address2 = db.Column(db.String)
-    city = db.Column(db.String)
-    state = db.Column(db.String)
-    zip = db.Column(db.String)
-    latitude = db.Column(db.Float)
-    longitude =db.Column(db.Float)
+    logo = db.Column(db.String)
+    category = db.Column(db.String)
+
+    addressCountry = db.Column(db.String)
+    addressLocality = db.Column(db.String)
+    addressRegion = db.Column(db.String)
+    postOfficeBoxNumber = db.Column(db.String)
+    postalCode = db.Column(db.String)
+    streetAddress = db.Column(db.String)
+    lat = db.Column(db.String)
+    lon = db.Column(db.String)
 
     source_data_id = db.Column(db.String)
     source_data_url = db.Column(db.String)
     source_id = db.Column(db.Integer, db.ForeignKey('organization_sources.id'))
 
-    search_vector = db.Column(TSVectorType('legalName', 'description'))
-
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
+
+    employees = db.relationship("Person", secondary="employment", backref="employers")
+    contacts = db.relationship("ContactPoint", backref="organization")
+
+    search_vector = db.Column(TSVectorType('legalName', 'description'))
 
     def __repr__(self):
         return get_string_repr(self)
@@ -196,18 +167,19 @@ class ContactPoint(db.Model):
     __tablename__= 'contact_points'
 
     id = db.Column(db.Integer, primary_key=True)
-    operating_hours = db.relationship("OperatingHours", backref="contact")
+    #operating_hours = db.relationship("OperatingHours", backref="contact")
     email = db.Column(db.String)
     faxNumber = db.Column(db.String)
     telephone = db.Column(db.String)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
 
-class OperatingHours(db.Model):
-    __tablename__= 'operating_hours'
-    id = db.Column(db.Integer, primary_key=True)
-    closes = db.Column(db.String)
-    opens = db.Column(db.String)
-    dayOfWeek = db.Column(db.String)
-    contact_id = db.Column(db.Integer, db.ForeignKey('contact_points.id'))
+# class OperatingHours(db.Model):
+#     __tablename__= 'operating_hours'
+#     id = db.Column(db.Integer, primary_key=True)
+#     closes = db.Column(db.String)
+#     opens = db.Column(db.String)
+#     dayOfWeek = db.Column(db.String)
+#     contact_id = db.Column(db.Integer, db.ForeignKey('contact_points.id'))
 
 #enable full-text search of postgres
 make_searchable()

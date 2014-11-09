@@ -4,7 +4,7 @@ import tempfile
 import os
 from datetime import datetime
 
-from app.model import db, Event, Business, OrganizationSource
+from app.model import db, Event, Organization, OrganizationSource
 from tests import hal_loads
 from app import create_application
 import sure
@@ -209,7 +209,7 @@ class BusinessesTest(ApiTest):
         """
         Call to Businesses collection with single event
         """
-        biz = Business()
+        biz = Organization()
 
         db.session.add(biz)
         db.session.commit()
@@ -232,7 +232,7 @@ class BusinessesTest(ApiTest):
         Create a bunch of businesses and verify the links are correct
         """
         for i in range(100):
-            db.session.add(Business())
+            db.session.add(Organization())
         db.session.commit()
 
         resp = self.test_client.get('/api/businesses')
@@ -251,7 +251,7 @@ class BusinessesTest(ApiTest):
         db.session.add(s)
         db.session.commit()
 
-        b = Business(legalName="mr. bill")
+        b = Organization(legalName="mr. bill")
         b.source_id = s.id
         db.session.add(b)
         db.session.commit()
@@ -267,7 +267,7 @@ class BusinessTest(ApiTest):
         """
         Get single business
         """
-        biz = Business()
+        biz = Organization()
 
         db.session.add(biz)
         db.session.commit()
