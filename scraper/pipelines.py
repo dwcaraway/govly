@@ -29,30 +29,31 @@ class PhoneNormalizationPipeline:
             log.msg("Unable to parse phone: %s" % p_original, level=log.DEBUG)
         return item
 
-class CreateSourcePipeline:
-    def __init__(self, app=None):
-        if app is None:
-            self.app = create_application()
-        else:
-            self.app = app
-
-    def process_item(self, item , spider):
-        #TODO source lookup in BusinessItemLoader (once) and cache
-        #assumes that note more than one source per spider which is fine
-        if item.get('source_id'):
-            return item
-
-        with self.app.app_context():
-            s = OrganizationSource.query.filter_by(name=spider.name).first()
-            if s is None:
-                log.msg("Source %s not found. Creating it." % spider.name, level=log.DEBUG)
-                s = OrganizationSource(name = spider.name)
-                db.session.add(s)
-                db.session.commit()
-
-            item['source_id'] = s.id
-
-        return item
+# class CreateSourcePipeline:
+#     def __init__(self, app=None):
+#         if app is None:
+#             self.app = create_application()
+#         else:
+#             self.app = app
+#
+#     def process_item(self, item , spider):
+#         #TODO source lookup in BusinessItemLoader (once) and cache
+#         #assumes that note more than one source per spider which is fine
+#         business
+#         if item.get('source_id'):
+#             return item
+#
+#         with self.app.app_context():
+#             s = OrganizationSource.query.filter_by(name=spider.name).first()
+#             if s is None:
+#                 log.msg("Source %s not found. Creating it." % spider.name, level=log.DEBUG)
+#                 s = OrganizationSource(name = spider.name)
+#                 db.session.add(s)
+#                 db.session.commit()
+#
+#             item['source_id'] = s.id
+#
+#         return item
 
 
 class DatabasePipeline:
@@ -65,19 +66,24 @@ class DatabasePipeline:
             self.app = app
 
     def process_item(self, item, spider):
+        b = None
+
         with self.app.app_context():
-            b = Organization.query.filter_by(source_data_id=item.get('source_data_id', '-1'), source_id=item['source_id']).first()
+            if item.get('source_data_id'):
+                o = OrganizationSource.query.filter_by(data_uid=item['source_data_id'], spider_name=spider.name).first()
+                if o is not None:
+                    b = o.organization
 
             if b is None and item.get('phone'):
                 #Try to get by phone
                 c = ContactPoint.query.filter_by(telephone=item['phone']).first()
-
-                if c is None:
-                    log.msg('business not found, creating new one', level=log.DEBUG)
-                    b = Organization()
-                    db.session.add(b)
-                else:
+                if c is not None:
                     b = c.organization
+
+            if b is None:
+                log.msg('business not found, creating new one', level=log.DEBUG)
+                b = Organization()
+                db.session.add(b)
 
             for key, value in item.iteritems():
                 setattr(b, key, value)

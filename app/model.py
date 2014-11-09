@@ -7,8 +7,6 @@ import json
 # Define the database functions
 db = SQLAlchemy()
 
-
-
 def get_string_repr(obj):
     #Using str for value since datetime is not json serializable
     new_obj = {}
@@ -40,6 +38,8 @@ db.Table('employment', db.Model.metadata,
 )
 
 class Event(db.Model):
+    __tablename__='events'
+
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String(80))
     title = db.Column(db.String(120))
@@ -75,11 +75,10 @@ class Event(db.Model):
 class OrganizationSource(db.Model):
     __tablename__='organization_sources'
     id = db.Column(db.Integer, primary_key=True)
-    source_unique_id = db.Column(db.String)
-    source_data_url = db.Column(db.String)
+    data_uid = db.Column(db.String)
+    data_url = db.Column(db.String)
     spider_name = db.Column(db.String)
-
-    organization = db.relationship("Organization", backref="sources")
+    organization_id= db.Column(db.Integer, db.ForeignKey("organizations.id"))
 
     def __repr__(self):
         return get_string_repr(self)
@@ -101,9 +100,6 @@ class Organization(db.Model):
     taxID = db.Column(db.String)
     description = db.Column(db.String)
 
-    logo = db.Column(db.String)
-    category = db.Column(db.String)
-
     addressCountry = db.Column(db.String)
     addressLocality = db.Column(db.String)
     addressRegion = db.Column(db.String)
@@ -113,20 +109,24 @@ class Organization(db.Model):
     lat = db.Column(db.String)
     lon = db.Column(db.String)
 
-    source_data_id = db.Column(db.String)
-    source_data_url = db.Column(db.String)
-    source_id = db.Column(db.Integer, db.ForeignKey('organization_sources.id'))
-
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
     employees = db.relationship("Person", secondary="employment", backref="employers")
     contacts = db.relationship("ContactPoint", backref="organization")
+    keywords = db.relationship("OrganizationKeyword", backref="organization")
+    sources = db.relationship("OrganizationSource", backref="organization")
 
     search_vector = db.Column(TSVectorType('legalName', 'description'))
 
     def __repr__(self):
         return get_string_repr(self)
+
+class OrganizationKeyword(db.Model):
+    __tablename__= 'organization_keywords'
+    id = db.Column(db.Integer, primary_key=True)
+    organization_id = db.Column(db.Integer, db.ForeignKey("organizations.id"))
+    keyword = db.Column(db.String)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)

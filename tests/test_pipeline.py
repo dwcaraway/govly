@@ -52,7 +52,6 @@ class DatabasePipelineTest(unittest.TestCase):
         item['city'] = 'mycity'
         item['state'] = 'mystate'
         item['zip'] = 'myzip'
-        item['source_id'] = sid
 
         ret = pipe.process_item(item, Spider(name='foo'))
 
@@ -100,29 +99,25 @@ class DatabasePipelineTest(unittest.TestCase):
         biz_uid = None
 
         with self.vitals.app_context():
-            b = Organization()
-            s = OrganizationSource(spider_name='daytonlocal.com')
-            
-            db.session.add(s)
-            db.session.commit()
-
-            b.legalName = 'oldname'
-            b.source_data_id='123'
-            b.source_id = s.id
+            b = Organization(legalName='oldname')
 
             db.session.add(b)
             db.session.commit()
 
+            s = OrganizationSource(data_uid='123', spider_name='daytonlocal.com', organization_id=b.id)
+            db.session.add(s)
+            db.session.commit()
+
             biz_uid = b.id
 
-            item = BusinessItem()
-            item['legalName']='newname'
-            item['source_data_id'] = '123'
-            item['source_id']=s.id
+        item = BusinessItem()
+        item['legalName']='newname'
+        item['source_data_id'] = '123'
 
-            pipe = DatabasePipeline(self.vitals)
-            pipe.process_item(item, Spider(name='daytonlocal.com'))
+        pipe = DatabasePipeline(self.vitals)
+        pipe.process_item(item, Spider(name='daytonlocal.com'))
 
+        with self.vitals.app_context():
             b = Organization.query.get(biz_uid)
             b.legalName.should.equal('newname')
 
@@ -141,7 +136,7 @@ class DatabasePipelineTest(unittest.TestCase):
                 db.session.commit()
 
                 random_name = 'oldname{0}'.format(random.randint(1, 99))
-                b = Organization(legalName=random_name, source_id=s.id)
+                b = Organization(legalName=random_name)
                 db.session.add(b)
                 db.session.commit()
 

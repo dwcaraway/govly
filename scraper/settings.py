@@ -9,8 +9,7 @@ USER_AGENT = 'dayton-healthcheck'
 
 ITEM_PIPELINES = {
     'scrapy.contrib.pipeline.images.ImagesPipeline': 1,
-    'scraper.pipelines.PhoneNormalizationPipeline':1,
-    'scraper.pipelines.CreateSourcePipeline':1,
+    'scraper.pipelines.PhoneNormalizationPipeline':5,
     'scraper.pipelines.DatabasePipeline': 1000
 }
 
