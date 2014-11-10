@@ -28,4 +28,4 @@ class BusinessItem(Item):
     linkedin = Field()
     category = Field()
     source_url = Field()
-    source_data_id = Field()
+    data_uid = Field()

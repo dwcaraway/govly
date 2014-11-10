@@ -88,7 +88,7 @@ class DaytonLocalSpider(Spider):
             l.add_xpath('phone', './/div[@class="clearl"]/i/following-sibling::text()[1]')
             l.add_xpath('description','.//div[@class="clearl"][2]/text()')
             l.add_xpath('category', './/div[@class="clearl"]/a[@class="ibutt"]/text()')
-            l.add_value('source_data_id', source_data_id)
+            l.add_value('data_uid', source_data_id)
 
             items.append(l.load_item())
 

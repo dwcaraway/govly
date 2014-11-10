@@ -111,7 +111,7 @@ class DatabasePipelineTest(unittest.TestCase):
 
         item = BusinessItem()
         item['legalName']='newname'
-        item['source_data_id'] = '123'
+        item['data_uid'] = '123'
 
         pipe = DatabasePipeline(self.vitals)
         pipe.process_item(item, Spider(name='daytonlocal.com'))
@@ -121,7 +121,7 @@ class DatabasePipelineTest(unittest.TestCase):
             b.legalName.should.equal('newname')
 
     def test_existing_by_phone(self):
-            """If a business doesn't have a source_data_id
+            """If a business doesn't have a data_uid
             then check to see if phone exists for that source id. if so,
             treat business as existing and modify rather than create 
             a new business.

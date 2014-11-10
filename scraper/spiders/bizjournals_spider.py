@@ -86,7 +86,7 @@ class BizJournalsSpider(Spider):
         l.add_xpath("zip", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[3]/ text()")
         l.add_xpath("phone", "//div[@class='b2Local-greenTextmed']/ text()")
         l.add_xpath("description", "//div[@id='b2sec-alpha']/p[4]/ text()")
-        l.add_value("source_data_id", unicode(split_url[-2]))
+        l.add_value("data_uid", unicode(split_url[-2]))
         l.add_value("category", unicode(split_url[-3]))
         l.add_value("data_source_url", unicode(response.url))
 

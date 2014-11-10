@@ -71,8 +71,8 @@ class DatabasePipeline:
         b = None
 
         with self.app.app_context():
-            if item.get('source_data_id'):
-                o = OrganizationSource.query.filter_by(data_uid=item['source_data_id'], spider_name=spider.name).first()
+            if item.get('data_uid'):
+                o = OrganizationSource.query.filter_by(data_uid=item['data_uid'], spider_name=spider.name).first()
                 if o is not None:
                     b = o.organization
 
