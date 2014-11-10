@@ -84,7 +84,6 @@ class DatabasePipelineTest(unittest.TestCase):
         item['city'] = 'mycity'
         item['state'] = 'mystate'
         item['zip'] = 'myzip'
-        item['source_id'] = sid
 
         ret = pipe.process_item(item, Spider(name='foo'))
 
@@ -140,18 +139,19 @@ class DatabasePipelineTest(unittest.TestCase):
                 db.session.add(b)
                 db.session.commit()
 
-                cc = ContactPoint(telephone='12342342345', organization_id=b.id)
+                cc = ContactPoint(telephone='+1 234-234-2345', organization_id=b.id)
                 db.session.add(cc)
+                db.session.commit()
 
                 #Create a scraped BusinessItem with matching src and phone
-                item = BusinessItem(legalName='newname', phone='12342342345', source_id=s.id)
+                item = BusinessItem(legalName='newname', phone='+1 234-234-2345')
 
                 pipe = DatabasePipeline(self.vitals)
                 pipe.process_item(item, Spider(name='daytonchamber.org'))
 
                 #Business should have been modified. If not, then
                 # a new business was mistakenly created.
-                c = ContactPoint.query.filter_by(telephone='12342342345').first()
+                c = ContactPoint.query.filter_by(telephone='+1 234-234-2345').first()
                 c.organization.shouldnot.equal(None)
                 c.organization.legalName.should.equal('newname')
                 len(Organization.query.all()).should.equal(1)

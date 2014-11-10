@@ -1,18 +1,13 @@
 __author__ = 'dwcaraway'
 
 from scrapy.spider import Spider
-from scrapy.selector import Selector
-from scrapy.http import Request
 import urlparse
 import re
 from urlparse import urljoin
-import lxml
-import datetime
 from scraper.items import BusinessItem
 from scrapy.contrib.loader.processor import MapCompose, TakeFirst
 from scrapy.contrib.loader import ItemLoader
 from urllib2 import urlopen
-from scrapy import log
 
 def get_redirected_url(original):
         return urlopen(original).geturl()
@@ -62,36 +57,38 @@ class DaytonLocalSpider(Spider):
         """
         Takes the data out of the pages at www.daytonlocal.com/listings/*
         """
+        source_data_id = None
+
+        raw_text = response.css('div.GoAwy div.clearl style').extract()
+        if(len(raw_text) > 0):
+            #Use the style element to find the uid using the map_canvas_(somenumber)
+            r = uid_matcher.search(raw_text[0])
+            source_data_id = r.groups()[0]
+        else:
+            #If business has a website link over their logo, grab the id
+            resp_href = response.css('div.dright a').xpath('@href').extract()
+            if resp_href:
+               source_data_id = get_uid_from_href(resp_href[0])
 
         items = []
 
         for container in response.css('div.vcard'):
             l = BusinessLoader(selector=container)
-            l.add_xpath('legalName', './*[contains(@class, "fn")]//strong/text()')
+            l.add_xpath('legalName', './div[@class="fn"]/a/strong/text()')
             l.add_xpath('image_urls', '//*[@id="MainContentArea"]//div[contains(@class, "dright")]/a/img/ @src')
             l.add_value('source_url', unicode(response.url))
-            l.add_xpath('website', './*[contains(@class, "fn")]//a/ @href')
-            l.add_xpath('city', '//span[contains(@class, "locality")]/text()')
-            l.add_xpath('state', '//span[contains(@class, "region")]/text()')
-            l.add_xpath('zip', '//span[contains(@class, "postal-code")]/text()')
-            l.add_xpath('facebook', "//a[@class='ebutt' and contains(@href, 'lnk=fb')]/@href")
-            l.add_xpath('twitter', "//a[@class='ebutt' and contains(@href, 'lnk=tw')]/@href")
-            l.add_xpath('address1', '//span[contains(@class, "street-address")]/text()')
-            l.add_xpath('address2', './div[@class="adr"]/br[2]/preceding-sibling::text()[1]')
-            l.add_xpath('phone', './div[@class="clearl"]/i/following-sibling::text()[1]')
-            l.add_xpath('description','./div[@class="clearl"][2]/text()')
-            l.add_xpath('category', './div[@class="clearl"]/a[@class="ibutt"]/text()')
-
-            raw_text = response.css('div.GoAwy div.clearl style').extract()
-            if(len(raw_text) > 0):
-                #Use the style element to find the uid using the map_canvas_(somenumber)
-                r = uid_matcher.search(raw_text[0])
-                l.add_value('source_data_id', r.groups()[0])
-            else:
-                #If business has a website link over their logo, grab the id
-                resp_href = response.css('div.dright a').xpath('@href').extract()
-                if resp_href:
-                    l.add_value('source_data_id', get_uid_from_href(resp_href[0]))
+            l.add_xpath('website', './div[@class="fn"]/a/@href')
+            l.add_xpath('city', './/span[@class="locality"]/text()')
+            l.add_xpath('state', './/span[contains(@class, "region")]/text()')
+            l.add_xpath('zip', './/span[contains(@class, "postal-code")]/text()')
+            l.add_xpath('facebook', ".//a[@class='ebutt' and contains(@href, 'lnk=fb')]/@href")
+            l.add_xpath('twitter', ".//a[@class='ebutt' and contains(@href, 'lnk=tw')]/@href")
+            l.add_xpath('address1', './/span[contains(@class, "street-address")]/text()')
+            l.add_xpath('address2', './/div[@class="adr"]/br[2]/preceding-sibling::text()[1]')
+            l.add_xpath('phone', './/div[@class="clearl"]/i/following-sibling::text()[1]')
+            l.add_xpath('description','.//div[@class="clearl"][2]/text()')
+            l.add_xpath('category', './/div[@class="clearl"]/a[@class="ibutt"]/text()')
+            l.add_value('source_data_id', source_data_id)
 
             items.append(l.load_item())
 

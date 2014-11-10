@@ -16,10 +16,10 @@ class PhoneNormalizationPipeline:
     def process_item(self, item, spider):
         p_original = item.get('phone')
 
-        #Normalize phone numbers
+        #Normalize phone numbers to INTERNATIONAL format, assumes US phone number to dial from
         try:
             p = phonenumbers.parse(p_original, 'US')
-            p = phonenumbers.normalize_digits_only(p)
+            p = phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
             item['phone'] = p
         except IndexError:
             item['phone'] = None
@@ -64,6 +64,8 @@ class DatabasePipeline:
             self.app = create_application()
         else:
             self.app = app
+        with app.app_context():
+            db.create_all()
 
     def process_item(self, item, spider):
         b = None
@@ -75,7 +77,7 @@ class DatabasePipeline:
                     b = o.organization
 
             if b is None and item.get('phone'):
-                #Try to get by phone
+                #Try to get by phone, assumes phone normalized to INTERNATIONAL standard
                 c = ContactPoint.query.filter_by(telephone=item['phone']).first()
                 if c is not None:
                     b = c.organization
