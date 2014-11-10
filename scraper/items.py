@@ -29,5 +29,3 @@ class BusinessItem(Item):
     category = Field()
     source_url = Field()
     source_data_id = Field()
-
-    source_id = Field()

@@ -50,7 +50,7 @@ class CbusChamberSpider(Spider):
         items = []
 
         for container in response.xpath("//div[contains(concat(' ', @class, ' '), ' ListingResults_All_CONTAINER ')]"):
-            detail_url = container.xpath('.//span[@itemprop="name"]/a/ @href').extract()[0]
+#            detail_url = container.xpath('.//span[@itemprop="name"]/a/ @href').extract()[0]
 
             l = BusinessLoader(item = response.meta.get('item'), selector=container, response=response)
             l.add_xpath('name', './/span[@itemprop="name"]/a/ text()')

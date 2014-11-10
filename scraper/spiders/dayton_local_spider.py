@@ -5,23 +5,37 @@ from scrapy.selector import Selector
 from scrapy.http import Request
 import urlparse
 import re
+from urlparse import urljoin
 import lxml
 import datetime
 from scraper.items import BusinessItem
-import urllib2
+from scrapy.contrib.loader.processor import MapCompose, TakeFirst
+from scrapy.contrib.loader import ItemLoader
+from urllib2 import urlopen
 from scrapy import log
 
-category_matcher = re.compile('.*[.]com/(.*)[.]asp')
+def get_redirected_url(original):
+        return urlopen(original).geturl()
+
 uid_matcher = re.compile("#map_canvas_(\d+)\s")
+
+class BusinessLoader(ItemLoader):
+
+    default_item_class = BusinessItem
+    default_input_processor = MapCompose(unicode.strip)
+    default_output_processor = TakeFirst()
+
+    category_in = MapCompose(unicode.strip, lambda x: x.split('More ')[1].lower())
+    image_urls_in = MapCompose(unicode.strip, lambda x: x if x.startswith('http') else urljoin('http://www.daytonlocal.com/', x))
+    twitter_in = MapCompose(get_redirected_url)
+    facebook_in = MapCompose(get_redirected_url)
+
 
 def get_uid_from_href(href):
     """Extracts the 'id' query string parameter value from the supplied href string"""
-    try:
-        parsed_href = urlparse.urlparse(href)
-        uid = urlparse.parse_qs(parsed_href.query)['id'][0]
-        return uid
-    except Exception:
-        return None;
+    parsed_href = urlparse.urlparse(href)
+    uid = urlparse.parse_qs(parsed_href.query)['id'][0]
+    return uid
 
 class DaytonLocalSpider(Spider):
     name = "dayton_local"
@@ -31,16 +45,14 @@ class DaytonLocalSpider(Spider):
     ]
 
     def parse(self, response):
-        sel = Selector(response)
-        links = sel.css('#MainContentArea div.clearc a').xpath('@href').extract()
+        links = response.css('#MainContentArea div.clearc a').xpath('@href').extract()
         links = filter(lambda a: a!= u'#top', links)
         return [Request(url=link, callback=self.paginate) for link in links if not link.startswith('#')]
 
     def paginate(self, response):
-        sel = Selector(response)
         links = response.xpath("//div[contains(@class,'dright')]/a/ @href").extract()
         link_req_objs = [Request(url=link, callback=self.extract) for link in links]
-        next_url = sel.xpath("//a[text()='Next']/@href").extract()
+        next_url = response.xpath("//a[text()='Next']/@href").extract()
         if next_url:
             link_req_objs.append(Request(url=urlparse.urljoin(response.url, next_url[0]), callback=self.paginate))
 
@@ -51,104 +63,39 @@ class DaytonLocalSpider(Spider):
         Takes the data out of the pages at www.daytonlocal.com/listings/*
         """
 
-        sel = Selector(response)
-        logo = sel.xpath('//*[@id="MainContentArea"]//div[contains(@class, "dright")]/a/img/ @src').extract()
-
-        item = BusinessItem()
-
         items = []
 
-        for card in sel.xpath('//div[contains(@class, "vcard")]'):
+        for container in response.css('div.vcard'):
+            l = BusinessLoader(selector=container)
+            l.add_xpath('legalName', './*[contains(@class, "fn")]//strong/text()')
+            l.add_xpath('image_urls', '//*[@id="MainContentArea"]//div[contains(@class, "dright")]/a/img/ @src')
+            l.add_value('source_url', unicode(response.url))
+            l.add_xpath('website', './*[contains(@class, "fn")]//a/ @href')
+            l.add_xpath('city', '//span[contains(@class, "locality")]/text()')
+            l.add_xpath('state', '//span[contains(@class, "region")]/text()')
+            l.add_xpath('zip', '//span[contains(@class, "postal-code")]/text()')
+            l.add_xpath('facebook', "//a[@class='ebutt' and contains(@href, 'lnk=fb')]/@href")
+            l.add_xpath('twitter', "//a[@class='ebutt' and contains(@href, 'lnk=tw')]/@href")
+            l.add_xpath('address1', '//span[contains(@class, "street-address")]/text()')
+            l.add_xpath('address2', './div[@class="adr"]/br[2]/preceding-sibling::text()[1]')
+            l.add_xpath('phone', './div[@class="clearl"]/i/following-sibling::text()[1]')
+            l.add_xpath('description','./div[@class="clearl"][2]/text()')
+            l.add_xpath('category', './div[@class="clearl"]/a[@class="ibutt"]/text()')
 
-            item['data_source_url'] = response.url
-            
             raw_text = response.css('div.GoAwy div.clearl style').extract()
             if(len(raw_text) > 0):
                 #Use the style element to find the uid using the map_canvas_(somenumber)
                 r = uid_matcher.search(raw_text[0])
-                item['source_data_id'] = r.groups()[0]
+                l.add_value('source_data_id', r.groups()[0])
             else:
                 #If business has a website link over their logo, grab the id
-                resp_href = sel.css('div.dright a').xpath('@href').extract()
+                resp_href = response.css('div.dright a').xpath('@href').extract()
                 if resp_href:
-                    item['source_data_id'] = get_uid_from_href(resp_href[0])
+                    l.add_value('source_data_id', get_uid_from_href(resp_href[0]))
 
-            item['retrieved_on'] = datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y")
-
-            name = card.xpath('//*[contains(@class, "fn")]//strong/text()').extract()
-            item['name'] = name[0] if name else None
-
-            website = card.xpath('//*[contains(@class, "fn")]//a/ @href').extract()
-            item['website'] = website[0] if website else None
-
-            item['image_urls'] = urlparse.urljoin('http://www.daytonlocal.com', logo[0]) if logo else None
-
-            address1 = card.xpath('//span[contains(@class, "street-address")]/text()').extract()
-            item['address1'] = address1[0] if address1 else None
-
-            # This ones weird..the text we want is between two <br> tags
-            addr_div = card.css('.adr').extract()
-            address2 = None
-            if addr_div:
-                br = lxml.html.fromstring(addr_div[0]).cssselect('br')
-                if br:
-                    address2 = br[0].tail
-            item['address2'] = address2
-
-            city = card.xpath('//span[contains(@class, "locality")]/text()').extract()
-            item['city'] = city[0] if city else None
-
-            state = card.xpath('//span[contains(@class, "region")]/text()').extract()
-            item['state'] = state[0] if state else None
-
-            zipcode = card.xpath('//span[contains(@class, "postal-code")]/text()').extract()
-            item['zip'] = zipcode[0] if zipcode else None
-
-            special_divs = card.xpath('div[contains(@class, "clearl")]')
-
-            if special_divs:
-                item['phone'] = special_divs[0].xpath('text()').extract()[1]
-
-            if len(special_divs) >=2:
-                descr = special_divs[1].xpath('text()').extract()
-                item['description'] = descr[0] if descr else None
-
-            try:
-                fb_href = response.xpath("//a/@href[contains(., 'lnk=fb')]").extract()
-                if len(fb_href) > 0:
-                    item['facebook'] = urllib2.urlopen(fb_href[0]).geturl()
-                    if item['source_data_id'] is None:
-                        item['source_data_id'] = get_uid_from_href(fb_href[0])
-            except:
-                log.msg('no twitter for %s' % response.url, level=log.DEBUG)
-            
-            try:
-                twitter_href = response.xpath("//a/@href[contains(., 'lnk=tw')]").extract()
-                if len(twitter_href) > 0:
-                    item['twitter'] = urllib2.urlopen(twitter_href[0]).geturl()
-                    if item['source_data_id'] is None:
-                        item['source_data_id'] = get_uid_from_href(twitter_href[0])
-            except Exception:
-                log.msg('no twitter for %s' % response.url, level=log.DEBUG)
-
-            item['category'] = None
-
-            if len(special_divs) >=3:
-                hrefs = special_divs[2].xpath('a/ @href').extract()
-                for href in hrefs:
-                    match = category_matcher.match(href)
-                    if match:
-                        item['category'] = match.group(1).split('/')
-
-            #Strip all strings
-            for k, v in item.iteritems():
-                if isinstance(v, basestring):
-                    item[k] = v.strip()
-
-            items.append(item)
+            items.append(l.load_item())
 
         return items
-
 
 if __name__ == '__main__':
     #Run data extraction test on individual page

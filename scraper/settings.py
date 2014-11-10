@@ -1,11 +1,11 @@
 # Scrapy settings for Vitals project
-BOT_NAME = 'dayton-healthcheck'
+BOT_NAME = 'fedvitals'
 
 SPIDER_MODULES = ['scraper.spiders']
 NEWSPIDER_MODULE = 'scraper.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'dayton-healthcheck'
+USER_AGENT = 'fedvitals'
 
 ITEM_PIPELINES = {
     'scrapy.contrib.pipeline.images.ImagesPipeline': 1,
@@ -25,8 +25,8 @@ IMAGES_THUMBS = {
 LOG_LEVEL='WARNING'
 
 #Feed output
-FEED_URI = './scrapeddata/scraped_business.json'
-FEED_FORMAT = 'json'
+#FEED_URI = './scrapeddata/scraped_business.json'
+#FEED_FORMAT = 'json'
 
 LOG_ENABLED=True
 LOG_LEVEL='WARNING'
