@@ -3,6 +3,7 @@ from app import create_application
 from app.config import DevelopmentConfig
 from scrapy import log
 import phonenumbers
+import string
 from address import AddressParser
 
 # Define your item pipelines here
@@ -27,6 +28,20 @@ class PhoneNormalizationPipeline:
         except Exception:
             item['phone'] = None
             log.msg("Unable to parse phone: %s" % p_original, level=log.DEBUG)
+        return item
+
+class AddressNormalizationPipeline:
+    """
+    Normalizes and combines the addresses.
+
+    First, we combine all the street address parts e.g. ['134 some st.', 'apt. #302'] becomes '134 some st., apt. #302'
+    """
+    def process_item(self, item, spider):
+        address = item.get('streetAddress')
+
+        if address:
+            item['streetAddress'] = string.join(address, ', ')
+
         return item
 
 # class CreateSourcePipeline:
@@ -99,7 +114,7 @@ class DatabasePipeline:
 
             # for key, value in item.iteritems():
             #     setattr(organization, key, value)
-            organization.streetAddress = item.get('address1') if not item.get('address2') else item.get('address1')+', '+item.get('address2')
+            organization.streetAddress = item.get('streetAddress')
             organization.addressLocality = item.get('city')
             organization.addressRegion = item.get('state')
             organization.postalCode = item.get('zip')

@@ -46,7 +46,7 @@ class XeniaChamberSpider(Spider):
 
         l = BusinessLoader(item = response.meta.get('item'), response=response)
         l.add_xpath('name', '//*[@id="gl_content-wide-left"]/h1/ text()')
-        l.add_xpath('address1', '//*[@id="gl_content-wide-left"]/table//table//tr[1]/td[1]/text()[1]')
+        l.add_xpath('streetAddress', '//*[@id="gl_content-wide-left"]/table//table//tr[1]/td[1]/text()[1]')
 
         city_state_zip_raw = response.xpath('//*[@id="gl_content-wide-left"]/table//table//tr[1]/td[1]/text()[2]').extract()
         if len(city_state_zip_raw) > 0:

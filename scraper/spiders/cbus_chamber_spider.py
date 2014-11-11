@@ -58,10 +58,10 @@ class CbusChamberSpider(Spider):
             street = response.xpath('.//span[@itemprop="street-address"]/ text()').extract()[0]
             addrs = street.split(', ')
 
-            l.add_value('address1', addrs[0])
+            l.add_value('streetAddress', addrs[0])
 
             if len(addrs) > 1:
-                l.add_value('address2', addrs[1])
+                l.add_value('streetAddress', addrs[1])
 
             l.add_xpath('city', './/span[@itemprop="locality"]/ text()')
             l.add_xpath('state', './/span[@itemprop="region"]/ text()')

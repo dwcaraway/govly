@@ -13,8 +13,7 @@ class BusinessItem(Item):
     images = Field()
 
     raw_address = Field() #An address in a single text field instead of parsed out
-    address1 = Field()
-    address2 = Field()
+    streetAddress = Field()
     city = Field()
     state = Field()
     zip = Field()

@@ -51,8 +51,7 @@ class DatabasePipelineTest(unittest.TestCase):
         item['linkedin'] = 'mylinkedin'
         item['category'] = 'mycategory'
         item['description'] = 'mydescription'
-        item['address1'] = 'myaddress1'
-        item['address2'] = 'myaddress2'
+        item['streetAddress'] = 'myaddress1'
         item['city'] = 'mycity'
         item['state'] = 'mystate'
         item['zip'] = 'myzip'
@@ -66,7 +65,7 @@ class DatabasePipelineTest(unittest.TestCase):
             o.shouldnot.equal(None)
 
             o.legalName.should.equal(item['legalName'])
-            o.streetAddress.should.equal(item['address1']+', '+item['address2'])
+            o.streetAddress.should.equal(item['streetAddress'])
             o.addressLocality.should.equal(item['city'])
             o.addressRegion.should.equal(item['state'])
             o.postalCode.should.equal(item['zip'])
@@ -92,8 +91,7 @@ class DatabasePipelineTest(unittest.TestCase):
         item['facebook'] = 'myfacebook'
         item['twitter'] = 'mytwitter'
         item['category'] = 'mycategory'
-        item['address1'] = 'myaddress1'
-        item['address2'] = 'myaddress2'
+        item['streetAddress'] = 'myaddress1'
         item['city'] = 'mycity'
         item['state'] = 'mystate'
         item['zip'] = 'myzip'
@@ -125,8 +123,7 @@ class DatabasePipelineTest(unittest.TestCase):
 
         item = BusinessItem()
         item['legalName']='myname'
-        item['address1'] = 'addr1'
-        item['address2'] = 'addr2'
+        item['streetAddress'] = 'addr1'
         item['city'] = 'city'
         item['state'] = 'state'
         item['zip'] = 'newzip'

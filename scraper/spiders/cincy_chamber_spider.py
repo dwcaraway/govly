@@ -85,14 +85,14 @@ class CincyChamberSpider(Spider):
 
         l.add_xpath('description', '//*[@id="ctl00_ctl00_body_maincontentblock_lblProductandServices"]/ text()')
 
-        #List of strings which, when joined, form the address. form is <address1>, <optional: address2>, <city and state and zip>
+        #List of strings which, when joined, form the address. form is <streetAddress>, <optional: streetAddress>, <city and state and zip>
         address_fields = response.xpath('//*[@id="ctl00_ctl00_body_maincontentblock_lblcoAddress"]/ text()').extract()
         m = re.match(pattern=u'^([\w\s]*),\s+([\w\s]+)[\xa0]+(\S+)$', string=address_fields[-1])
 
-        l.add_value('address1', address_fields[0])
+        l.add_value('streetAddress', address_fields[0])
 
         if len(address_fields) is 3:
-            l.add_value('address2', address_fields[1])
+            l.add_value('streetAddress', address_fields[1])
 
         l.add_value('city', m.group(1))
         l.add_value('state', m.group(2))

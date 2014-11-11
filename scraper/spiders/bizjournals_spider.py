@@ -80,7 +80,7 @@ class BizJournalsSpider(Spider):
         l = BusinessLoader(response=response)
         l.add_xpath('name', "//div[@id='b2sec-alpha']/h2/text()")
         l.add_xpath("website", "//div[@class='b2secDetails-URL']//a/ @href")
-        l.add_xpath("address1", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][1]/ text()")
+        l.add_xpath("streetAddress", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][1]/ text()")
         l.add_xpath("city", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[1]/ text()")
         l.add_xpath("state", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[2]/ text()")
         l.add_xpath("zip", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[3]/ text()")
