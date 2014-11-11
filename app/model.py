@@ -76,9 +76,9 @@ class OrganizationSource(db.Model):
     __tablename__='organization_sources'
     id = db.Column(db.Integer, primary_key=True)
     data_uid = db.Column(db.String)
-    data_url = db.Column(db.String)
-    spider_name = db.Column(db.String)
-    organization_id= db.Column(db.Integer, db.ForeignKey("organizations.id"))
+    data_url = db.Column(db.String, nullable=False)
+    spider_name = db.Column(db.String, nullable=False)
+    organization_id= db.Column(db.Integer, db.ForeignKey("organizations.id"), nullable=False)
 
     def __repr__(self):
         return get_string_repr(self)
@@ -93,7 +93,7 @@ class Organization(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     duns = db.Column(db.String)
-    legalName = db.Column(db.String)
+    legalName = db.Column(db.String, nullable=False)
     logo = db.Column(db.String)
     naics = db.Column(db.String)
     cage = db.Column(db.String)
@@ -103,7 +103,6 @@ class Organization(db.Model):
     addressCountry = db.Column(db.String)
     addressLocality = db.Column(db.String)
     addressRegion = db.Column(db.String)
-    postOfficeBoxNumber = db.Column(db.String)
     postalCode = db.Column(db.String)
     streetAddress = db.Column(db.String)
     lat = db.Column(db.String)
@@ -125,8 +124,8 @@ class Organization(db.Model):
 class OrganizationKeyword(db.Model):
     __tablename__= 'organization_keywords'
     id = db.Column(db.Integer, primary_key=True)
-    organization_id = db.Column(db.Integer, db.ForeignKey("organizations.id"))
-    keyword = db.Column(db.String)
+    organization_id = db.Column(db.Integer, db.ForeignKey("organizations.id"), nullable=False)
+    keyword = db.Column(db.String, nullable=False)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -147,8 +146,8 @@ class Link(db.Model):
     __tablename__ = 'links'
 
     id = db.Column(db.Integer, primary_key=True)
-    rel = db.Column(db.String)
-    href = db.Column(db.String)
+    rel = db.Column(db.String, nullable=False)
+    href = db.Column(db.String, nullable=False)
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
@@ -157,7 +156,7 @@ class Product(db.Model):
     __tablename__ = 'products'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String, nullable=False)
     url = db.Column(db.String)
 
     created_on = db.Column(db.DateTime, default=db.func.now())
@@ -168,10 +167,10 @@ class ContactPoint(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     #operating_hours = db.relationship("OperatingHours", backref="contact")
+    name = db.Column(db.String, nullable=False)
     email = db.Column(db.String)
-    faxNumber = db.Column(db.String)
     telephone = db.Column(db.String)
-    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'))
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
 
 # class OperatingHours(db.Model):
 #     __tablename__= 'operating_hours'

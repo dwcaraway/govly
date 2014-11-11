@@ -168,8 +168,10 @@ class SourceTest(ApiTest):
         """
         Get single source
         """
-        src = OrganizationSource(spider_name='foo')
+        o = Organization(legalName='somename')
+        src = OrganizationSource(spider_name='foo', data_url='http://www.foo.com', organization=o)
 
+        db.session.add(o)
         db.session.add(src)
         db.session.commit()
 
@@ -178,7 +180,7 @@ class SourceTest(ApiTest):
 
         doc = hal_loads(resp.data)
         doc.links['r:sources'].url().should.equal('/api/sources')
-        doc.properties.should.equal({'spider_name': 'foo', 'id':src.id})
+        doc.properties.should.equal({'data_url':'http://www.foo.com', 'organization_id':o.id, 'spider_name': 'foo', 'id':src.id})
 
 class BusinessesTest(ApiTest):
     """Test of API 'Businesses' resource"""
@@ -209,7 +211,7 @@ class BusinessesTest(ApiTest):
         """
         Call to Businesses collection with single event
         """
-        biz = Organization()
+        biz = Organization(legalName='somename')
 
         db.session.add(biz)
         db.session.commit()
@@ -232,7 +234,7 @@ class BusinessesTest(ApiTest):
         Create a bunch of businesses and verify the links are correct
         """
         for i in range(100):
-            db.session.add(Organization())
+            db.session.add(Organization(legalName='somename'))
         db.session.commit()
 
         resp = self.test_client.get('/api/businesses')
@@ -247,13 +249,14 @@ class BusinessesTest(ApiTest):
         We first create a business, then we query for it where the match
         is in the name.
         """
-        s = OrganizationSource(spider_name='testsrc')
-        db.session.add(s)
-        db.session.commit()
 
         b = Organization(legalName="mr. bill")
-        b.source_id = s.id
         db.session.add(b)
+
+        s = OrganizationSource(spider_name='testsrc', data_url='http://www.foo.com')
+        s.organization = b
+
+        db.session.add(s)
         db.session.commit()
 
         #Now
@@ -267,7 +270,7 @@ class BusinessTest(ApiTest):
         """
         Get single business
         """
-        biz = Organization()
+        biz = Organization(legalName='somename')
 
         db.session.add(biz)
         db.session.commit()
@@ -277,5 +280,5 @@ class BusinessTest(ApiTest):
 
         doc = hal_loads(resp.data)
         doc.links['r:businesses'].url().should.equal('/api/businesses?page=1')
-        doc.properties.should.equal({'id':biz.id, 'created_on':biz.created_on.isoformat(), 'updated_on': biz.updated_on.isoformat()})
+        doc.properties.should.equal({'id':biz.id, 'legalName':'somename','created_on':biz.created_on.isoformat(), 'updated_on': biz.updated_on.isoformat()})
 

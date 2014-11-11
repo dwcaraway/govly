@@ -64,31 +64,46 @@ class DatabasePipeline:
             self.app = create_application()
         else:
             self.app = app
-        with app.app_context():
+
+        with self.app.app_context():
             db.create_all()
 
     def process_item(self, item, spider):
-        b = None
+        organization = None
 
         with self.app.app_context():
             if item.get('data_uid'):
-                o = OrganizationSource.query.filter_by(data_uid=item['data_uid'], spider_name=spider.name).first()
-                if o is not None:
-                    b = o.organization
+                os = OrganizationSource.query.filter_by(data_uid=item['data_uid'], spider_name=spider.name).first()
 
-            if b is None and item.get('phone'):
+                if os is not None:
+                    organization = os.organization
+
+            if organization is None and item.get('phone'):
                 #Try to get by phone, assumes phone normalized to INTERNATIONAL standard
                 c = ContactPoint.query.filter_by(telephone=item['phone']).first()
                 if c is not None:
-                    b = c.organization
+                    organization = c.organization
 
-            if b is None:
+            if organization is None:
                 log.msg('business not found, creating new one', level=log.DEBUG)
-                b = Organization()
-                db.session.add(b)
+                organization = Organization(legalName=item['legalName'])
+                db.session.add(organization)
 
-            for key, value in item.iteritems():
-                setattr(b, key, value)
+            if organization.contacts is None and (item.get('phone') or item.get('email')):
+                c = ContactPoint(name='main', telephone=item.get('phone'), email=item.get('email'))
+                c.organization = organization
+                db.session.add(c)
+
+                os = OrganizationSource(data_uid=item.get('data_uid'), data_url=item['source_url'], spider_name=spider.name, organization_id=organization.id)
+                db.session.add(os)
+
+            # for key, value in item.iteritems():
+            #     setattr(organization, key, value)
+            organization.streetAddress = item.get('address1') if not item.get('address2') else item.get('address1')+', '+item.get('address2')
+            organization.addressLocality = item.get('city')
+            organization.addressRegion = item.get('state')
+            organization.postalCode = item.get('zip')
+            organization.description = item.get('description')
 
             db.session.commit()
 
