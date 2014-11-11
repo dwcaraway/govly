@@ -52,11 +52,11 @@ class XeniaChamberSpider(Spider):
         if len(city_state_zip_raw) > 0:
             m = re.match('\s*(\w+\s*\w*),\s+(\w+)\s*(\d*)\s*', city_state_zip_raw[0])
             
-            l.add_value('city', m.group(1))
-            l.add_value('state', m.group(2))
-            l.add_value('zip', m.group(3))
+            l.add_value('addressLocality', m.group(1))
+            l.add_value('addressRegion', m.group(2))
+            l.add_value('postalCode', m.group(3))
 
-        l.add_xpath('phone', '//*[@id="gl_content-wide-left"]/table//table//tr[1]/td[2]/text()[2]')
+        l.add_xpath('telephone', '//*[@id="gl_content-wide-left"]/table//table//tr[1]/td[2]/text()[2]')
         l.add_xpath('latitude', '//*[@id="lat"]/ @value')
         l.add_xpath('longitude', '//*[@id="lon"]/ @value')
 

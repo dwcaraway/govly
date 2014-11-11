@@ -42,7 +42,7 @@ class DatabasePipelineTest(unittest.TestCase):
 
         item = BusinessItem()
         item['legalName']='myname'
-        item['phone'] = 'myphone'
+        item['telephone'] = 'myphone'
         item['email'] = 'myemail'
         item['website'] = 'mywebsite'
         item['image_urls'] = 'mylogo'
@@ -52,9 +52,9 @@ class DatabasePipelineTest(unittest.TestCase):
         item['category'] = 'mycategory'
         item['description'] = 'mydescription'
         item['streetAddress'] = 'myaddress1'
-        item['city'] = 'mycity'
-        item['state'] = 'mystate'
-        item['zip'] = 'myzip'
+        item['addressLocality'] = 'mycity'
+        item['addressRegion'] = 'mystate'
+        item['postalCode'] = 'myzip'
         item['source_url'] = 'http://www.somefoosomewhere.com'
         item['data_uid'] = 'source_data_id'
 
@@ -66,9 +66,9 @@ class DatabasePipelineTest(unittest.TestCase):
 
             o.legalName.should.equal(item['legalName'])
             o.streetAddress.should.equal(item['streetAddress'])
-            o.addressLocality.should.equal(item['city'])
-            o.addressRegion.should.equal(item['state'])
-            o.postalCode.should.equal(item['zip'])
+            o.addressLocality.should.equal(item['addressLocality'])
+            o.addressRegion.should.equal(item['addressRegion'])
+            o.postalCode.should.equal(item['postalCode'])
             o.description.should.equal(item['description'])
 
 
@@ -86,15 +86,15 @@ class DatabasePipelineTest(unittest.TestCase):
 
         item = BusinessItem()
         item['legalName']='myname'
-        item['phone'] = 'myphone'
+        item['telephone'] = 'myphone'
         item['website'] = 'mywebsite'
         item['facebook'] = 'myfacebook'
         item['twitter'] = 'mytwitter'
         item['category'] = 'mycategory'
         item['streetAddress'] = 'myaddress1'
-        item['city'] = 'mycity'
-        item['state'] = 'mystate'
-        item['zip'] = 'myzip'
+        item['addressLocality'] = 'mycity'
+        item['addressRegion'] = 'mystate'
+        item['postalCode'] = 'myzip'
         item['source_url'] = 'http://www.somefoosomewhere.com'
 
         ret = pipe.process_item(item, Spider(name='foo'))
@@ -124,9 +124,9 @@ class DatabasePipelineTest(unittest.TestCase):
         item = BusinessItem()
         item['legalName']='myname'
         item['streetAddress'] = 'addr1'
-        item['city'] = 'city'
-        item['state'] = 'state'
-        item['zip'] = 'newzip'
+        item['addressLocality'] = 'addressLocality'
+        item['addressRegion'] = 'addressRegion'
+        item['postalCode'] = 'newzip'
         item['data_uid'] = '123'
 
         pipe = DatabasePipeline(self.vitals)
@@ -138,7 +138,7 @@ class DatabasePipelineTest(unittest.TestCase):
 
     def test_existing_by_phone(self):
         """If a business doesn't have a data_uid
-        then check to see if phone exists for that source id. if so,
+        then check to see if telephone exists for that source id. if so,
         treat business as existing and modify rather than create
         a new business.
         """
@@ -160,8 +160,8 @@ class DatabasePipelineTest(unittest.TestCase):
 
             db.session.commit()
 
-            #Create a scraped BusinessItem with matching src and phone, no unique id though
-            item = BusinessItem(legalName='myname', phone='+1 234-234-2345', city='newcity')
+            #Create a scraped BusinessItem with matching src and telephone, no unique id though
+            item = BusinessItem(legalName='myname', telephone='+1 234-234-2345', addressLocality='newcity')
 
             pipe = DatabasePipeline(self.vitals)
             pipe.process_item(item, Spider(name='daytonchamber.org'))

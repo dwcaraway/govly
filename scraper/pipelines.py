@@ -12,22 +12,22 @@ from address import AddressParser
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
 class PhoneNormalizationPipeline:
-    """Normalizes a phone"""
+    """Normalizes a telephone"""
 
     def process_item(self, item, spider):
-        p_original = item.get('phone')
+        p_original = item.get('telephone')
 
-        #Normalize phone numbers to INTERNATIONAL format, assumes US phone number to dial from
+        #Normalize telephone numbers to INTERNATIONAL format, assumes US telephone number to dial from
         try:
             p = phonenumbers.parse(p_original, 'US')
             p = phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
-            item['phone'] = p
+            item['telephone'] = p
         except IndexError:
-            item['phone'] = None
-            log.msg("phone number not found at url: %s" % item['data_source_url'], level=log.DEBUG)
+            item['telephone'] = None
+            log.msg("telephone number not found at url: %s" % item['data_source_url'], level=log.DEBUG)
         except Exception:
-            item['phone'] = None
-            log.msg("Unable to parse phone: %s" % p_original, level=log.DEBUG)
+            item['telephone'] = None
+            log.msg("Unable to parse telephone: %s" % p_original, level=log.DEBUG)
         return item
 
 class AddressNormalizationPipeline:
@@ -93,9 +93,9 @@ class DatabasePipeline:
                 if os is not None:
                     organization = os.organization
 
-            if organization is None and item.get('phone'):
-                #Try to get by phone, assumes phone normalized to INTERNATIONAL standard
-                c = ContactPoint.query.filter_by(telephone=item['phone']).first()
+            if organization is None and item.get('telephone'):
+                #Try to get by telephone, assumes telephone normalized to INTERNATIONAL standard
+                c = ContactPoint.query.filter_by(telephone=item['telephone']).first()
                 if c is not None:
                     organization = c.organization
 
@@ -104,8 +104,8 @@ class DatabasePipeline:
                 organization = Organization(legalName=item['legalName'])
                 db.session.add(organization)
 
-            if organization.contacts is None and (item.get('phone') or item.get('email')):
-                c = ContactPoint(name='main', telephone=item.get('phone'), email=item.get('email'))
+            if organization.contacts is None and (item.get('telephone') or item.get('email')):
+                c = ContactPoint(name='main', telephone=item.get('telephone'), email=item.get('email'))
                 c.organization = organization
                 db.session.add(c)
 
@@ -115,9 +115,9 @@ class DatabasePipeline:
             # for key, value in item.iteritems():
             #     setattr(organization, key, value)
             organization.streetAddress = item.get('streetAddress')
-            organization.addressLocality = item.get('city')
-            organization.addressRegion = item.get('state')
-            organization.postalCode = item.get('zip')
+            organization.addressLocality = item.get('addressLocality')
+            organization.addressRegion = item.get('addressRegion')
+            organization.postalCode = item.get('postalCode')
             organization.description = item.get('description')
 
             db.session.commit()

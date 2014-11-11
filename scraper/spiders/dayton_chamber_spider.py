@@ -68,7 +68,7 @@ class DaytonChamberSpider(Spider):
             item['category'] = row_dict.get('Business Category:', None)
             item['raw_address']= row_dict.get('Address:', None)
             item['website'] = row_dict.get('Website:', None)
-            item['phone'] = row_dict.get('Phone Number:', None)
+            item['telephone'] = row_dict.get('Phone Number:', None)
 
             items.append(item)
 

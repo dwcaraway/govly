@@ -74,17 +74,17 @@ class BizJournalsSpider(Spider):
     def extract(self, response):
         """Extracts data from a business page"""
 
-        #Assume url pattern is /<city>/<category>/<duid>/<name>.html
+        #Assume url pattern is /<addressLocality>/<category>/<duid>/<name>.html
         split_url = response.url.split('/')
 
         l = BusinessLoader(response=response)
         l.add_xpath('name', "//div[@id='b2sec-alpha']/h2/text()")
         l.add_xpath("website", "//div[@class='b2secDetails-URL']//a/ @href")
         l.add_xpath("streetAddress", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][1]/ text()")
-        l.add_xpath("city", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[1]/ text()")
-        l.add_xpath("state", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[2]/ text()")
-        l.add_xpath("zip", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[3]/ text()")
-        l.add_xpath("phone", "//div[@class='b2Local-greenTextmed']/ text()")
+        l.add_xpath("addressLocality", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[1]/ text()")
+        l.add_xpath("addressRegion", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[2]/ text()")
+        l.add_xpath("postalCode", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[3]/ text()")
+        l.add_xpath("telephone", "//div[@class='b2Local-greenTextmed']/ text()")
         l.add_xpath("description", "//div[@id='b2sec-alpha']/p[4]/ text()")
         l.add_value("data_uid", unicode(split_url[-2]))
         l.add_value("category", unicode(split_url[-3]))

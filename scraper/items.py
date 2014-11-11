@@ -14,12 +14,12 @@ class BusinessItem(Item):
 
     raw_address = Field() #An address in a single text field instead of parsed out
     streetAddress = Field()
-    city = Field()
-    state = Field()
-    zip = Field()
+    addressLocality = Field()
+    addressRegion = Field()
+    postalCode = Field()
     latitude = Field()
     longitude = Field()
-    phone = Field()
+    telephone = Field()
     email = Field()
     description = Field()
     facebook = Field()

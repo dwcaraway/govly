@@ -63,10 +63,10 @@ class CbusChamberSpider(Spider):
             if len(addrs) > 1:
                 l.add_value('streetAddress', addrs[1])
 
-            l.add_xpath('city', './/span[@itemprop="locality"]/ text()')
-            l.add_xpath('state', './/span[@itemprop="region"]/ text()')
-            l.add_xpath('zip', './/span[@itemprop="postal-code"]/ text()')
-            l.add_xpath('phone', ".//div[contains(concat(' ', @class, ' '), 'PHONE')]/ text()")
+            l.add_xpath('addressLocality', './/span[@itemprop="locality"]/ text()')
+            l.add_xpath('addressRegion', './/span[@itemprop="region"]/ text()')
+            l.add_xpath('postalCode', './/span[@itemprop="postal-code"]/ text()')
+            l.add_xpath('telephone', ".//div[contains(concat(' ', @class, ' '), 'PHONE')]/ text()")
             l.add_xpath('image_urls', ".//img[contains(concat(' ', @class, ' '), 'LOGOIMG')]/ @src")
 
             item = l.load_item()

@@ -46,7 +46,7 @@ class CincyChamberSpider(Spider):
 
 
     def after_parse(self, response):
-        """This extracts the email, phone and website data and then calls a child page to extract the rest of the business info"""
+        """This extracts the email, telephone and website data and then calls a child page to extract the rest of the business info"""
 
         extraction_requests = []
 
@@ -54,7 +54,7 @@ class CincyChamberSpider(Spider):
             detail_url = container.xpath('./td[1]/a/ @href').extract()[0]
 
             l = BusinessLoader(selector=container, response=response)
-            l.add_xpath('phone', './td[1]/span/ text()')
+            l.add_xpath('telephone', './td[1]/span/ text()')
             l.add_xpath('website', './td[2]/a/ @href')
             l.add_xpath('email', "substring-after(./td[4]/a/ @href,'mailto:')")
             l.add_xpath('name', './td[1]/a/ text()')
@@ -80,12 +80,12 @@ class CincyChamberSpider(Spider):
 
         l = BusinessLoader(item=i, response=response)
 
-        #Assume url pattern is /<city>/<category>/<duid>/<name>.html
+        #Assume url pattern is /<addressLocality>/<category>/<duid>/<name>.html
         data_uid = re.match(pattern=u'.*COMPANYID=(\d+)$', string=response.url).group(1).lstrip('0')
 
         l.add_xpath('description', '//*[@id="ctl00_ctl00_body_maincontentblock_lblProductandServices"]/ text()')
 
-        #List of strings which, when joined, form the address. form is <streetAddress>, <optional: streetAddress>, <city and state and zip>
+        #List of strings which, when joined, form the address. form is <streetAddress>, <optional: streetAddress>, <addressLocality and state and postalCode>
         address_fields = response.xpath('//*[@id="ctl00_ctl00_body_maincontentblock_lblcoAddress"]/ text()').extract()
         m = re.match(pattern=u'^([\w\s]*),\s+([\w\s]+)[\xa0]+(\S+)$', string=address_fields[-1])
 
@@ -94,9 +94,9 @@ class CincyChamberSpider(Spider):
         if len(address_fields) is 3:
             l.add_value('streetAddress', address_fields[1])
 
-        l.add_value('city', m.group(1))
-        l.add_value('state', m.group(2))
-        l.add_value('zip', m.group(3))
+        l.add_value('addressLocality', m.group(1))
+        l.add_value('addressRegion', m.group(2))
+        l.add_value('postalCode', m.group(3))
 
         #Extract any social media links
         social_media_links = response.xpath('//table[@id="ctl00_ctl00_body_maincontentblock_gvSocialMedia"]//a/ @href').extract()
