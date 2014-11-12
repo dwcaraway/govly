@@ -120,6 +120,7 @@ class DatabasePipelineTest(unittest.TestCase):
         item['addressRegion'] = 'addressRegion'
         item['postalCode'] = 'newzip'
         item['data_uid'] = '123'
+        item['data_url'] = 'http://www.foo.com'
 
         pipe = DatabasePipeline(self.vitals)
         pipe.process_item(item, Spider(name='daytonlocal.com'))
@@ -152,7 +153,7 @@ class DatabasePipelineTest(unittest.TestCase):
             session.close()
 
         #Create a scraped BusinessItem with matching src and telephone, no unique id though
-        item = BusinessItem(legalName='myname', telephone='+1 234-234-2345', addressLocality='newcity')
+        item = BusinessItem(legalName='myname', telephone='+1 234-234-2345', addressLocality='newcity', data_url='http://www.foo.com')
 
         pipe = DatabasePipeline(self.vitals)
         pipe.process_item(item, Spider(name='daytonchamber.org'))
@@ -314,6 +315,33 @@ class DatabasePipelineTest(unittest.TestCase):
         try:
             contacts = session.query(ContactPoint).all()
             len(contacts).should.equal(2)
+        finally:
+            session.close()
+
+    def test_organization_with_no_data_uid(self):
+        """Verifies that organization extracted data with no data_uid will use data_url for lookup"""
+        session = self.DBSession()
+        c=None
+        try:
+            o = Organization(legalName='org1', streetAddress='addr1')
+            session.add(o)
+            os = OrganizationSource(data_uid='1234', data_url='http://foo.com/bar?id=1234', spider_name='foo', organization=o)
+            session.commit()
+        finally:
+            session.close()
+
+        item = BusinessItem()
+        item['legalName']='org1'
+        item['streetAddress']= 'addr1'
+        item['data_url']='http://foo.com/bar?id=1234'
+
+        pipe = DatabasePipeline(self.vitals)
+        pipe.process_item(item, Spider(name='foo'))
+
+        session = self.DBSession()
+        try:
+            orgs = session.query(Organization).all()
+            len(orgs).should.equal(1)
         finally:
             session.close()
 

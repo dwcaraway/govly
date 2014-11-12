@@ -1,6 +1,6 @@
 from app.model import db, Organization, OrganizationSource, ContactPoint, OrganizationKeyword, Link
 from app import create_application
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 from app.config import DevelopmentConfig
 from scrapy import log
 import phonenumbers
@@ -74,11 +74,12 @@ class DatabasePipeline:
         organization = None
 
         with self.app.app_context():
-            if item.get('data_uid'):
-                os = OrganizationSource.query.filter_by(data_uid=item['data_uid'], spider_name=spider.name).first()
+            os = OrganizationSource.query.filter(or_(
+                and_(OrganizationSource.data_uid==item.get('data_uid'), OrganizationSource.spider_name==spider.name),
+                                                 OrganizationSource.data_url==item['data_url'])).first()
 
-                if os:
-                    organization = os.organization
+            if os:
+                organization = os.organization
 
             if organization is None and item.get('telephone'):
                 #Try to get by telephone, assumes telephone normalized to INTERNATIONAL standard
