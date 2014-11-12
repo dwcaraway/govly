@@ -115,6 +115,7 @@ class Organization(db.Model):
     contacts = db.relationship("ContactPoint", backref="organization")
     keywords = db.relationship("OrganizationKeyword", backref="organization")
     sources = db.relationship("OrganizationSource", backref="organization")
+    links = db.relationship("Link", backref="organization")
 
     search_vector = db.Column(TSVectorType('legalName', 'description'))
 
@@ -148,6 +149,7 @@ class Link(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     rel = db.Column(db.String, nullable=False)
     href = db.Column(db.String, nullable=False)
+    organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
 
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
@@ -166,19 +168,20 @@ class ContactPoint(db.Model):
     __tablename__= 'contact_points'
 
     id = db.Column(db.Integer, primary_key=True)
-    #operating_hours = db.relationship("OperatingHours", backref="contact")
+    operating_hours = db.relationship("OperatingHours", backref="contact")
     name = db.Column(db.String, nullable=False)
     email = db.Column(db.String)
     telephone = db.Column(db.String)
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
 
-# class OperatingHours(db.Model):
-#     __tablename__= 'operating_hours'
-#     id = db.Column(db.Integer, primary_key=True)
-#     closes = db.Column(db.String)
-#     opens = db.Column(db.String)
-#     dayOfWeek = db.Column(db.String)
-#     contact_id = db.Column(db.Integer, db.ForeignKey('contact_points.id'))
+class OperatingHours(db.Model):
+    __tablename__= 'operating_hours'
+
+    id = db.Column(db.Integer, primary_key=True)
+    closes = db.Column(db.String)
+    opens = db.Column(db.String)
+    dayOfWeek = db.Column(db.String)
+    contact_id = db.Column(db.Integer, db.ForeignKey('contact_points.id'), nullable=False)
 
 #enable full-text search of postgres
 make_searchable()

@@ -7,8 +7,9 @@ import tempfile
 import os
 import random
 import sure
+from sqlalchemy.orm import scoped_session, sessionmaker
 from app import create_application
-from app.model import db, Organization, OrganizationSource, ContactPoint, Organization
+from app.model import db, OrganizationSource, ContactPoint, Organization, Link
 from app.config import TestingConfig
 
 class DatabasePipelineTest(unittest.TestCase):
@@ -19,6 +20,9 @@ class DatabasePipelineTest(unittest.TestCase):
         #Push a context so that database knows what application to attach to
         with self.vitals.app_context():
             db.create_all()
+            self.DBSession = scoped_session(sessionmaker(autocommit=False,
+                                         autoflush=False,
+                                         bind=db.engine))
 
     def tearDown(self):
         """Removes temporary database at end of each test"""
@@ -32,14 +36,6 @@ class DatabasePipelineTest(unittest.TestCase):
 
         sid = None
         
-        with self.vitals.app_context(): 
-            # s = OrganizationSource(spider_name='testsrc', data_url='http://www.foo.com')
-            # db.session.add(s)
-            # db.session.commit()
-            # sid = s.id
-
-            len(Organization.query.all()).should.equal(0)
-
         item = BusinessItem()
         item['legalName']='myname'
         item['telephone'] = 'myphone'
@@ -55,14 +51,14 @@ class DatabasePipelineTest(unittest.TestCase):
         item['addressLocality'] = 'mycity'
         item['addressRegion'] = 'mystate'
         item['postalCode'] = 'myzip'
-        item['source_url'] = 'http://www.somefoosomewhere.com'
+        item['data_url'] = 'http://www.somefoosomewhere.com'
         item['data_uid'] = 'source_data_id'
 
         ret = pipe.process_item(item, Spider(name='foo'))
 
-        with self.vitals.app_context():
-            o = Organization.query.first()
-            o.shouldnot.equal(None)
+        session = self.DBSession()
+        try:
+            o = session.query(Organization).one()
 
             o.legalName.should.equal(item['legalName'])
             o.streetAddress.should.equal(item['streetAddress'])
@@ -71,19 +67,11 @@ class DatabasePipelineTest(unittest.TestCase):
             o.postalCode.should.equal(item['postalCode'])
             o.description.should.equal(item['description'])
 
+        finally:
+            session.close()
+
 
     def test_missing_desc(self):
-        pipe = DatabasePipeline(self.vitals)
-
-        sid = None
-
-        # with self.vitals.app_context():
-        #     s = OrganizationSource(spider_name='testsrc', data_url='http://www.foo.com')
-        #     db.session.add(s)
-        #     db.session.commit()
-        #     sid = s.id
-        #     len(Organization.query.all()).should.equal(0)
-
         item = BusinessItem()
         item['legalName']='myname'
         item['telephone'] = 'myphone'
@@ -95,31 +83,35 @@ class DatabasePipelineTest(unittest.TestCase):
         item['addressLocality'] = 'mycity'
         item['addressRegion'] = 'mystate'
         item['postalCode'] = 'myzip'
-        item['source_url'] = 'http://www.somefoosomewhere.com'
+        item['data_url'] = 'http://www.somefoosomewhere.com'
 
-        ret = pipe.process_item(item, Spider(name='foo'))
+        pipe = DatabasePipeline(self.vitals)
+        pipe.process_item(item, Spider(name='foo'))
 
-        ret.should.be(item) 
+        session = self.DBSession()
+        try:
+            o = session.query(Organization).one()
+            o.description.should.equal(None)
+        finally:
+            session.close()
 
-        with self.vitals.app_context():
-            len(Organization.query.all()).should.equal(1)
 
     def test_existing(self):
         """An existing business should be updated"""
 
         biz_uid = None
 
-        with self.vitals.app_context():
+        session = self.DBSession()
+        try:
             b = Organization(legalName='myname', postalCode='oldzip')
+            s = OrganizationSource(data_uid='123', spider_name='daytonlocal.com', organization=b, data_url='http://www.foo.com')
 
-            db.session.add(b)
-            db.session.commit()
-
-            s = OrganizationSource(data_uid='123', spider_name='daytonlocal.com', organization_id=b.id, data_url='http://www.foo.com')
-            db.session.add(s)
-            db.session.commit()
+            session.add(b)
+            session.commit()
 
             biz_uid = b.id
+        finally:
+            session.close()
 
         item = BusinessItem()
         item['legalName']='myname'
@@ -132,9 +124,12 @@ class DatabasePipelineTest(unittest.TestCase):
         pipe = DatabasePipeline(self.vitals)
         pipe.process_item(item, Spider(name='daytonlocal.com'))
 
-        with self.vitals.app_context():
-            b = Organization.query.get(biz_uid)
+        session = self.DBSession()
+        try:
+            b = session.query(Organization).get(biz_uid)
             b.postalCode.should.equal('newzip')
+        finally:
+            session.close()
 
     def test_existing_by_phone(self):
         """If a business doesn't have a data_uid
@@ -145,33 +140,102 @@ class DatabasePipelineTest(unittest.TestCase):
 
         biz_uid = None
 
-        with self.vitals.app_context():
-
-
+        session = self.DBSession()
+        try:
             b = Organization(legalName='myname', addressLocality='originalcity')
-            db.session.add(b)
-
+            session.add(b)
             #OrganizationSource does not have a UID
             s = OrganizationSource(spider_name='daytonchamber.org', data_url='http://www.foo.com', organization=b)
-            db.session.add(s)
-
             cc = ContactPoint(name='main', telephone='+1 234-234-2345', organization=b)
-            db.session.add(cc)
+            session.commit()
+        finally:
+            session.close()
 
-            db.session.commit()
+        #Create a scraped BusinessItem with matching src and telephone, no unique id though
+        item = BusinessItem(legalName='myname', telephone='+1 234-234-2345', addressLocality='newcity')
 
-            #Create a scraped BusinessItem with matching src and telephone, no unique id though
-            item = BusinessItem(legalName='myname', telephone='+1 234-234-2345', addressLocality='newcity')
-
-            pipe = DatabasePipeline(self.vitals)
-            pipe.process_item(item, Spider(name='daytonchamber.org'))
+        pipe = DatabasePipeline(self.vitals)
+        pipe.process_item(item, Spider(name='daytonchamber.org'))
 
             #Business should have been modified. If not, then
             # a new business was mistakenly created.
-            c = ContactPoint.query.filter_by(telephone='+1 234-234-2345').first()
+        session = self.DBSession()
+        try:
+            c = session.query(ContactPoint).filter(ContactPoint.telephone == '+1 234-234-2345').one()
             c.organization.shouldnot.equal(None)
             c.organization.addressLocality.should.equal('newcity')
-            len(Organization.query.all()).should.equal(1)
+            session.query(Organization).one()
+        finally:
+            session.close()
+
+    def test_organization_source_saved(self):
+        """A business item's source information should be saved"""
+        item = BusinessItem()
+        item['legalName']='myname'
+        item['data_url'] = 'http://www.foo.com/somebusiness.html'
+        item['data_uid'] = 'a32sdf'
+
+        pipe = DatabasePipeline(self.vitals)
+        pipe.process_item(item, Spider(name='foo'))
+
+        session = self.DBSession()
+        try:
+            o = session.query(Organization).one()
+            len(o.sources).should.equal(1)
+            o.sources[0].data_url.should.equal(item['data_url'])
+            o.sources[0].data_uid.should.equal(item['data_uid'])
+        finally:
+            session.close()
+
+    def test_organization_keywords_saved(self):
+        """A business item's keyword should be saved"""
+        item = BusinessItem()
+        item['legalName']='myname'
+        item['category'] = 'legal attorney'
+        item['data_url'] = 'http://www.foo.com/somebusiness.html'
+
+        pipe = DatabasePipeline(self.vitals)
+        pipe.process_item(item, Spider(name='foo'))
+
+        session = self.DBSession()
+        try:
+            o = session.query(Organization).one()
+            len(o.keywords).should.equal(1)
+            o.keywords[0].keyword.should.equal(item['category'])
+        finally:
+            session.close()
+
+    def test_organization_links_saved(self):
+        """A business item's links should be saved"""
+        item = BusinessItem()
+        item['legalName']='myname'
+        item['website'] = 'mywebsite'
+        item['facebook'] = 'myfacebook'
+        item['twitter'] = 'mytwitter'
+        item['linkedin'] = 'mylinkedin'
+        item['data_url'] = 'http://www.foo.com/somebusiness.html'
+
+        pipe = DatabasePipeline(self.vitals)
+        pipe.process_item(item, Spider(name='foo'))
+
+        session = self.DBSession()
+        try:
+            o = session.query(Organization).one()
+            len(o.links).should.equal(4)
+
+            fb = session.query(Link).filter(Link.rel=='facebook').one()
+            fb.href.should.equal(item['facebook'])
+
+            web = session.query(Link).filter(Link.rel=='website').one()
+            web.href.should.equal(item['website'])
+
+            ln = session.query(Link).filter(Link.rel=='linkedin').one()
+            ln.href.should.equal(item['linkedin'])
+
+            tw = session.query(Link).filter(Link.rel=='twitter').one()
+            tw.href.should.equal(item['twitter'])
+        finally:
+            session.close()
 
     # def test_image_download(self):
     #     """Test local storage of images"""

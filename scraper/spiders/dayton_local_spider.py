@@ -3,6 +3,7 @@ __author__ = 'dwcaraway'
 from scrapy.spider import Spider
 import urlparse
 import re
+from scrapy.http import Request
 from urlparse import urljoin
 from scraper.items import BusinessItem
 from scrapy.contrib.loader.processor import MapCompose, TakeFirst
@@ -10,7 +11,10 @@ from scrapy.contrib.loader import ItemLoader
 from urllib2 import urlopen
 
 def get_redirected_url(original):
-        return urlopen(original).geturl()
+        try:
+            return urlopen(original).geturl()
+        except Exception:
+            return None
 
 uid_matcher = re.compile("#map_canvas_(\d+)\s")
 
@@ -76,7 +80,7 @@ class DaytonLocalSpider(Spider):
             l = BusinessLoader(selector=container)
             l.add_xpath('legalName', './div[@class="fn"]/a/strong/text()')
             l.add_xpath('image_urls', '//*[@id="MainContentArea"]//div[contains(@class, "dright")]/a/img/ @src')
-            l.add_value('source_url', unicode(response.url))
+            l.add_value('data_url', unicode(response.url))
             l.add_xpath('website', './div[@class="fn"]/a/@href')
             l.add_xpath('addressLocality', './/span[@class="locality"]/text()')
             l.add_xpath('addressRegion', './/span[contains(@class, "region")]/text()')

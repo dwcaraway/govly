@@ -26,5 +26,5 @@ class BusinessItem(Item):
     twitter = Field()
     linkedin = Field()
     category = Field()
-    source_url = Field()
+    data_url = Field()
     data_uid = Field()

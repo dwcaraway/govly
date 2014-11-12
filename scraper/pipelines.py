@@ -1,15 +1,16 @@
-from app.model import db, Organization, OrganizationSource, ContactPoint
+from app.model import db, Organization, OrganizationSource, ContactPoint, OrganizationKeyword, Link
 from app import create_application
+from sqlalchemy import or_
 from app.config import DevelopmentConfig
 from scrapy import log
 import phonenumbers
-import string
 from address import AddressParser
 
 # Define your item pipelines here
 #
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
+
 
 class PhoneNormalizationPipeline:
     """Normalizes a telephone"""
@@ -23,8 +24,7 @@ class PhoneNormalizationPipeline:
             p = phonenumbers.format_number(p, phonenumbers.PhoneNumberFormat.INTERNATIONAL)
             item['telephone'] = p
         except IndexError:
-            item['telephone'] = None
-            log.msg("telephone number not found at url: %s" % item['data_source_url'], level=log.DEBUG)
+            log.msg("telephone number not found at url: %s" % item['data_url'], level=log.DEBUG)
         except Exception:
             item['telephone'] = None
             log.msg("Unable to parse telephone: %s" % p_original, level=log.DEBUG)
@@ -39,40 +39,15 @@ class AddressNormalizationPipeline:
     def process_item(self, item, spider):
         address = item.get('streetAddress')
 
-        if address:
-            item['streetAddress'] = string.join(address, ', ')
+        if address and not isinstance(address, basestring):
+            item['streetAddress'] = ', '.join(address)
 
         return item
 
-# class CreateSourcePipeline:
-#     def __init__(self, app=None):
-#         if app is None:
-#             self.app = create_application()
-#         else:
-#             self.app = app
-#
-#     def process_item(self, item , spider):
-#         #TODO source lookup in BusinessItemLoader (once) and cache
-#         #assumes that note more than one source per spider which is fine
-#         business
-#         if item.get('source_id'):
-#             return item
-#
-#         with self.app.app_context():
-#             s = OrganizationSource.query.filter_by(name=spider.name).first()
-#             if s is None:
-#                 log.msg("Source %s not found. Creating it." % spider.name, level=log.DEBUG)
-#                 s = OrganizationSource(name = spider.name)
-#                 db.session.add(s)
-#                 db.session.commit()
-#
-#             item['source_id'] = s.id
-#
-#         return item
-
-
 class DatabasePipeline:
     """Sends processed items to storage"""
+
+    DBSession = None
 
     def __init__(self, app=None):
         if app is None:
@@ -82,6 +57,9 @@ class DatabasePipeline:
 
         with self.app.app_context():
             db.create_all()
+
+            from sqlalchemy.orm import scoped_session, sessionmaker
+            self.DBSession = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=db.engine))
 
     def process_item(self, item, spider):
         organization = None
@@ -104,21 +82,37 @@ class DatabasePipeline:
                 organization = Organization(legalName=item['legalName'])
                 db.session.add(organization)
 
-            if organization.contacts is None and (item.get('telephone') or item.get('email')):
-                c = ContactPoint(name='main', telephone=item.get('telephone'), email=item.get('email'))
-                c.organization = organization
-                db.session.add(c)
+                OrganizationSource(data_uid=item.get('data_uid'), data_url=item.get('data_url'), spider_name=spider.name, organization=organization)
 
-                os = OrganizationSource(data_uid=item.get('data_uid'), data_url=item['source_url'], spider_name=spider.name, organization_id=organization.id)
-                db.session.add(os)
+            if item.get('telephone') or item.get('email'):
+                c = ContactPoint.query.filter(or_(ContactPoint.telephone == item.get('telephone'), ContactPoint.email == item.get('email'))).first()
+                if not c:
+                    c = ContactPoint(name='main', telephone=item.get('telephone'), email=item.get('email'), organization=organization)
+                else:
+                    if item.get('telephone'):
+                        c.telephone = item.get('telephone')
+                    if item.get('email'):
+                        c.email = item.get('email')
 
-            # for key, value in item.iteritems():
-            #     setattr(organization, key, value)
-            organization.streetAddress = item.get('streetAddress')
-            organization.addressLocality = item.get('addressLocality')
-            organization.addressRegion = item.get('addressRegion')
-            organization.postalCode = item.get('postalCode')
-            organization.description = item.get('description')
+
+            for x in ['website', 'facebook', 'linkedin', 'twitter']:
+                if item.get(x):
+                    found = False
+                    for link in organization.links:
+                        if link.rel == x:
+                            link.href = item.get(x)
+                            found = True
+                            break
+                    if not found:
+                        Link(rel=x, href=item.get(x), organization=organization)
+
+            if item.get('category'):
+                existing_categories = [k.keyword for k in organization.keywords]
+                if item['category'] not in existing_categories:
+                    OrganizationKeyword(keyword=item['category'], organization=organization)
+
+            for key, value in item.iteritems():
+                setattr(organization, key, value)
 
             db.session.commit()
 
