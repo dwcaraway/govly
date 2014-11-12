@@ -45,7 +45,7 @@ class XeniaChamberSpider(Spider):
         """This extracts part of the information and then calls a child page to extract the rest of the business info"""
 
         l = BusinessLoader(item = response.meta.get('item'), response=response)
-        l.add_xpath('name', '//*[@id="gl_content-wide-left"]/h1/ text()')
+        l.add_xpath('legalName', '//*[@id="gl_content-wide-left"]/h1/ text()')
         l.add_xpath('streetAddress', '//*[@id="gl_content-wide-left"]/table//table//tr[1]/td[1]/text()[1]')
 
         city_state_zip_raw = response.xpath('//*[@id="gl_content-wide-left"]/table//table//tr[1]/td[1]/text()[2]').extract()

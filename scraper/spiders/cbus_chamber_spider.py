@@ -53,7 +53,7 @@ class CbusChamberSpider(Spider):
 #            detail_url = container.xpath('.//span[@itemprop="name"]/a/ @href').extract()[0]
 
             l = BusinessLoader(item = response.meta.get('item'), selector=container, response=response)
-            l.add_xpath('name', './/span[@itemprop="name"]/a/ text()')
+            l.add_xpath('legalName', './/span[@itemprop="name"]/a/ text()')
 
             street = response.xpath('.//span[@itemprop="street-address"]/ text()').extract()[0]
             addrs = street.split(', ')

@@ -15,7 +15,7 @@ class BusinessLoader(ItemLoader):
     default_input_processor = MapCompose(unicode.strip)
     default_output_processor = TakeFirst()
 
-    city_in = MapCompose(unicode.strip, lambda x: x.rstrip(','))
+    addressLocality_in = MapCompose(unicode.strip, lambda x: x.rstrip(','))
 
 
 class BizJournalsSpider(Spider):
@@ -78,7 +78,7 @@ class BizJournalsSpider(Spider):
         split_url = response.url.split('/')
 
         l = BusinessLoader(response=response)
-        l.add_xpath('name', "//div[@id='b2sec-alpha']/h2/text()")
+        l.add_xpath('legalName', "//div[@id='b2sec-alpha']/h2/text()")
         l.add_xpath("website", "//div[@class='b2secDetails-URL']//a/ @href")
         l.add_xpath("streetAddress", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][1]/ text()")
         l.add_xpath("addressLocality", "//div[@id='b2sec-alpha']/p[@class='b2sec-alphaText'][2]/span[1]/ text()")
@@ -88,6 +88,6 @@ class BizJournalsSpider(Spider):
         l.add_xpath("description", "//div[@id='b2sec-alpha']/p[4]/ text()")
         l.add_value("data_uid", unicode(split_url[-2]))
         l.add_value("category", unicode(split_url[-3]))
-        l.add_value("data_source_url", unicode(response.url))
+        l.add_value("data_url", unicode(response.url))
 
         return l.load_item()

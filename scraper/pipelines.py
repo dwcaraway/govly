@@ -48,12 +48,7 @@ class DatabasePipeline:
     """
     Sends processed items to storage
 
-    We do try to avoid duplicate entries (especially from the same source). To that end
-
-    1.) If the item has a data_uid, check if that (data_uid, spider_name) entry exists
-    2.) If not found, next check if that telephone number exists (for any source)
-    3.) Finally, create a new organization
-
+    We do try to avoid duplicate entries (especially from the same source).
     """
 
     DBSession = None
@@ -74,12 +69,11 @@ class DatabasePipeline:
         organization = None
 
         with self.app.app_context():
-            os = OrganizationSource.query.filter(or_(
-                and_(OrganizationSource.data_uid==item.get('data_uid'), OrganizationSource.spider_name==spider.name),
-                                                 OrganizationSource.data_url==item['data_url'])).first()
+            organization = Organization.query.join(OrganizationSource).filter(OrganizationSource.data_uid==item.get('data_uid')).\
+                    filter(OrganizationSource.spider_name==spider.name).first()
 
-            if os:
-                organization = os.organization
+            if organization is None:
+                organization = Organization.query.filter_by(legalName=item['legalName']).join(OrganizationSource).filter(OrganizationSource.data_url==item['data_url']).first()
 
             if organization is None and item.get('telephone'):
                 #Try to get by telephone, assumes telephone normalized to INTERNATIONAL standard

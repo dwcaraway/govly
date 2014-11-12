@@ -29,7 +29,7 @@ class DaytonChamberSpider(Spider):
 
             item = BusinessItem()
 
-            item['data_source_url'] = response.url
+            item['data_url'] = response.url
 
             rows = container.css('div.row')
 
@@ -64,7 +64,7 @@ class DaytonChamberSpider(Spider):
                 row_dict[key] = value
 
 
-            item['name'] = row_dict.get('Business Name:', None)
+            item['legalName'] = row_dict.get('Business Name:', None)
             item['category'] = row_dict.get('Business Category:', None)
             item['raw_address']= row_dict.get('Address:', None)
             item['website'] = row_dict.get('Website:', None)

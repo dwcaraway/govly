@@ -57,7 +57,7 @@ class CincyChamberSpider(Spider):
             l.add_xpath('telephone', './td[1]/span/ text()')
             l.add_xpath('website', './td[2]/a/ @href')
             l.add_xpath('email', "substring-after(./td[4]/a/ @href,'mailto:')")
-            l.add_xpath('name', './td[1]/a/ text()')
+            l.add_xpath('legalName', './td[1]/a/ text()')
             item = l.load_item()
 
             log.msg('business details extracted from index: {0}'.format(item))
@@ -109,6 +109,6 @@ class CincyChamberSpider(Spider):
                 l.add_value('facebook', unicode(link))
 
         l.add_value("data_uid", unicode(data_uid))
-        l.add_value("data_source_url", unicode(response.url))
+        l.add_value("data_url", unicode(response.url))
 
         return l.load_item()
