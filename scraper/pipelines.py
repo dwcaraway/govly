@@ -45,7 +45,16 @@ class AddressNormalizationPipeline:
         return item
 
 class DatabasePipeline:
-    """Sends processed items to storage"""
+    """
+    Sends processed items to storage
+
+    We do try to avoid duplicate entries (especially from the same source). To that end
+
+    1.) If the item has a data_uid, check if that (data_uid, spider_name) entry exists
+    2.) If not found, next check if that telephone number exists (for any source)
+    3.) Finally, create a new organization
+
+    """
 
     DBSession = None
 
@@ -68,13 +77,13 @@ class DatabasePipeline:
             if item.get('data_uid'):
                 os = OrganizationSource.query.filter_by(data_uid=item['data_uid'], spider_name=spider.name).first()
 
-                if os is not None:
+                if os:
                     organization = os.organization
 
             if organization is None and item.get('telephone'):
                 #Try to get by telephone, assumes telephone normalized to INTERNATIONAL standard
                 c = ContactPoint.query.filter_by(telephone=item['telephone']).first()
-                if c is not None:
+                if c:
                     organization = c.organization
 
             if organization is None:
@@ -85,15 +94,21 @@ class DatabasePipeline:
                 OrganizationSource(data_uid=item.get('data_uid'), data_url=item.get('data_url'), spider_name=spider.name, organization=organization)
 
             if item.get('telephone') or item.get('email'):
-                c = ContactPoint.query.filter(or_(ContactPoint.telephone == item.get('telephone'), ContactPoint.email == item.get('email'))).first()
-                if not c:
-                    c = ContactPoint(name='main', telephone=item.get('telephone'), email=item.get('email'), organization=organization)
+                c = None
+
+                if not item.get('email'):
+                    c = ContactPoint.query.filter_by(telephone=item['telephone']).first()
+                elif not item.get('telephone'):
+                    c = ContactPoint.query.filter_by(email=item['email']).first()
                 else:
+                    c = ContactPoint.query.filter(or_(ContactPoint.telephone == item.get('telephone'), ContactPoint.email == item.get('email'))).first()
+                if c:
                     if item.get('telephone'):
                         c.telephone = item.get('telephone')
                     if item.get('email'):
                         c.email = item.get('email')
-
+                else:
+                    c = ContactPoint(name='main', telephone=item.get('telephone'), email=item.get('email'), organization=organization)
 
             for x in ['website', 'facebook', 'linkedin', 'twitter']:
                 if item.get(x):

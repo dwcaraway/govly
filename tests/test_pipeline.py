@@ -237,6 +237,86 @@ class DatabasePipelineTest(unittest.TestCase):
         finally:
             session.close()
 
+    def test_organization_contact_saved(self):
+        """A business item's contacts should be saved"""
+        item = BusinessItem()
+        item['legalName']='myname'
+        item['email'] = 'my@me.com'
+        item['telephone'] = '12342342345'
+        item['data_url'] = 'http://www.foo.com/somebusiness.html'
+
+        pipe = DatabasePipeline(self.vitals)
+        pipe.process_item(item, Spider(name='foo'))
+
+        session = self.DBSession()
+        try:
+            o = session.query(Organization).one()
+            len(o.contacts).should.equal(1)
+
+            o.contacts[0].email.should.equal(item['email'])
+            o.contacts[0].telephone.should.equal(item['telephone'])
+        finally:
+            session.close()
+
+    def test_organization_contact_update(self):
+        """Verifies that an organization contact can be updated"""
+        session = self.DBSession()
+        c=None
+        try:
+            o = Organization(legalName='myname')
+            session.add(o)
+            OrganizationSource(data_uid='345', spider_name='foo', data_url='http://www.bar.com/firstbusiness.html', organization=o)
+            c = ContactPoint(email='you@you.com', telephone='12342342345', organization=o)
+            session.commit()
+        finally:
+            session.close()
+
+        item = BusinessItem()
+        item['legalName']='myname'
+        item['data_uid']='1234'
+        item['email'] = 'my@me.com'
+        item['telephone'] = '12342342345'
+        item['data_url'] = 'http://www.foo.com/somebusiness.html'
+
+        pipe = DatabasePipeline(self.vitals)
+        pipe.process_item(item, Spider(name='foo'))
+
+        session = self.DBSession()
+        try:
+            o = session.query(Organization).one()
+            len(o.contacts).should.equal(1)
+            o.contacts[0].email.should.equal(item['email'])
+        finally:
+            session.close()
+
+    def test_multiple_contacts_bug(self):
+        """Verifies that multiple contacts can be stored (had a bug where all contacts overwrote each other"""
+        session = self.DBSession()
+        c=None
+        try:
+            o = Organization(legalName='org1')
+            session.add(o)
+            c = ContactPoint(telephone='telephone1', organization=o)
+            session.commit()
+        finally:
+            session.close()
+
+        item = BusinessItem()
+        item['legalName']='org2'
+        item['data_uid']='1234'
+        item['telephone'] = 'telephone2'
+        item['data_url'] = 'http://www.foo.com/somebusiness.html'
+
+        pipe = DatabasePipeline(self.vitals)
+        pipe.process_item(item, Spider(name='foo'))
+
+        session = self.DBSession()
+        try:
+            contacts = session.query(ContactPoint).all()
+            len(contacts).should.equal(2)
+        finally:
+            session.close()
+
     # def test_image_download(self):
     #     """Test local storage of images"""
     #     from scrapy.contrib.pipeline.images import ImagesPipeline

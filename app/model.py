@@ -100,7 +100,7 @@ class Organization(db.Model):
     taxID = db.Column(db.String)
     description = db.Column(db.String)
 
-    addressCountry = db.Column(db.String)
+#:    addressCountry = db.Column(db.String)
     addressLocality = db.Column(db.String)
     addressRegion = db.Column(db.String)
     postalCode = db.Column(db.String)
@@ -169,7 +169,7 @@ class ContactPoint(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     operating_hours = db.relationship("OperatingHours", backref="contact")
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String)
     email = db.Column(db.String)
     telephone = db.Column(db.String)
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
