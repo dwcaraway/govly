@@ -345,6 +345,38 @@ class DatabasePipelineTest(unittest.TestCase):
         finally:
             session.close()
 
+    def test_organization_no_uid_false_duplicate(self):
+        """
+        Verifies that scraped organization with no data_uid,
+        same data_url, same spider name but different legal names save as separate organizations.
+
+        This example comes from the one page displays of business information (e.g. local dayton chamber)
+        """
+        session = self.DBSession()
+        c=None
+        try:
+            o = Organization(legalName='org1', streetAddress='addr1')
+            session.add(o)
+            os = OrganizationSource(data_url='http://foo.com/bar', spider_name='foo', organization=o)
+            session.commit()
+        finally:
+            session.close()
+
+        item = BusinessItem()
+        item['legalName']='org2'
+        item['streetAddress']= 'addr2'
+        item['data_url']='http://foo.com/bar'
+
+        pipe = DatabasePipeline(self.vitals)
+        pipe.process_item(item, Spider(name='foo'))
+
+        session = self.DBSession()
+        try:
+            orgs = session.query(Organization).all()
+            len(orgs).should.equal(2)
+        finally:
+            session.close()
+
     # def test_image_download(self):
     #     """Test local storage of images"""
     #     from scrapy.contrib.pipeline.images import ImagesPipeline

@@ -69,7 +69,8 @@ class DatabasePipeline:
         organization = None
 
         with self.app.app_context():
-            organization = Organization.query.join(OrganizationSource).filter(OrganizationSource.data_uid==item.get('data_uid')).\
+            if item.get('data_uid'):
+                organization = Organization.query.join(OrganizationSource).filter(OrganizationSource.data_uid==item.get('data_uid')).\
                     filter(OrganizationSource.spider_name==spider.name).first()
 
             if organization is None:
