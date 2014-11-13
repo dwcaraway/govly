@@ -13,7 +13,7 @@ import re
 class BusinessLoader(ItemLoader):
 
     default_item_class = BusinessItem
-    default_input_processor = MapCompose(unicode.strip)
+    default_input_processor = MapCompose(unicode, unicode.strip)
     default_output_processor = TakeFirst()
 
     city_in = MapCompose(unicode.strip, lambda x: x.rstrip(','))
@@ -68,6 +68,7 @@ class CbusChamberSpider(Spider):
             l.add_xpath('postalCode', './/span[@itemprop="postal-code"]/ text()')
             l.add_xpath('telephone', ".//div[contains(concat(' ', @class, ' '), 'PHONE')]/ text()")
             l.add_xpath('image_urls', ".//img[contains(concat(' ', @class, ' '), 'LOGOIMG')]/ @src")
+            l.add_value('data_url', response.url)
 
             item = l.load_item()
 

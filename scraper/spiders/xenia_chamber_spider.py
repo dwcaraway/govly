@@ -7,12 +7,13 @@ from scrapy.shell import inspect_response
 from scraper.items import BusinessItem
 from scrapy.contrib.loader.processor import MapCompose, TakeFirst
 from scrapy import log
+from scrapy.shell import inspect_response
 import re
 
 class BusinessLoader(ItemLoader):
 
     default_item_class = BusinessItem
-    default_input_processor = MapCompose(unicode.strip)
+    default_input_processor = MapCompose(unicode, unicode.strip)
     default_output_processor = TakeFirst()
 
 class XeniaChamberSpider(Spider):
@@ -27,17 +28,20 @@ class XeniaChamberSpider(Spider):
 
     def parse(self, response):
         """This will extract links to all categorized lists of businesses"""
-
-        business_nodes = response.xpath('//div[@class="bus-listing"]')
-
         requests = []
 
-        for node in business_nodes:
-            url = node.xpath('./strong/a/ @href').extract()[0]
-            data_uid = re.match(pattern=u'.*CoID=(\d+)$', string=url).group(1).lstrip('0')
-            category = node.xpath('./preceding-sibling::h2[1]/ text()').extract()[0]
-            meta = {'item': BusinessItem(category=category, source_data_id=data_uid, source_url=url)}
-            requests.append(Request(url=url, callback=self.extract, meta=meta))
+        for node in response.xpath('//div[@class="bus-listing"]'):
+            l = BusinessLoader(selector=node, response=response)
+
+            # inspect_response(response, self)
+
+            l.add_xpath('category', './preceding-sibling::h2[1]/ text()')
+            l.add_xpath('data_url', './/a[contains(@href, "CoID=")]/ @href')
+
+            l.add_value('data_uid', re.match(pattern=u'.*CoID=(\d+)$', string=l.get_output_value('data_url')).group(1).lstrip('0'))
+
+            meta = {'item': l.load_item()}
+            requests.append(Request(url=l.get_output_value('data_url'), callback=self.extract, meta=meta))
 
         return requests
 
