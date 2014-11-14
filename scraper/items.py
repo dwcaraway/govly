@@ -28,3 +28,10 @@ class BusinessItem(Item):
     category = Field()
     data_url = Field()
     data_uid = Field()
+
+    duns = Field()
+    naics = Field()
+    cage = Field()
+
+    record = Field() #Bulk record of additional data
+    record_type = Field() #Bulk record type e.g. 'SAM' or 'SAM_EXCLUSION'

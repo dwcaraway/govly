@@ -1,4 +1,4 @@
-from app.model import db, Organization, OrganizationSource, ContactPoint, OrganizationKeyword, Link
+from app.model import db, Organization, OrganizationSource, ContactPoint, OrganizationKeyword, Link, OrganizationRecord
 from app import create_application
 from sqlalchemy import or_, and_
 from app.config import DevelopmentConfig
@@ -121,6 +121,15 @@ class DatabasePipeline:
                 existing_categories = [k.keyword for k in organization.keywords]
                 if item['category'] not in existing_categories:
                     OrganizationKeyword(keyword=item['category'], organization=organization)
+
+            if item.get('record'):
+                found = False
+                for r in organization.records:
+                    if r.type == item['record_type']:
+                        r.record = item['record']
+                        found = True
+                if not found:
+                    OrganizationRecord(record=item['record'], type=item['record_type'], organization=organization)
 
             for key, value in item.iteritems():
                 setattr(organization, key, value)

@@ -83,6 +83,16 @@ class OrganizationSource(db.Model):
     def __repr__(self):
         return get_string_repr(self)
 
+class OrganizationRecord(db.Model):
+    __tablename__='organization_records'
+    id = db.Column(db.Integer, primary_key=True)
+    record = db.Column(db.String, nullable=False)
+    type = db.Column(db.String, nullable=False)
+    organization_id= db.Column(db.Integer, db.ForeignKey("organizations.id"), nullable=False)
+
+    def __repr__(self):
+        return get_string_repr(self)
+
 class OrganizationQuery(BaseQuery, SearchQueryMixin):
     pass
 
@@ -116,6 +126,7 @@ class Organization(db.Model):
     keywords = db.relationship("OrganizationKeyword", backref="organization")
     sources = db.relationship("OrganizationSource", backref="organization")
     links = db.relationship("Link", backref="organization")
+    records = db.relationship("Record", backref="organization")
 
     search_vector = db.Column(TSVectorType('legalName', 'description'))
 
