@@ -30,6 +30,7 @@ class BusinessItem(Item):
     data_uid = Field()
 
     duns = Field()
+    dunsPlus4 = Field()
     naics = Field()
     cage = Field()
 

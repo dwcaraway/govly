@@ -103,6 +103,7 @@ class Organization(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     duns = db.Column(db.String)
+    dunsPlus4 = db.Column(db.String)
     legalName = db.Column(db.String, nullable=False)
     logo = db.Column(db.String)
     naics = db.Column(db.String)

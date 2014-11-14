@@ -28,6 +28,26 @@ class BusinessLoader(ItemLoader):
     default_input_processor = MapCompose(unicode, unicode.strip)
     default_output_processor = TakeFirst()
 
+def get_start_urls():
+    """The Sam.gov website uses AJAX and is complicated to scrape, so we just guess the filename"""
+
+    from datetime import date
+    from urllib2 import urlopen, URLError
+
+    ret = []
+
+    url_base = 'https://www.sam.gov/SAMPortal/extractfiledownload?role=WW&version=SAM&filename=SAM_PUBLIC_MONTHLY_'
+
+    today = date.today()
+
+    for x in range(1, today.day+1):
+        url = "{0}{1}.ZIP".format(url_base, date(today.year, today.month, x).strftime("%Y%m%d"))
+        try:
+            urlopen(url)
+            return [url]
+        except URLError:
+            continue
+
 class SamSpider(Spider):
     """
     Spider for the General Service Administration's System for Award Management.
@@ -40,12 +60,7 @@ class SamSpider(Spider):
     allowed_domains = ["sam.gov"]
 
     #Create list of starting urls
-    start_urls = [
-
-        "https://www.sam.gov/SAMPortal/extractfiledownload?role=WW&version=SAM&filename=SAM_PUBLIC_DAILY_20141113.ZIP"
-#        "https://www.sam.gov/SAMPortal/extractfiledownload?role=SAM-PUBLIC-UTF8&version=SAM&filename=SAM_PUBLIC_UTF-8_DAILY_20141113.ZIP"
-      #,  "https://www.sam.gov/public-extracts/SAM-Public/SAM_Exclusions_Public_Extract_14317.ZIP"
-    ]
+    start_urls = get_start_urls()
 
     def parse(self, response):
         """This will extract links to all categorized lists of businesses"""
@@ -67,6 +82,7 @@ class SamSpider(Spider):
                     l = BusinessLoader()
                     l.add_value('legalName', business['LEGAL BUSINESS NAME'])
                     l.add_value('duns', business['DUNS'])
+                    l.add_value('dunsPlus4', business['DUNS+4'])
                     l.add_value('naics', business['PRIMARY NAICS'])
                     l.add_value('cage', business['CAGE CODE'])
                     l.add_value('streetAddress', business['SAM ADDRESS 1'])
@@ -77,7 +93,7 @@ class SamSpider(Spider):
                     l.add_value('website', business['CORPORATE URL'])
                     l.add_value('record', json.dumps(business))
                     l.add_value('record_type', u'sam')
-                    l.add_value('data_uid', business['DUNS'])
+                    l.add_value('data_uid', business['CAGE CODE'])
                     l.add_value('data_url', u'http://www.sam.gov')
 
                     yield l.load_item()
