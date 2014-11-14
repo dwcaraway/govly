@@ -126,7 +126,7 @@ class Organization(db.Model):
     keywords = db.relationship("OrganizationKeyword", backref="organization")
     sources = db.relationship("OrganizationSource", backref="organization")
     links = db.relationship("Link", backref="organization")
-    records = db.relationship("Record", backref="organization")
+    records = db.relationship("OrganizationRecord", backref="organization")
 
     search_vector = db.Column(TSVectorType('legalName', 'description'))
 

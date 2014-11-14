@@ -16,6 +16,8 @@ try:
 except:
   from StringIO import StringIO
 
+import json
+
 csv.register_dialect('piper', delimiter='|', quoting=csv.QUOTE_NONE)
 
 sam_fieldnames = ['DUNS', 'DUNS+4', 'CAGE CODE', 'DODAAC', 'SAM EXTRACT CODE', 'PURPOSE OF REGISTRATION', 'REGISTRATION DATE', 'EXPIRATION DATE', 'LAST UPDATE DATE', 'ACTIVATION DATE', 'LEGAL BUSINESS NAME', 'DBA NAME', 'COMPANY DIVISION', 'DIVISION NUMBER', 'SAM ADDRESS 1', 'SAM ADDRESS 2', 'SAM CITY', 'SAM PROVINCE OR STATE', 'SAM ZIP/POSTAL CODE', 'SAM ZIP CODE +4', 'SAM COUNTRY CODE', 'SAM CONGRESSIONAL DISTRICT', 'BUSINESS START DATE', 'FISCAL YEAR END CLOSE DATE', 'CORPORATE URL', 'ENTITY STRUCTURE', 'STATE OF INCORPORATION', 'COUNTRY OF INCORPORATION', 'BUSINESS TYPE COUNTER', 'BUS TYPE STRING', 'PRIMARY NAICS', 'NAICS CODE COUNTER', 'NAICS CODE STRING', 'PSC CODE COUNTER', 'PSC CODE STRING', 'CREDIT CARD USAGE', 'CORRESPONDENCE FLAG', 'MAILING ADDRESS LINE 1', 'MAILING ADDRESS LINE 2', 'MAILING ADDRESS CITY', 'MAILING ADDRESS ZIP/POSTAL CODE', 'MAILING ADDRESS ZIP CODE +4', 'MAILING ADDRESS COUNTRY', 'MAILING ADDRESS STATE OR PROVINCE', 'GOVT BUS POC FIRST NAME', 'GOVT BUS POC MIDDLE INITIAL', 'GOVT BUS POC LAST NAME', 'GOVT BUS POC TITLE', 'GOVT BUS POC ST ADD 1', 'GOVT BUS POC ST ADD 2', 'GOVT BUS POC CITY ', 'GOVT BUS POC ZIP/POSTAL CODE', 'GOVT BUS POC ZIP CODE +4', 'GOVT BUS POC COUNTRY CODE', 'GOVT BUS POC STATE OR PROVINCE', 'GOVT BUS POC U.S. PHONE', 'GOVT BUS POC U.S. PHONE EXT', 'GOVT BUS POC NON-U.S. PHONE', 'GOVT BUS POC FAX U.S. ONLY', 'GOVT BUS POC EMAIL ', 'ALT GOVT BUS POC FIRST NAME', 'ALT GOVT BUS POC MIDDLE INITIAL', 'ALT GOVT BUS POC LAST NAME', 'ALT GOVT BUS POC TITLE', 'ALT GOVT BUS POC ST ADD 1', 'ALT GOVT BUS POC ST ADD 2', 'ALT GOVT BUS POC CITY ', 'ALT GOVT BUS POC ZIP/POSTAL CODE', 'ALT GOVT BUS POC ZIP CODE +4', 'ALT GOVT BUS POC COUNTRY CODE', 'ALT GOVT BUS POC STATE OR PROVINCE', 'ALT GOVT BUS POC U.S. PHONE', 'ALT GOVT BUS POC U.S. PHONE EXT', 'ALT GOVT BUS POC NON-U.S. PHONE', 'ALT GOVT BUS POC FAX U.S. ONLY', 'ALT GOVT BUS POC EMAIL ', 'PAST PERF POC POC  FIRST NAME', 'PAST PERF POC POC  MIDDLE INITIAL', 'PAST PERF POC POC  LAST NAME', 'PAST PERF POC POC  TITLE', 'PAST PERF POC ST ADD 1', 'PAST PERF POC ST ADD 2', 'PAST PERF POC CITY ', 'PAST PERF POC ZIP/POSTAL CODE', 'PAST PERF POC ZIP CODE +4', 'PAST PERF POC COUNTRY CODE', 'PAST PERF POC STATE OR PROVINCE', 'PAST PERF POC U.S. PHONE', 'PAST PERF POC U.S. PHONE EXT', 'PAST PERF POC NON-U.S. PHONE', 'PAST PERF POC FAX U.S. ONLY', 'PAST PERF POC EMAIL ', 'ALT PAST PERF POC FIRST NAME', 'ALT PAST PERF POC MIDDLE INITIAL', 'ALT PAST PERF POC LAST NAME', 'ALT PAST PERF POC TITLE', 'ALT PAST PERF POC ST ADD 1', 'ALT PAST PERF POC ST ADD 2', 'ALT PAST PERF POC CITY ', 'ALT PAST PERF POC ZIP/POSTAL CODE', 'ALT PAST PERF POC ZIP CODE +4', 'ALT PAST PERF POC COUNTRY CODE', 'ALT PAST PERF POC STATE OR PROVINCE', 'ALT PAST PERF POC U.S. PHONE', 'ALT PAST PERF POC U.S. PHONE EXT', 'ALT PAST PERF POC NON-U.S. PHONE', 'ALT PAST PERF POC FAX U.S. ONLY', 'ALT PAST PERF POC EMAIL ', 'ELEC BUS POC FIRST NAME', 'ELEC BUS POC MIDDLE INITIAL', 'ELEC BUS POC LAST NAME', 'ELEC BUS POC TITLE', 'ELEC BUS POC ST ADD 1', 'ELEC BUS POC ST ADD 2', 'ELEC BUS POC CITY ', 'ELEC BUS POC ZIP/POSTAL CODE', 'ELEC BUS POC ZIP CODE +4', 'ELEC BUS POC COUNTRY CODE', 'ELEC BUS POC STATE OR PROVINCE', 'ELEC BUS POC U.S. PHONE', 'ELEC BUS POC U.S. PHONE EXT', 'ELEC BUS POC NON-U.S. PHONE', 'ELEC BUS POC FAX U.S. ONLY', 'ELEC BUS POC EMAIL', 'ALT ELEC POC BUS POC FIRST NAME', 'ALT ELEC POC BUS POC MIDDLE INITIAL', 'ALT ELEC POC BUS POC LAST NAME', 'ALT ELEC POC BUS POC TITLE', 'ALT ELEC POC BUS ST ADD 1', 'ALT ELEC POC BUS ST ADD 2', 'ALT ELEC POC BUS CITY ', 'ALT ELEC POC BUS ZIP/POSTAL CODE', 'ALT ELEC POC BUS ZIP CODE +4', 'ALT ELEC POC BUS COUNTRY CODE', 'ALT ELEC POC BUS STATE OR PROVINCE', 'ALT ELEC POC BUS U.S. PHONE', 'ALT ELEC POC BUS U.S. PHONE EXT', 'ALT ELEC POC BUS NON-U.S. PHONE', 'ALT ELEC POC BUS FAX U.S. ONLY', 'ALT ELEC POC BUS EMAIL ', 'NAICS EXCEPTION COUNTER', 'NAICS EXCEPTION STRING', 'DELINQUENT FEDERAL DEBT FLAG', 'EXCLUSION STATUS FLAG', 'SBA BUSINESS TYPES COUNTER', 'SBA BUSINESS TYPES STRING', 'NO PUBLIC DISPLAY FLAG', 'DISASTER RESPONSE COUNTER', 'DISASTER RESPONSE STRING', 'END OF RECORD INDICATOR']
@@ -25,8 +27,6 @@ class BusinessLoader(ItemLoader):
     default_item_class = BusinessItem
     default_input_processor = MapCompose(unicode, unicode.strip)
     default_output_processor = TakeFirst()
-
-    city_in = MapCompose(unicode.strip, lambda x: x.rstrip(','))
 
 class SamSpider(Spider):
     """
@@ -42,7 +42,8 @@ class SamSpider(Spider):
     #Create list of starting urls
     start_urls = [
 
-        "https://www.sam.gov/SAMPortal/extractfiledownload?role=SAM-PUBLIC-UTF8&version=SAM&filename=SAM_PUBLIC_UTF-8_DAILY_20141113.ZIP"
+        "https://www.sam.gov/SAMPortal/extractfiledownload?role=WW&version=SAM&filename=SAM_PUBLIC_DAILY_20141113.ZIP"
+#        "https://www.sam.gov/SAMPortal/extractfiledownload?role=SAM-PUBLIC-UTF8&version=SAM&filename=SAM_PUBLIC_UTF-8_DAILY_20141113.ZIP"
       #,  "https://www.sam.gov/public-extracts/SAM-Public/SAM_Exclusions_Public_Extract_14317.ZIP"
     ]
 
@@ -59,6 +60,10 @@ class SamSpider(Spider):
             with z.open('{}.dat'.format(filename)) as f:
 
                 for business in csv.DictReader(f, fieldnames=sam_fieldnames, dialect='piper'):
+
+                    if not business['LEGAL BUSINESS NAME'] and business['DUNS']:
+                        continue
+
                     l = BusinessLoader()
                     l.add_value('legalName', business['LEGAL BUSINESS NAME'])
                     l.add_value('duns', business['DUNS'])
@@ -70,9 +75,9 @@ class SamSpider(Spider):
                     l.add_value('addressRegion', business['SAM PROVINCE OR STATE'])
                     l.add_value('postalCode', business['SAM ZIP/POSTAL CODE'])
                     l.add_value('website', business['CORPORATE URL'])
-                    l.add_value('record', business)
-                    l.add_value('record_type', 'sam')
+                    l.add_value('record', json.dumps(business))
+                    l.add_value('record_type', u'sam')
                     l.add_value('data_uid', business['DUNS'])
-                    l.add_value('data_url', 'http://www.sam.gov')
+                    l.add_value('data_url', u'http://www.sam.gov')
 
                     yield l.load_item()
