@@ -228,11 +228,31 @@ class Businesses(Resource):
 
             return b.as_object()
 
+class SignUp(Resource):
+    """Endpoint for signing up for an account"""
+
+    def __init__(self):
+        self.req_parse = reqparse.RequestParser()
+        self.req_parse.add_argument('email', type=str, help="The primary account email", required=True)
+        self.req_parse.add_argument('password', type=str, help="The account password", required=True)
+
+    def post(self):
+        """Create a new account"""
+        args = self.req_parse.parse_args()
+
+        db.user_datastore.create_user(email=args['email'], password=args['password'])
+        db.session.commit()
+
+        return "Account created. A confirmation email has been sent.", 201
+
+
+
 api.add_resource(EventsList, '/events', endpoint='events')
 api.add_resource(SourcesList, '/sources', endpoint='sources')
 api.add_resource(Sources, '/sources/<int:id>', endpoint='source')
 api.add_resource(BusinessesList, '/businesses', endpoint='businesses')
 api.add_resource(Businesses, '/businesses/<int:id>', endpoint='business')
+api.add_resource(SignUp, '/signup', endpoint='signup')
 api.add_resource(Endpoints, '/', endpoint="endpoints")
 
 

@@ -7,44 +7,57 @@ api = Api(mod_rel)
 __author__ = 'DavidWCaraway'
 
 RELS = {
-"event":
-    {
-        "$schema": "http://json-schema.org/schema#",
+    "event":
+        {
+            "$schema": "http://json-schema.org/schema#",
 
-        "type": "object",
-        "properties": {
-            "name": {"type": "string"},
-            "email": {"type": "string"}
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "email": {"type": "string"}
+            },
+            "required": ["email"]
         },
-        "required": ["email"]
-    },
 
-"source":
-    {
-        "$schema": "http://json-schema.org/schema#",
+    "source":
+        {
+            "$schema": "http://json-schema.org/schema#",
 
-        "type": "object",
-        "properties": {
-            "name": {"type": "string"},
-            "email": {"type": "string"}
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "email": {"type": "string"}
+            },
+            "required": ["email"]
         },
-        "required": ["email"]
-    },
-"events":
-    {
-    "to": "do"
-    },
-"sources":
-    {
-    "to": "do"
-    },
-"businesses":
-    {
-    "to": "do"
-    },
-"business":
-    {
-    "to": "do"
+    "events":
+        {
+            "to": "do"
+        },
+    "sources":
+        {
+            "to": "do"
+        },
+    "businesses":
+        {
+            "to": "do"
+        },
+    "business":
+        {
+            "to": "do"
+        },
+    "signup": {
+        "post": {
+            "$schema": "http://json-schema.org/schema#",
+
+            "type": "object",
+            "properties": {
+                "email": {"type": "string"},
+                "password": {"type": "string"},
+                "real_name": {"type": "string"}
+            },
+            "required": ["email", "password"]
+        },
     }
 }
 

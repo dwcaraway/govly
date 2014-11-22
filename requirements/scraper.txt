@@ -1,0 +1,9 @@
+#Scraper libraries
+scrapy
+zope.interface
+cryptography
+requests
+cssselect
+phonenumbers
+service-identity
+lxml

@@ -6,22 +6,27 @@ class Config(object):
     """
     DEBUG = False
     TESTING = False
-    SECRET_KEY = "secret"
-    CSRF_ENABLED = True
+
+    SECRET_KEY = "supermegavitalssecret"
     SECURITY_PASSWORD_HASH = 'bcrypt'
-    SECURITY_REGISTERABLE = True
-    SECURITY_PASSWORD_SALT = 'lotsofsalt'
-    SECURITY_CHANGEABLE = True
-    SECURITY_RECOVERABLE = True
+    SECURITY_PASSWORD_SALT = 'ubersaltstuff'
+    SECURITY_CONFIRMABLE = True
+
+    MAIL_SERVER = 'localhost'
+    MAIL_PORT = 25
+    MAIL_USE_SSL = True
+    MAIL_SUPPRESS_SEND = True
+    MAIL_USERNAME = 'testuser'
+    MAIL_PASSWORD = 'testpassword'
 
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitals'
+    MAIL_SUPPRESS_SEND = False
 
 class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitalsdev'
     DEBUG = True
-
 
 class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitalstest'

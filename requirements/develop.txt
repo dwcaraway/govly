@@ -1,0 +1,9 @@
+-r framework.txt
+-r scraper.txt
+
+#Libraries for testing
+sure >= 1.2.7
+selenium == 2.42.1
+mock >= 1.0.1
+nose >= 1.3.4
+liveandletdie==0.0.2

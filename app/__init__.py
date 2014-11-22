@@ -12,6 +12,15 @@ def create_application(config_object=DevelopmentConfig):
     from app.model import db
     db.init_app(application)
 
+    from app.model import User, Role
+    from flask.ext.security import Security, SQLAlchemyUserDatastore
+    db.user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+
+    application.security = Security(application, db.user_datastore)
+
+    from flask_mail import Mail
+    application.mail = Mail(application)
+
     from app.route import index
     application.add_url_rule('/', 'index', index)
 
@@ -28,7 +37,6 @@ def create_application(config_object=DevelopmentConfig):
     application.register_blueprint(api_module)
     application.register_blueprint(rel_module)
     application.register_blueprint(mod_hal)
-
 
     @application.before_first_request
     def create_db():

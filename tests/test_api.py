@@ -4,20 +4,21 @@ import tempfile
 import os
 from datetime import datetime
 
-from app.model import db, Event, Organization, OrganizationSource
+from app.model import db, Event, Organization, OrganizationSource, User
 from tests import hal_loads
 from app import create_application
 import sure
+import json
 from app.config import TestingConfig
+from flask import url_for
 
 logger = logging.getLogger(__name__)
 
 class ApiTest(unittest.TestCase):
     def setUp(self):
         """Construct temporary database and test client for testing routing and responses"""
-        # self.db_fd, self.db_path = tempfile.mkstemp()
-
         self.vitals = create_application(TestingConfig())
+        self.vitals.testing = True
         self.test_client = self.vitals.test_client()
 
         #Push a context so that database knows what application to attach to
@@ -281,4 +282,66 @@ class BusinessTest(ApiTest):
         doc = hal_loads(resp.data)
         doc.links['r:businesses'].url().should.equal('/api/businesses?page=1')
         doc.properties.should.equal({'id':biz.id, 'legalName':'somename','created_on':biz.created_on.isoformat(), 'updated_on': biz.updated_on.isoformat()})
+
+class SecurityTest(ApiTest):
+
+    def test_account_registration_creates_account(self):
+        """
+        Given that I am an unauthenticated user
+        When I post an email and password to <r:signup url>
+        Then I receive a HTTP 201 code indicating account creation
+        """
+        url = None
+        with self.vitals.app_context():
+            url = url_for('api.signup')
+
+        data = {'email':'me@colliderproject.org', 'password':"bestpasswordever!"}
+        headers = {'Content-Type': 'application/json'}
+
+        resp = self.test_client.post(url, data=json.dumps(data), headers=headers)
+        resp.status_code.should.equal(201)
+
+        with self.vitals.app_context():
+            User.query.all().should.have.length_of(1)
+            db.user_datastore.get_user(data['email']).shouldnot.equal(None)
+
+    def test_account_registration_sends_email(self):
+        """
+        Given that I am an unauthenticated user
+        When I post an email and password to <r:signup url>
+        Then I may not log in yet and
+        I receive an email with a confirmation link
+        """
+
+        from contextlib import contextmanager
+        from flask_security.signals import confirm_instructions_sent
+        from flask_security.utils import login_instructions_sent
+
+        @contextmanager
+        def captured_emails(app):
+            recorded = []
+            def record(sender, user, **extra):
+                recorded.append(user)
+                confirm_instructions_sent.connect(record, app)
+            try:
+                yield recorded
+            finally:
+                confirm_instructions_sent.disconnect(record, app)
+
+#        with captured_emails(self.vitals) as emails:
+
+        with self.vitals.mail.record_messages() as outbox:
+            url = None
+            with self.vitals.app_context():
+                url = url_for('api.signup')
+
+            data = {'email':'me@colliderproject.org', 'password':"!bestpasswordever!"}
+            headers = {'Content-Type': 'application/json'}
+
+            resp = self.test_client.post(url, data=json.dumps(data), headers=headers)
+
+            outbox.should.have.length_of(1)
+
+#            emails.should.have.length_of(1)
+#            emails[0].user.email.should.equal('me@colliderproject.org')
 
