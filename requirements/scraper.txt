@@ -1,5 +1,8 @@
 #Scraper libraries
 scrapy
+twisted
+w3lib
+address
 zope.interface
 cryptography
 requests
