@@ -12,3 +12,4 @@ dist
 *.db
 *.egg-info
 *.lock
+app/frontend/static

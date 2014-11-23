@@ -43,7 +43,7 @@ module.exports = (grunt) ->
     bowercopy:
       options:
         srcPrefix: 'bower_components'
-        destPrefix: 'vitals/frontend/static'
+        destPrefix: 'app/frontend/static'
       scripts:
         files:
           'js/vendor/backbone.js': 'backbone/backbone.js'
