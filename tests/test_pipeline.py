@@ -1,16 +1,15 @@
 __author__ = 'DavidWCaraway'
+import unittest
+
+from scrapy.spider import Spider
+from sqlalchemy.orm import scoped_session, sessionmaker
+
 from scraper.pipelines import DatabasePipeline
 from scraper.items import BusinessItem
-from scrapy.spider import Spider
-import unittest
-import tempfile
-import os
-import random
-import sure
-from sqlalchemy.orm import scoped_session, sessionmaker
 from app import create_application
-from app.model import db, OrganizationSource, ContactPoint, Organization, Link
+from app.models.model import db, OrganizationSource, ContactPoint, Organization, Link
 from app.config import TestingConfig
+
 
 class DatabasePipelineTest(unittest.TestCase):
     def setUp(self):

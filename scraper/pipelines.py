@@ -1,10 +1,10 @@
-from app.model import db, Organization, OrganizationSource, ContactPoint, OrganizationKeyword, Link, OrganizationRecord
-from app import create_application
-from sqlalchemy import or_, and_
-from app.config import DevelopmentConfig
+from sqlalchemy import or_
 from scrapy import log
 import phonenumbers
-from address import AddressParser
+
+from app.models.model import db, Organization, OrganizationSource, ContactPoint, OrganizationKeyword, Link, OrganizationRecord
+from app import create_application
+
 
 # Define your item pipelines here
 #

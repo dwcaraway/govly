@@ -1,5 +1,7 @@
-from app.config import DevelopmentConfig
 import logging
+
+from app.config import DevelopmentConfig
+
 
 logger = logging.getLogger(__name__)
     
@@ -9,10 +11,10 @@ def create_application(config_object=DevelopmentConfig):
     application.config.from_object(config_object)
     application.config.from_envvar('vitals_settings', True)
 
-    from app.model import db
+    from app.models.model import db
     db.init_app(application)
 
-    from app.model import User, Role
+    from app.models.model import User, Role
     from flask.ext.security import Security, SQLAlchemyUserDatastore
     db.user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 
@@ -43,3 +45,13 @@ def create_application(config_object=DevelopmentConfig):
         db.create_all()
 
     return application
+
+from werkzeug.wsgi import DispatcherMiddleware
+
+from . import api
+from . import frontend
+
+def create_app(override_settings=None):
+    return DispatcherMiddleware(frontend.create_app(override_settings), {
+        '/api': api.create_app(override_settings),
+    })

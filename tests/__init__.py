@@ -1,4 +1,5 @@
 import sys
+import sure
 sys.path.append('../')
 
 from dougrain import Document

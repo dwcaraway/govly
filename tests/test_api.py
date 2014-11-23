@@ -1,16 +1,15 @@
 import unittest
 import logging
-import tempfile
-import os
 from datetime import datetime
+import json
 
-from app.model import db, Event, Organization, OrganizationSource, User
+from flask import url_for
+
+from app.models.model import db, Event, Organization, OrganizationSource, User
 from tests import hal_loads
 from app import create_application
-import sure
-import json
 from app.config import TestingConfig
-from flask import url_for
+
 
 logger = logging.getLogger(__name__)
 
@@ -315,7 +314,6 @@ class SecurityTest(ApiTest):
 
         from contextlib import contextmanager
         from flask_security.signals import confirm_instructions_sent
-        from flask_security.utils import login_instructions_sent
 
         @contextmanager
         def captured_emails(app):

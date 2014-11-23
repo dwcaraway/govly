@@ -3,12 +3,11 @@ from datetime import datetime
 from datetime import date
 import logging
 
-from flask import Blueprint, request 
+from flask import Blueprint, request
 from dougrain import Builder
 from flask.ext.restful import reqparse, Api, Resource, abort
 
-from app.model import Event, db, Organization, OrganizationSource
-from sqlalchemy_searchable import search
+from app.models.model import Event, db, Organization, OrganizationSource
 
 
 logger = logging.getLogger(__name__)
