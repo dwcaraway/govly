@@ -25,7 +25,11 @@ SQLAlchemy-ImageAttach>=0.8.2
 alembic>=0.6.7
 
 # Views
-Flask-Classy>=0.6.10
+#Flask-Classy>=0.6.10
+-e git+https://github.com/apiguy/flask-classy.git#egg=Flask-Classy
+
+# Assets
+Flask-Assets>=0.10
 
 # API
 Flask-RESTful>=0.2.12
@@ -36,7 +40,7 @@ jsonschema>=2.4.0
 # Auth
 Flask-Security>=1.7.3
 #flask-jwt>=0.2.0
--e git+https://github.com/ryanolson/flask-jwt.git#egg=Flask-JWT-devel
+-e git+https://github.com/mattupstate/flask-jwt.git#egg=Flask-JWT-devel
 passlib>=1.6.2
 py-bcrypt>=0.4
 
