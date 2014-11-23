@@ -1,4 +1,7 @@
-import json, os, tempfile, logging
+import json
+import os
+import tempfile
+import logging
 from jsonschema import Draft4Validator
 from app import create_application
 from tests.test_api import ApiTest

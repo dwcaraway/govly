@@ -18,9 +18,9 @@ from flask.ext.script import Command, Manager, Option, Shell, Server
 from flask.ext.migrate import MigrateCommand
 from werkzeug.serving import run_simple
 
-from vitals import create_app
-from vitals.framework.sql import db
-from vitals.models.users import User
+from app import create_app
+from app.framework.sql import db
+from app.models.users import User
 
 
 application = create_app()

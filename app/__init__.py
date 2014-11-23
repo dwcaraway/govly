@@ -1,8 +1,6 @@
 import logging
 
 from app.config import DevelopmentConfig
-
-
 logger = logging.getLogger(__name__)
     
 def create_application(config_object=DevelopmentConfig):
@@ -46,12 +44,13 @@ def create_application(config_object=DevelopmentConfig):
 
     return application
 
-from werkzeug.wsgi import DispatcherMiddleware
-
-from . import api
-from . import frontend
 
 def create_app(override_settings=None):
+    from werkzeug.wsgi import DispatcherMiddleware
+
+    from . import api
+    from . import frontend
+
     return DispatcherMiddleware(frontend.create_app(override_settings), {
         '/api': api.create_app(override_settings),
     })

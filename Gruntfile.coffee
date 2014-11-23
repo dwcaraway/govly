@@ -9,33 +9,33 @@ module.exports = (grunt) ->
       app:
         expand: true
         src: ['**/*.coffee']
-        cwd: 'vitals/frontend/client/coffee'
-        dest: 'vitals/frontend/static/js/'
+        cwd: 'app/frontend/client/coffee'
+        dest: 'app/frontend/static/js/'
         ext: '.js'
         options:
           bare: false
           preserve_dirs: true
-          base_path: 'vitals/frontend/client/coffee'
+          base_path: 'app/frontend/client/coffee'
 
     # compile coffee-react source files
     cjsx:
       app:
         expand: true
         src: ['**/*.cjsx']
-        cwd: 'vitals/frontend/client/coffee'
-        dest: 'vitals/frontend/static/js'
+        cwd: 'app/frontend/client/coffee'
+        dest: 'app/frontend/static/js'
         ext: '.js'
         options:
           base: false
           preserve_dirs: true
-          base_path: 'vitals/frontend/client/coffee'
+          base_path: 'app/frontend/client/coffee'
 
     # watch for file changes and react
     watch:
       app:
         files: [
-          'vitals/frontend/client/coffee/**/*.coffee',
-          'vitals/frontend/client/coffee/**/*.cjsx',
+          'app/frontend/client/coffee/**/*.coffee',
+          'app/frontend/client/coffee/**/*.cjsx',
         ]
         tasks: ['coffee:app', 'cjsx:app']
 

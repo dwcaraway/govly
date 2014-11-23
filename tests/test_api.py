@@ -13,6 +13,7 @@ from app.config import TestingConfig
 
 logger = logging.getLogger(__name__)
 
+
 class ApiTest(unittest.TestCase):
     def setUp(self):
         """Construct temporary database and test client for testing routing and responses"""
