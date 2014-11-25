@@ -44,7 +44,6 @@ def create_application(config_object=DevelopmentConfig):
 
     return application
 
-
 def create_app(override_settings=None):
     from werkzeug.wsgi import DispatcherMiddleware
 

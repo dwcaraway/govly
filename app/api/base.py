@@ -104,7 +104,7 @@ class ClassyAPI(RestfulAPI):
         return conditionalify_response(response)
 
 
-class BaseAPI(FlaskView):
+class BaseView(FlaskView):
     """Flask-Classy base class for ClassyAPI views."""
 
     trailing_slash = None
@@ -121,12 +121,6 @@ class BaseAPI(FlaskView):
     def make_response(cls, response):
         """JSONify responses"""
         return jsonify_response(envelopify_response(response))
-
-    @classmethod
-    def get_class_suffix(cls):
-        """API views will use the -API suffix rather than the -View suffix."""
-        return "API"
-
 
 class BaseResource(Resource):
     """Flask-RESTful base class Resource API views."""
