@@ -28,7 +28,7 @@ def app():
     yield _app
     ctx.pop()
 
-@pytest.yield_fixture(scope='function', params=['classy', 'restful'])
+@pytest.yield_fixture(scope='function', params=['classy'])
 def apiapp(request):
     _app = api.create_app(test_settings)
     if request.param == 'classy':

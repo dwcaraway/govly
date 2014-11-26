@@ -15,7 +15,7 @@ from flask import request
 from flask.ext.classy import FlaskView
 from flask.ext.jwt import verify_jwt, JWTError
 from flask.ext.restful import Api as RestfulAPI, Resource
-from flask.ext.restful import abort, representations, types
+from flask.ext.restful import abort, representations, fields
 from flask.ext.restful.representations.json import output_json
 from flask.ext.restful.reqparse import RequestParser
 from flask.ext.restful.utils import unpack
@@ -36,14 +36,14 @@ request_options.add_argument('page', type=int, location='args')
 request_options.add_argument('per_page', type=int, location='args')
 
 response_options = RequestParser()
-response_options.add_argument('envelope', type=types.boolean, location='args')
+response_options.add_argument('envelope', type=fields.Boolean, location='args')
 response_options.add_argument('callback', type=str, location='args')
-response_options.add_argument('X-Conditional', type=types.boolean,
+response_options.add_argument('X-Conditional', type=fields.Boolean,
                              location='headers')
 
 _log = logging.getLogger(__name__)
 
-__all__ = ('ClassyAPI', 'BaseAPI', 'BaseResource', 'secure_endpoint')
+__all__ = ('ClassyAPI', 'BaseAPI', 'secure_endpoint')
 
 
 class ClassyAPI(RestfulAPI):
@@ -121,15 +121,6 @@ class BaseView(FlaskView):
     def make_response(cls, response):
         """JSONify responses"""
         return jsonify_response(envelopify_response(response))
-
-class BaseResource(Resource):
-    """Flask-RESTful base class Resource API views."""
-
-    def dispatch_request(self, *args, **kwargs):
-        """Extend dispatch_request to enforce Content-Type == application/json"""
-        enforce_json_post_put_patch_requests()
-        return super(BaseResource, self).dispatch_request(*args, **kwargs)
-
 
 def secure_endpoint(jwt=True, oauth2=True, jwt_realm=None):
     """View decorator to protect API endpoints."""

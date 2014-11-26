@@ -24,16 +24,17 @@ SQLAlchemy-ImageAttach>=0.8.2
 # Migrations
 alembic>=0.6.7
 
-# Views
-#Flask-Classy>=0.6.10
--e git+https://github.com/apiguy/flask-classy.git#egg=Flask-Classy
-
 # Assets
 Flask-Assets>=0.10
+cssmin>=0.2.0
 
 # API
 Flask-RESTful>=0.2.12
-Flask-Restless>=0.13.1
+Flask-Restless>=0.15.0
+# Using a fork of the Flask-Classy with many of the pull requests merged in
+-e git+https://github.com/dwcaraway/flask-classy.git#egg=Flask-Classy
+aniso8601
+pytz
 dougrain>=0.5.1
 jsonschema>=2.4.0
 

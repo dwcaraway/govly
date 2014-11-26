@@ -15,7 +15,6 @@ class Config(object):
     MAIL_SERVER = 'localhost'
     MAIL_PORT = 25
     MAIL_USE_SSL = True
-    MAIL_SUPPRESS_SEND = True
     MAIL_USERNAME = 'testuser'
     MAIL_PASSWORD = 'testpassword'
 
@@ -23,10 +22,13 @@ class Config(object):
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitals'
     MAIL_SUPPRESS_SEND = False
+    TESTING = False
+    DEBUG = False
 
 class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitalsdev'
     DEBUG = True
+    TESTING = True
 
 class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitalstest'

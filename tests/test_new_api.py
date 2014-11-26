@@ -53,8 +53,8 @@ class TestAPI:
 
     def test_todos_index(self, todos, testapi):
         resp = testapi.get("/api/tests/todos")
-        assert isinstance(resp.json, list)
-        assert len(resp.json) == 2
+        assert isinstance(resp.json, dict)
+        assert len(resp.json['todos']) == 2
 
     def test_todos_post(self, user, testapi):
         token = self.test_jwt_log_in_returns_200_with_token(user, testapi)
