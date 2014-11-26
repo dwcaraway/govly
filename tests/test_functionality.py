@@ -45,7 +45,7 @@ class TestLoggingIn:
         assert user.email in res
 
     def test_sees_login_link_on_log_out(self, user, testapp):
-        res = testapp.get("/login")
+        res = testapp.get("/login", expect_errors=True)
         # Fills out login form on the login page
         form = res.forms['login_form']
         form['email'] = user.email

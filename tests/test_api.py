@@ -8,9 +8,7 @@ from flask import url_for
 from app.models.model import db, Event, Organization, OrganizationSource, User
 from tests import hal_loads
 from app import create_application
-from app.config import TestingConfig
-
-
+from .settings import TestingConfig
 logger = logging.getLogger(__name__)
 
 

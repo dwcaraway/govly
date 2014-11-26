@@ -43,8 +43,8 @@ def create_app(package_name, package_path, settings_override=None,
                 instance_path=instance_path)
 
     # Initialize settings
-    from app.settings import DevelopmentConfig
-    app.config.from_object(DevelopmentConfig())
+    from app.settings import ProductionConfig
+    app.config.from_object(ProductionConfig())
     app.config.from_pyfile("settings.cfg", silent=True)
     app.config.from_object(settings_override)
 

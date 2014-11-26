@@ -27,12 +27,13 @@ alembic>=0.6.7
 # Assets
 Flask-Assets>=0.10
 cssmin>=0.2.0
+jsmin>=2.0.11
 
 # API
 Flask-RESTful>=0.2.12
 Flask-Restless>=0.15.0
 # Using a fork of the Flask-Classy with many of the pull requests merged in
--e git+https://github.com/dwcaraway/flask-classy.git#egg=Flask-Classy
+-e git+https://github.com/dwcaraway/flask-classy.git#egg=Flask-Classy-fork
 aniso8601
 pytz
 dougrain>=0.5.1

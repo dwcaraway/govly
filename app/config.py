@@ -30,6 +30,3 @@ class DevelopmentConfig(Config):
     DEBUG = True
     TESTING = True
 
-class TestingConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitalstest'
-    TESTING = True

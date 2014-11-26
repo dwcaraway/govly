@@ -15,26 +15,23 @@ from webtest import TestApp
 from app import api
 from app import frontend
 from app.framework.sql import db as _db
-from . import settings as test_settings
+from .settings import TestingConfig
 from .apis import classy_api
 from .factories import UserFactory
 
 
 @pytest.yield_fixture(scope='function')
 def app():
-    _app = frontend.create_app(test_settings)
+    _app = frontend.create_app(TestingConfig)
     ctx = _app.test_request_context()
     ctx.push()
     yield _app
     ctx.pop()
 
-@pytest.yield_fixture(scope='function', params=['classy'])
+@pytest.yield_fixture(scope='function')
 def apiapp(request):
-    _app = api.create_app(test_settings)
-    if request.param == 'classy':
-        classy_api(_app)
-    else:
-        restful_api(_app)
+    _app = api.create_app(TestingConfig)
+    classy_api(_app)
     ctx = _app.test_request_context()
     ctx.push()
     yield _app
