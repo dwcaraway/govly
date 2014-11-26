@@ -20,15 +20,6 @@ class SecureView(api.BaseView):
             "secret": "shhhhhh, keep this quiet",
         }
 
-class SecureResource(api.BaseResource):
-
-    @api.secure_endpoint()
-    def get(self):
-        return {
-            "secret": "shhhhhh, keep this quiet",
-        }
-
-
 def classy_api(app):
     """Create an Flask-Classy-based API on app"""
     bp = api.v1.create_blueprint('test', url_prefix='/api/tests')

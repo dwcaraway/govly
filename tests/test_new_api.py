@@ -111,7 +111,7 @@ class TestAPI:
         resp = testapi.get("/api/tests/todos?envelope=true")
         assert isinstance(resp.json, dict)
         assert resp.json['status'] == resp.status_code
-        assert len(resp.json['data']) == 2
+        assert len(resp.json['data']['todos']) == 2
 
     def test_jwt_log_in_returns_200_with_token(self, user, testapi):
         data = dict(username=user.email, password='myprecious')

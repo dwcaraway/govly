@@ -16,7 +16,7 @@ from app import api
 from app import frontend
 from app.framework.sql import db as _db
 from . import settings as test_settings
-from .apis import classy_api, restful_api
+from .apis import classy_api
 from .factories import UserFactory
 
 
