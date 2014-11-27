@@ -10,6 +10,9 @@
     templated from https://github.com/ryanolson/cookiecutter-webapp
 """
 from app.api.v1.todos import TodosView
+from app.api.v1.organizations import OrganizationsView
+from app.api.v1.root import RootView
+from app.api.v1.rel import LinkRelationsView
 
 def create_blueprint(name=None, url_prefix=None, subdomain=None):
     """Register API endpoints on a Flask :class:`Blueprint`."""
@@ -27,5 +30,8 @@ def create_blueprint(name=None, url_prefix=None, subdomain=None):
 
     # Register API endpoints
     TodosView.register(bp)
+    OrganizationsView.register(bp)
+    LinkRelationsView.register(bp)
+    RootView.register(bp)
 
     return bp
