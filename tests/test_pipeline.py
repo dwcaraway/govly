@@ -8,7 +8,7 @@ from scraper.pipelines import DatabasePipeline
 from scraper.items import BusinessItem
 from app import create_application
 from app.models.model import db, OrganizationSource, ContactPoint, Organization, Link
-from app.config import TestingConfig
+from .settings import TestingConfig
 
 
 class DatabasePipelineTest(unittest.TestCase):

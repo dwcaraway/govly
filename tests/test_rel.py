@@ -5,7 +5,7 @@ import logging
 from jsonschema import Draft4Validator
 from app import create_application
 from tests.test_api import ApiTest
-from app.config import TestingConfig
+from .settings import TestingConfig
 
 __author__ = 'DavidWCaraway'
 
