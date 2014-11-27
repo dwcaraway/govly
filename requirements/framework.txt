@@ -13,6 +13,7 @@ billiard>=3.3.0.19
 
 # Migrations
 Flask-Migrate>=1.0.0
+alembic>=0.6.7
 
 # Database
 Flask-SQLAlchemy>=1.0
@@ -20,9 +21,6 @@ SQLAlchemy>=0.9.4
 psycopg2>=2.5.2
 SQLAlchemy-Searchable>=0.7.0
 SQLAlchemy-ImageAttach>=0.8.2
-
-# Migrations
-alembic>=0.6.7
 
 # Assets
 Flask-Assets>=0.10
@@ -41,7 +39,7 @@ jsonschema>=2.4.0
 
 # Auth
 Flask-Security>=1.7.3
-#flask-jwt>=0.2.0
+-e git+https://github.com/mattupstate/flask-social.git@develop#egg=Flask-Social-develop
 -e git+https://github.com/mattupstate/flask-jwt.git#egg=Flask-JWT-devel
 passlib>=1.6.2
 py-bcrypt>=0.4
