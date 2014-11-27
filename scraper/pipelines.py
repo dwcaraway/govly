@@ -2,8 +2,9 @@ from sqlalchemy import or_
 from scrapy import log
 import phonenumbers
 
-from app.models.model import db, Organization, OrganizationSource, ContactPoint, OrganizationKeyword, Link, OrganizationRecord
-from app import create_application
+from app.models.model import Organization, OrganizationSource, ContactPoint, OrganizationKeyword, Link, OrganizationRecord
+from app.framework.sql import db
+from app import create_app
 
 
 # Define your item pipelines here
@@ -55,7 +56,7 @@ class DatabasePipeline:
 
     def __init__(self, app=None):
         if app is None:
-            self.app = create_application()
+            self.app = create_app()
         else:
             self.app = app
 

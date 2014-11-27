@@ -5,9 +5,11 @@ import json
 
 from flask import url_for
 
-from app.models.model import db, Event, Organization, OrganizationSource, User
+from app.framework.sql  import db
+from app.models.users import User
+from app.models.model import Event, Organization, OrganizationSource
 from tests import hal_loads
-from app import create_application
+from app import create_app
 from .settings import TestingConfig
 logger = logging.getLogger(__name__)
 
@@ -15,7 +17,7 @@ logger = logging.getLogger(__name__)
 class ApiTest(unittest.TestCase):
     def setUp(self):
         """Construct temporary database and test client for testing routing and responses"""
-        self.vitals = create_application(TestingConfig())
+        self.vitals = create_app(TestingConfig())
         self.vitals.testing = True
         self.test_client = self.vitals.test_client()
 

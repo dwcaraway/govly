@@ -6,15 +6,16 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 from scraper.pipelines import DatabasePipeline
 from scraper.items import BusinessItem
-from app import create_application
-from app.models.model import db, OrganizationSource, ContactPoint, Organization, Link
+from app import create_app
+from app.framework.sql import db
+from app.models.model import (Organization, OrganizationSource, ContactPoint, Link)
 from .settings import TestingConfig
 
 
 class DatabasePipelineTest(unittest.TestCase):
     def setUp(self):
         """Construct temporary database and test client for testing routing and responses"""
-        self.vitals = create_application(TestingConfig())
+        self.vitals = create_app(TestingConfig())
 
         #Push a context so that database knows what application to attach to
         with self.vitals.app_context():

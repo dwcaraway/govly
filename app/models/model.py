@@ -1,4 +1,4 @@
-from flask.ext.sqlalchemy import SQLAlchemy, BaseQuery
+from flask.ext.sqlalchemy import BaseQuery
 from sqlalchemy_searchable import make_searchable
 from sqlalchemy_searchable import SearchQueryMixin
 from sqlalchemy_utils.types import TSVectorType
@@ -6,7 +6,12 @@ from datetime import datetime
 from flask.ext.security import UserMixin, RoleMixin
 import json
 # Define the database functions
-db = SQLAlchemy()
+
+from ..framework.sql import (
+    db,
+    Model,
+    ReferenceColumn,
+)
 
 def get_string_repr(obj):
     #Using str for value since datetime is not json serializable
@@ -20,7 +25,7 @@ def get_string_repr(obj):
 
     return json.dumps(new_obj)
 
-class Person(db.Model):
+class Person(Model):
 
     __tablename__ = 'people'
 
@@ -33,12 +38,12 @@ class Person(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-db.Table('employment', db.Model.metadata,
+db.Table('employment', Model.metadata,
                 db.Column('employer_id', None, db.ForeignKey('organizations.id')),
                 db.Column('employee_id', None, db.ForeignKey('people.id'))
 )
 
-class Event(db.Model):
+class Event(Model):
     __tablename__='events'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -73,7 +78,7 @@ class Event(db.Model):
     def __repr__(self):
         return get_string_repr(self)
 
-class OrganizationSource(db.Model):
+class OrganizationSource(Model):
     __tablename__='organization_sources'
     id = db.Column(db.Integer, primary_key=True)
     data_uid = db.Column(db.String)
@@ -84,7 +89,7 @@ class OrganizationSource(db.Model):
     def __repr__(self):
         return get_string_repr(self)
 
-class OrganizationRecord(db.Model):
+class OrganizationRecord(Model):
     __tablename__='organization_records'
     id = db.Column(db.Integer, primary_key=True)
     record = db.Column(db.String, nullable=False)
@@ -97,7 +102,7 @@ class OrganizationRecord(db.Model):
 class OrganizationQuery(BaseQuery, SearchQueryMixin):
     pass
 
-class Organization(db.Model):
+class Organization(Model):
     """A data model for a business"""
     query_class = OrganizationQuery
     __tablename__='organizations'
@@ -135,33 +140,13 @@ class Organization(db.Model):
     def __repr__(self):
         return get_string_repr(self)
 
-class OrganizationKeyword(db.Model):
+class OrganizationKeyword(Model):
     __tablename__= 'organization_keywords'
     id = db.Column(db.Integer, primary_key=True)
     organization_id = db.Column(db.Integer, db.ForeignKey("organizations.id"), nullable=False)
     keyword = db.Column(db.String, nullable=False)
 
-roles_users = db.Table('roles_users',
-        db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-        db.Column('role_id', db.Integer, db.ForeignKey('role.id')))
-
-class Role(db.Model, RoleMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True)
-    description = db.Column(db.String)
-
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String, unique=True)
-    password = db.Column(db.String)
-    first_name = db.Column(db.String)
-    last_name = db.Column(db.String)
-    active = db.Column(db.Boolean())
-    confirmed_at = db.Column(db.DateTime())
-    roles = db.relationship('Role', secondary=roles_users,
-                            backref=db.backref('users', lazy='dynamic'))
-
-class Link(db.Model):
+class Link(Model):
     __tablename__ = 'links'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -172,7 +157,7 @@ class Link(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-class Product(db.Model):
+class Product(Model):
     __tablename__ = 'products'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -182,7 +167,7 @@ class Product(db.Model):
     created_on = db.Column(db.DateTime, default=db.func.now())
     updated_on = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-class ContactPoint(db.Model):
+class ContactPoint(Model):
     __tablename__= 'contact_points'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -192,7 +177,7 @@ class ContactPoint(db.Model):
     telephone = db.Column(db.String)
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'), nullable=False)
 
-class OperatingHours(db.Model):
+class OperatingHours(Model):
     __tablename__= 'operating_hours'
 
     id = db.Column(db.Integer, primary_key=True)

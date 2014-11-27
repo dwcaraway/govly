@@ -3,7 +3,7 @@ import os
 import tempfile
 import logging
 from jsonschema import Draft4Validator
-from app import create_application
+from app import create_app
 from tests.test_api import ApiTest
 from .settings import TestingConfig
 
@@ -17,7 +17,7 @@ class LinkRelationTest(ApiTest):
 
     def setUp(self):
         """Construct temporary database and test client for testing routing and responses"""
-        self.vitals = create_application(TestingConfig())
+        self.vitals = create_app(TestingConfig())
         self.vitals.testing = True
         self.test_client = self.vitals.test_client()
 
