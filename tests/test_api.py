@@ -7,7 +7,7 @@ from flask import url_for
 
 from app.framework.sql  import db
 from app.models.users import User
-from app.models.model import Event, Organization, OrganizationSource
+from app.models.model import Organization, OrganizationSource
 from tests import hal_loads
 from app import create_app
 from .settings import TestingConfig
@@ -46,98 +46,8 @@ class EndpointsTests(ApiTest):
         doc = hal_loads(resp.data)
 
         resp.status_code.should.equal(200)
-        doc.links['r:events'].url().should.equal('/api/events')
         doc.links['r:sources'].url().should.equal('/api/sources')
         doc.links['r:businesses'].url().should.equal('/api/businesses')
-
-
-class EventListTest(ApiTest):
-    """Tests of api 'EventList' resource"""
-
-    def test_link_relation_curie(self):
-        """Verify that Event resource has a link relation curie in HAL response"""
-        resp = self.test_client.get('/api/events')
-        doc = hal_loads(resp.data)
-        curie_url = doc.links.curies['r'].url()
-        curie_variables = doc.links.curies['r'].variables
-        curie_url.should.equal('/api/rels/')
-        curie_variables.should.equal(['rel'])
-
-    def test_empty_events(self):
-        """
-        Call to Event collection should contain link to self and be empty
-        """
-        resp = self.test_client.get('/api/events')
-        doc = hal_loads(resp.data)
-
-        resp.status_code.should.equal(200)
-        doc.properties['total'].should.equal(0)
-        doc.links['self'].url().should.equal('/api/events?page=1')
-        doc.embedded.keys().should.equal([])
-
-    def test_single_event(self):
-        """
-        Call to Event collection with single event
-        """
-        event = Event('http://www.foo.com', 'Test', 'chicago', datetime.now())
-
-        db.session.add(event)
-        db.session.commit()
-
-        resp = self.test_client.get('/api/events')
-        doc = hal_loads(resp.data)
-
-        doc.links['r:event'].url().should.equal('/api/events/%d' % event.id)
-
-
-
-    def test_links(self):
-        """
-        A large event collection should return links to navigate the collection
-        """
-        for x in range(100):
-            event = Event('http://www.foo.com/%d' % x, 'Test%d' % x, 'chicago', datetime.now())
-            db.session.add(event)
-            db.session.commit()
-
-        resp = self.test_client.get('/api/events')
-        doc = hal_loads(resp.data)
-
-        doc.links['next'].url().should.equal('/api/events?page=2')
-        doc.links['last'].url().should.equal('/api/events?page=5')
-        doc.links.keys().shouldnot.contain('first')
-        doc.links['self'].url().should.equal('/api/events?page=1')
-        len(doc.links['r:event']).should.equal(20)
-        doc.properties['total'].should.equal(100)
-        doc.embedded.keys().should.equal([])
-
-    def test_bad_page(self):
-        """
-        Page should not be able to be 0 or > num_pages
-        """
-        for x in range(5):
-            event = Event('http://www.foo.com/%d' % x, 'Test%d' % x, 'chicago', datetime.now())
-            db.session.add(event)
-            db.session.commit()
-
-        resp = self.test_client.get('/api/events?page=0')
-        resp.status_code.should.equal(404)
-
-        resp = self.test_client.get('/api/events?page=6')
-        resp.status_code.should.equal(404)
-
-    def test_create_event(self):
-        """
-        Create an event
-        """
-        resp = self.test_client.post('/api/events', data=dict())
-        doc = hal_loads(resp.data)
-
-        resp.status_code.should.equal(201)
-
-        len(Event.query.all()).should.equal(1)
-
-        doc.properties['id'].should.equal(Event.query.first().id)
 
 class SourcesTest(ApiTest):
     """Test of API 'Sources' resource"""

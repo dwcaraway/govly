@@ -7,7 +7,7 @@ from flask import Blueprint, request
 from dougrain import Builder
 from flask.ext.restful import reqparse, Api, Resource, abort
 
-from app.models.model import Event, db, Organization, OrganizationSource
+from app.models.model import Organization, OrganizationSource
 
 
 logger = logging.getLogger(__name__)
@@ -29,64 +29,10 @@ class Endpoints(Resource):
     def get(self):
         """Starting endpoint for all available endpoints"""
         return Builder('/').add_curie('r', '/rels/{rel}') \
-            .add_link('r:events', '/api/events') \
             .add_link('r:sources', '/api/sources') \
             .add_link('r:businesses', '/api/businesses')\
             .set_property('welcome', 'Welcome to the Vitals API!')\
             .as_object() 
-
-
-class EventsList(Resource):
-    """Events that are happening"""
-
-    def __init__(self):
-        self.get_req_parse = reqparse.RequestParser()
-        #TODO test for q parameter and then uncomment below
-        #self.getparser.add_argument('q', type=str, help='Free-text search string', default="")
-        self.get_req_parse.add_argument('page', type=int, help='Page number of results', default=1)
-        self.get_req_parse.add_argument('per_page', type=int, help='Max number of items (up to 200) per page',
-                                        default=20)
-        #TODO test for complete parameter and then uncomment
-        #self.getparser.add_argument('complete', type=bool, help='True if complete events should be included in results, false otherwise', default=False)
-        self.get_req_parse.add_argument('order', type=str, help='Sort order of events response. Ascending sorts from \
-			most distrant past event first to present/future event; descending does the opposite', default='asc')
-
-        self.post_req_parse = reqparse.RequestParser()
-
-        super(EventsList, self).__init__()
-
-    def get(self):
-        """ Returns a collection of events matching specified criteria """
-
-        args = self.get_req_parse.parse_args()
-
-        pagination = Event.query.paginate(page=args.page, per_page=args.per_page)
-        response = Builder("/api/events?page=%d" % pagination.page).add_curie('r', "/api/rels/{rel}").set_property(
-            'total', pagination.total)
-
-        if pagination.has_prev:
-            response = response.add_link('prev', '/api/events?page=%d' % pagination.prev_num)
-
-        if pagination.has_next:
-            response = response.add_link('next', '/api/events?page=%d' % pagination.next_num)
-
-        if pagination.total > 1 and pagination.has_prev:
-            response = response.add_link('first', '/api/events?page=1')
-        if pagination.total > 1 and pagination.has_next:
-            response = response.add_link('last','/api/events?page=%d' % pagination.pages)
-        for event in pagination.items:
-            response = response.add_link('r:event', '/api/events/%d' % event.id)
-
-        return response.as_object()
-
-    def post(self):
-        """ Creates a new event """
-        event = Event('http://www.foo.com', 'Test', 'Dayton, OH', datetime.now())
-        db.session.add(event)
-        db.session.commit()
-
-        return Builder('/events/%d' % event.id).set_property('id', event.id).as_object(), 201
-
 
 class SourcesList(Resource):
     """Sources of data"""
@@ -227,31 +173,8 @@ class Businesses(Resource):
 
             return b.as_object()
 
-class SignUp(Resource):
-    """Endpoint for signing up for an account"""
-
-    def __init__(self):
-        self.req_parse = reqparse.RequestParser()
-        self.req_parse.add_argument('email', type=str, help="The primary account email", required=True)
-        self.req_parse.add_argument('password', type=str, help="The account password", required=True)
-
-    def post(self):
-        """Create a new account"""
-        args = self.req_parse.parse_args()
-
-        db.user_datastore.create_user(email=args['email'], password=args['password'])
-        db.session.commit()
-
-        return "Account created. A confirmation email has been sent.", 201
-
-
-
-api.add_resource(EventsList, '/events', endpoint='events')
 api.add_resource(SourcesList, '/sources', endpoint='sources')
 api.add_resource(Sources, '/sources/<int:id>', endpoint='source')
 api.add_resource(BusinessesList, '/businesses', endpoint='businesses')
 api.add_resource(Businesses, '/businesses/<int:id>', endpoint='business')
-api.add_resource(SignUp, '/signup', endpoint='signup')
 api.add_resource(Endpoints, '/', endpoint="endpoints")
-
-

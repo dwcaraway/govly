@@ -23,7 +23,8 @@ from app.framework.sql import db
 from app.models.users import User
 
 
-application = create_app()
+from app.config import DevelopmentConfig
+application = create_app(override_settings=DevelopmentConfig)
 
 manager = Manager(application.app)
 TEST_CMD = "py.test tests"
