@@ -33,8 +33,8 @@ Flask-Restless>=0.15.0
 # Using a fork of the Flask-Classy with many of the pull requests merged in
 -e git+https://github.com/dwcaraway/flask-classy.git#egg=Flask-Classy-fork
 aniso8601
+-e git+https://github.com/dwcaraway/dougrain.git#egg=Dougrain-fork
 pytz
-dougrain>=0.5.1
 jsonschema>=2.4.0
 
 # Auth

@@ -64,7 +64,7 @@ RELS = {
 class LinkRelationsView(BaseView):
     """Link relations for resources of the API"""
 
-    base_url = '/rel/'
+    route_base = '/rels/'
 
     def index(self):
         """Gets all link relations"""

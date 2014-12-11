@@ -18,7 +18,25 @@ from app.framework.sql import db as _db
 from .settings import TestingConfig
 from .apis import classy_api
 from .factories import UserFactory
+from webtest import TestResponse
+from dougrain import Document
 
+#monkey patch the TestResponse to return a HAL dougrain object
+def hal(self):
+        """
+        Return the response as a JSON response.  You must have `simplejson
+        <http://goo.gl/B9g6s>`_ installed to use this, or be using a Python
+        version with the json module.
+
+        The content type must be one of json type to use this.
+        """
+        if not self.content_type.endswith(('+json', '/json')):
+            raise AttributeError(
+                "Not a JSON response body (content-type: %s)"
+                % self.content_type)
+        return Document.from_string(self.testbody)
+
+TestResponse.hal = property(hal)
 
 @pytest.yield_fixture(scope='function')
 def app():

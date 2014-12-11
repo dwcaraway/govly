@@ -51,6 +51,32 @@ class TestAPI:
         assert resp.json['status'] == 404
         assert 'Not Found' in resp.json['data']['message']
 
+    def test_unsupported_media(self, testapi):
+        """Non-JSON POSTs should fail with a 415 - Unsupported Media Type"""
+        resp = testapi.post("/api/tests/todos", {"title": "something"},
+                            expect_errors=True)
+        assert resp.status_code == 415
+
+    def test_enveloped_todos_index(self, todos, testapi):
+        resp = testapi.get("/api/tests/todos?envelope=true")
+        assert isinstance(resp.json, dict)
+        assert resp.json['status'] == resp.status_code
+        assert len(resp.json['data']['todos']) == 2
+
+    def test_jwt_log_in_returns_200_with_token(self, user, testapi):
+        data = dict(username=user.email, password='myprecious')
+        resp = testapi.post_json('/auth', data)
+        assert resp.status_code == 200
+        assert 'token' in resp.json
+        return resp.json['token']
+
+class TestRootView:
+
+    def test_root_index(self, todos, testapi):
+        resp = testapi.get("/api/tests/")
+        resp.hal.links['r:businesses'].url().should.equal('/api/businesses')
+
+class TestTodosView:
     def test_todos_index(self, todos, testapi):
         resp = testapi.get("/api/tests/todos")
         assert isinstance(resp.json, dict)
@@ -96,30 +122,19 @@ class TestAPI:
         })
         resp.status_code == 204
 
-    def test_todos_patch(self, todos, testapi):
-        uri = "/api/tests/todos/{0}".format(todos[0].id)
-        resp = testapi.patch_json(uri, {"completed": True}, expect_errors=True)
-        assert resp.status_code == 405
+class TestOrganizationsView:
+    pass
 
-    def test_unsupported_media(self, testapi):
-        """Non-JSON POSTs should fail with a 415 - Unsupported Media Type"""
-        resp = testapi.post("/api/tests/todos", {"title": "something"},
-                            expect_errors=True)
-        assert resp.status_code == 415
-
-    def test_enveloped_todos_index(self, todos, testapi):
-        resp = testapi.get("/api/tests/todos?envelope=true")
+class TestLinkRelationsView:
+    def test_todos_index(self, todos, testapi):
+        resp = testapi.get("/api/tests/todos")
         assert isinstance(resp.json, dict)
-        assert resp.json['status'] == resp.status_code
-        assert len(resp.json['data']['todos']) == 2
+        assert len(resp.json['todos']) == 2
 
-    def test_jwt_log_in_returns_200_with_token(self, user, testapi):
-        data = dict(username=user.email, password='myprecious')
-        resp = testapi.post_json('/auth', data)
-        assert resp.status_code == 200
-        assert 'token' in resp.json
-        return resp.json['token']
-
+    def test_todos_get(self, todos, testapi):
+        resp = testapi.get("/api/tests/todos/1")
+        assert resp.json['title'] == 'todo #1'
+        assert resp.json['completed'] == False
 
 class TestAPILoggingIn:
 
