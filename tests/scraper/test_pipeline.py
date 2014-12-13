@@ -2,36 +2,13 @@ __author__ = 'DavidWCaraway'
 import unittest
 
 from scrapy.spider import Spider
-from sqlalchemy.orm import scoped_session, sessionmaker
-
 from scraper.pipelines import DatabasePipeline
 from scraper.items import BusinessItem
-from app import create_app
-from app.framework.sql import db
 from app.models.model import (Organization, OrganizationSource, ContactPoint, Link)
-from .settings import TestingConfig
 
+class DatabasePipelineTest:
 
-class DatabasePipelineTest(unittest.TestCase):
-    def setUp(self):
-        """Construct temporary database and test client for testing routing and responses"""
-        self.vitals = create_app(TestingConfig())
-
-        #Push a context so that database knows what application to attach to
-        with self.vitals.app_context():
-            db.create_all()
-            self.DBSession = scoped_session(sessionmaker(autocommit=False,
-                                         autoflush=False,
-                                         bind=db.engine))
-
-    def tearDown(self):
-        """Removes temporary database at end of each test"""
-        with self.vitals.app_context():
-            db.drop_all()
-            db.session.remove()
-
-
-    def test_basic(self):
+    def test_basic(self, ):
         pipe = DatabasePipeline(self.vitals)
 
         sid = None

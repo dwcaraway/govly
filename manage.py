@@ -83,7 +83,7 @@ def _make_context():
 def test():
     """Run the tests."""
     import pytest
-    exit_code = pytest.main(['tests', '--verbose'])
+    exit_code = pytest.main(['./tests/server'])
     return exit_code
 
 manager.add_command('runserver', WSGI(host='0.0.0.0'), )
