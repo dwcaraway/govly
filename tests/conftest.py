@@ -88,3 +88,7 @@ def user(db):
 @pytest.fixture
 def org(apidb):
     return OrganizationFactory()
+
+@pytest.fixture
+def orgs(apidb):
+    return OrganizationFactory.create_batch(size=100)

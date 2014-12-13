@@ -166,3 +166,23 @@ class TestOrganizations:
         doc.links.keys().shouldnot.contain('first')
         doc.links.keys().shouldnot.contain('last')
         doc.embedded.should.be.empty
+
+    def test_large_business_collection(self, testapi, orgs):
+        """
+        Create a bunch of organizations and verify the links are correct
+        """
+
+        resp = testapi.get(url_for('v1.OrganizationsView:index'))
+        doc = resp.hal
+
+        doc.links.keys().shouldnot.contain('first')
+        doc.links['last'].url().should.equal(url_for('v1.OrganizationsView:index', page=5))
+
+    def test_get(self, testapi, org):
+        """
+        Get single organization
+        """
+        resp = testapi.get(url_for('v1.OrganizationsView:get', id=org.id))
+
+        doc = resp.hal
+        doc.links['r:organizations'].url().should.equal(url_for('v1.OrganizationsView:index', page=1))

@@ -33,7 +33,7 @@ class OrganizationsView(BaseView):
         args = org_parser.parse_args()
 
         pagination = Organization.query.paginate(page=args.page, per_page=args.per_page)
-        response = Builder("{0}?page={1}".format(url_for("v1.OrganizationsView:index"), pagination.page))\
+        response = Builder(url_for("v1.OrganizationsView:index", page=pagination.page))\
             .add_curie('r', url_for('v1.LinkRelationsView:index')+"/{rel}")\
             .set_property('total', pagination.total)
 
@@ -62,7 +62,17 @@ class OrganizationsView(BaseView):
 
     def get(self, id):
         """Returns a specific of Organization."""
-        return Organization.get_or_404(id).to_dict()
+
+        org = Organization.get_or_404(id)
+
+        response = Builder(url_for("v1.OrganizationsView:get", id=id))\
+            .add_curie('r', url_for('v1.LinkRelationsView:index')+"/{rel}")\
+            .add_link('r:organizations', url_for("v1.OrganizationsView:index", page=1))
+
+        for key, value in org.to_dict().iteritems():
+            response.set_property(key, value)
+
+        return response.as_object()
 
     @secure_endpoint()
     def put(self, id):
