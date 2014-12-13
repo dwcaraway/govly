@@ -34,22 +34,22 @@ class OrganizationsView(BaseView):
 
         pagination = Organization.query.paginate(page=args.page, per_page=args.per_page)
         response = Builder("{0}?page={1}".format(url_for("v1.OrganizationsView:index"), pagination.page))\
-            .add_curie('r', "/api/rels/{rel}")\
+            .add_curie('r', url_for('v1.LinkRelationsView:index')+"/{rel}")\
             .set_property('total', pagination.total)
 
         if pagination.has_prev:
-            response = response.add_link('prev', '{0}?page={1}'.format(url_for("v1.OrganizationsView:index"), pagination.prev_num))
+            response = response.add_link('prev', url_for("v1.OrganizationsView:index", page=pagination.prev_num))
 
         if pagination.has_next:
-            response = response.add_link('next', '{0}?page={1}'.format(url_for("v1.OrganizationsView:index"), pagination.next_num))
+            response = response.add_link('next', url_for("v1.OrganizationsView:index", page=pagination.next_num))
 
         if pagination.total > 1 and pagination.has_prev:
-            response = response.add_link('first', '{0}?page={1}'.format(url_for("v1.OrganizationsView:index", 1)))
+            response = response.add_link('first', url_for("v1.OrganizationsView:index", page=1))
         if pagination.total > 1 and pagination.has_next:
-            response = response.add_link('last', '{0}?page={1}'.format(url_for("v1.OrganizationsView:index"), pagination.pages))
+            response = response.add_link('last', url_for("v1.OrganizationsView:index", page=pagination.pages))
 
         for business in pagination.items:
-            response = response.add_link('r:business', '{0}/%d'.format(url_for("v1.OrganizationsView:index"), business.id))
+            response = response.add_link('r:organization', url_for("v1.OrganizationsView:get", id=business.id))
 
         return response.as_object()
 

@@ -12,108 +12,12 @@ from tests import hal_loads
 from .settings import TestingConfig
 logger = logging.getLogger(__name__)
 
-
-class EndpointsTests(ApiTest):
-    """Tests the root endpoint"""
-
-    def test_endpoints(self):
-        resp = self.test_client.get('/')
-        doc = hal_loads(resp.data)
-
-        resp.status_code.should.equal(200)
-        doc.links['r:sources'].url().should.equal('/api/sources')
-        doc.links['r:businesses'].url().should.equal('/api/businesses')
-
-class SourcesTest(ApiTest):
-    """Test of API 'Sources' resource"""
-
-    def test_link_relation_curie(self):
-        """Verify that resource has a link relation curie in HAL response"""
-        resp = self.test_client.get('/api/sources')
-        doc = hal_loads(resp.data)
-
-        curie_url = doc.links.curies['r'].url()
-        curie_variables = doc.links.curies['r'].variables
-        curie_url.should.equal('/api/rels/')
-        curie_variables.should.equal(['rel'])
-
-    def test_empty_sources(self):
-        """
-        Get all members of Sources collection and verify that it's an empty data set
-        """
-        resp = self.test_client.get('/api/sources')
-        doc = hal_loads(resp.data)
-
-        resp.status_code.should.equal(200)
-        doc.links['self'].url().should.equal('/api/sources?page=1')
-        doc.properties['total'].should.equal(0)
-        doc.embedded.keys().should.equal([])
-
-class SourceTest(ApiTest):
-    def test_get(self):
-        """
-        Get single source
-        """
-        o = Organization(legalName='somename')
-        src = OrganizationSource(spider_name='foo', data_url='http://www.foo.com', organization=o)
-
-        db.session.add(o)
-        db.session.add(src)
-        db.session.commit()
-
-        resp = self.test_client.get('/api/sources/%d'%src.id)
-        resp.status_code.should.equal(200)
-
-        doc = hal_loads(resp.data)
-        doc.links['r:sources'].url().should.equal('/api/sources')
-        doc.properties.should.equal({'data_url':'http://www.foo.com', 'organization_id':o.id, 'spider_name': 'foo', 'id':src.id})
-
-class BusinessesTest(ApiTest):
+class BusinessesTest:
     """Test of API 'Businesses' resource"""
 
-    def test_link_relation_curie(self):
-        """Verify that resource has a link relation curie in HAL response"""
-        resp = self.test_client.get('/api/businesses')
-        doc = hal_loads(resp.data)
 
-        curie_url = doc.links.curies['r'].url()
-        curie_variables = doc.links.curies['r'].variables
-        curie_url.should.equal('/api/rels/')
-        curie_variables.should.equal(['rel'])
 
-    def test_empty_businesses(self):
-        """
-        Get all members of Businesses collection and verify that it's an empty data set
-        """
-        resp = self.test_client.get('/api/businesses')
-        doc = hal_loads(resp.data)
 
-        resp.status_code.should.equal(200)
-        doc.links['self'].url().should.equal('/api/businesses?page=1')
-        doc.properties['total'].should.equal(0)
-        doc.embedded.keys().should.equal([])
-
-    def test_single_business(self):
-        """
-        Call to Businesses collection with single event
-        """
-        biz = Organization(legalName='somename')
-
-        db.session.add(biz)
-        db.session.commit()
-
-        resp = self.test_client.get('/api/businesses')
-        doc = hal_loads(resp.data)
-
-        #There should only be links
-        doc.links['r:business'].url().should.equal('/api/businesses/%d' % biz.id)
-
-        doc = hal_loads(resp.data)
-
-        #Should not have 'first' and 'last' links
-        doc.links.keys().shouldnot.contain('first')
-        doc.links.keys().shouldnot.contain('last')
-        doc.embedded.keys().should.equal([])
 
     def test_large_business_collection(self):
         """
@@ -151,7 +55,7 @@ class BusinessesTest(ApiTest):
         doc = hal_loads(resp.data)
         doc.links['r:business'].url().should.equal('/api/businesses/1')
 
-class BusinessTest(ApiTest):
+class BusinessTest:
     def test_get(self):
         """
         Get single business

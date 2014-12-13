@@ -38,11 +38,11 @@ RELS = {
         {
             "to": "do"
         },
-    "businesses":
+    "organizations":
         {
             "to": "do"
         },
-    "business":
+    "organization":
         {
             "to": "do"
         },

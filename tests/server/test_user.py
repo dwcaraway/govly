@@ -3,15 +3,15 @@
     tests.test_users
     ~~~~~~~~~~~~~~~~
 
-    :author: Dave Caraway
-    :copyright: © 2014-2015, Fog Mine LLC
-    :license: Proprietary, see LICENSE for more details.
+    :author: 18F
+    :copyright: © 2014-2015, 18F
+    :license: CC0 Public Domain License, see LICENSE for more details.
 
     templated from https://github.com/ryanolson/cookiecutter-webapp
 """
 import datetime as dt
-
 import pytest
+
 from flask.ext.security.utils import verify_password
 
 from app.models.users import User, Role

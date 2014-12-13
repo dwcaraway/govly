@@ -9,10 +9,25 @@
 
     templated from https://github.com/ryanolson/cookiecutter-webapp
 """
-from app.api.v1.todos import TodosView
-from app.api.v1.organizations import OrganizationsView
-from app.api.v1.root import RootView
-from app.api.v1.rel import LinkRelationsView
+import importlib
+import inspect
+import pkgutil
+
+def get_views():
+    """
+    Get all view classes within a given module
+    params
+
+    :returns an array of class
+    """
+    rv = []
+    for _, m, _ in pkgutil.iter_modules(path=__path__):
+        i = importlib.import_module(name="{0}.{1}".format(__name__, m))
+        for name, obj in inspect.getmembers(i, predicate=inspect.isclass):
+            if u'View' in name and obj.__module__ == i.__name__:
+                rv.append(obj)
+
+    return rv
 
 def create_blueprint(name=None, url_prefix=None, subdomain=None):
     """Register API endpoints on a Flask :class:`Blueprint`."""
@@ -28,9 +43,7 @@ def create_blueprint(name=None, url_prefix=None, subdomain=None):
     bp = Blueprint(name, __name__, url_prefix=url_prefix, subdomain=subdomain)
 
     # Register API endpoints
-    TodosView.register(bp)
-    OrganizationsView.register(bp)
-    LinkRelationsView.register(bp)
-    RootView.register(bp)
+    for v in get_views():
+        v.register(bp)
 
     return bp

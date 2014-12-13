@@ -14,6 +14,7 @@ from factory import Factory, Sequence, LazyAttribute, post_generation
 from flask.ext.security.utils import encrypt_password
 
 from app.models.users import User, Role
+from app.models.model import Organization
 from app.models.todos import Todo
 from app.framework.sql import db
 
@@ -50,3 +51,7 @@ class UserFactory(BaseFactory):
     @post_generation
     def password(self, create, extracted, **kwargs):
         self.password = encrypt_password(extracted or "password")
+
+class OrganizationFactory(BaseFactory):
+    FACTORY_FOR = Organization
+    legalName = Sequence(lambda n: 'legalname{0}'.format(n))

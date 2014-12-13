@@ -17,7 +17,7 @@ from app import frontend
 from app.framework.sql import db as _db
 from .settings import TestingConfig
 from .apis import classy_api
-from .factories import UserFactory
+from .factories import UserFactory, OrganizationFactory
 from webtest import TestResponse
 from dougrain import Document
 
@@ -73,6 +73,18 @@ def db(app):
     yield _db
     _db.drop_all()
 
+@pytest.yield_fixture(scope='function')
+def apidb(apiapp):
+    _db.app = apiapp
+    with apiapp.app_context():
+        _db.create_all()
+    yield _db
+    _db.drop_all()
+
 @pytest.fixture
 def user(db):
     return UserFactory()
+
+@pytest.fixture
+def org(apidb):
+    return OrganizationFactory()
