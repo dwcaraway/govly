@@ -71,9 +71,8 @@ class LinkRelationsView(BaseView):
         return RELS
 
     def get(self, id):
-        schema = RELS.get(id)
-
-        if schema is None:
-            abort(404, message="Rel {} doesn't exist".format(id))
-        else:
+        """Gets individual link relation."""
+        try:
             return RELS[id]
+        except KeyError:
+            abort(404)

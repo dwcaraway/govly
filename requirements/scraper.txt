@@ -1,12 +1,12 @@
 #Scraper libraries
-scrapy
-twisted
-w3lib
-address
-zope.interface
-cryptography
-requests
-cssselect
-phonenumbers
-service-identity
-lxml
+scrapy==0.24.4
+twisted==14.0.2
+w3lib==1.10.0
+address==0.1.1
+zope.interface==4.1.1
+cryptography==0.6.1
+requests==2.5.0
+cssselect==0.9.1
+phonenumbers==7.0.1
+service-identity==14.0.0
+lxml==3.4.1

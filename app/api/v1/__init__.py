@@ -21,7 +21,6 @@ def create_blueprint(name=None, url_prefix=None, subdomain=None):
 
     # Determine blueprint name
     name = name or __name__.split('.')[-1]
-    url_prefix = url_prefix or "/{0}".format(name)
     if subdomain:
         name = "{0}_{1}".format(subdomain, name)
 

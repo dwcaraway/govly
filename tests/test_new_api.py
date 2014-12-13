@@ -74,7 +74,7 @@ class TestRootView:
 
     def test_root_index(self, todos, testapi):
         resp = testapi.get("/api/tests/")
-        resp.hal.links['r:businesses'].url().should.equal('/api/businesses')
+        resp.hal.links['r:organizations'].url().should.equal('/api/organizations')
 
 class TestTodosView:
     def test_todos_index(self, todos, testapi):
@@ -171,4 +171,5 @@ class TestAPILoggingIn:
         assert resp.status_code == 400
         assert resp.json['error'] == 'Invalid JWT'
         assert resp.json['description'] == 'Invalid secret'
+
 

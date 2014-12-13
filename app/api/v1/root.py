@@ -15,7 +15,7 @@ class RootView(BaseView):
     @route('/')
     def index(self):
         """Starting endpoint for all available endpoints"""
-        return Builder('/').add_curie('r', '/rels/{rel}') \
+        return Builder(url_for('v1.RootView:index')).add_curie('r', '/rels/{rel}') \
             .add_link('r:organizations', url_for('v1.OrganizationsView:index'))\
-            .set_property('welcome', 'Welcome to the Vitals API!')\
+            .set_property('welcome', 'Welcome to the FogMine API!')\
             .as_object()

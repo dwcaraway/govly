@@ -9,40 +9,15 @@ from app.framework.sql  import db
 from app.models.users import User
 from app.models.model import Organization, OrganizationSource
 from tests import hal_loads
-from app import create_app
 from .settings import TestingConfig
 logger = logging.getLogger(__name__)
-
-
-class ApiTest(unittest.TestCase):
-    def setUp(self):
-        """Construct temporary database and test client for testing routing and responses"""
-        self.vitals = create_app(TestingConfig())
-        self.vitals.testing = True
-        self.test_client = self.vitals.test_client()
-
-        #Push a context so that database knows what application to attach to
-        self.ctx = self.vitals.test_request_context()
-        self.ctx.push()
-        db.create_all()
-
-    def tearDown(self):
-        """Removes temporary database at end of each test"""
-        db.session.remove()
-        db.drop_all()
-
-        # os.close(self.db_fd)
-        # os.unlink(self.db_path)
-
-        #Remove the context so that we can create a new app and reassign the db
-        self.ctx.pop()
 
 
 class EndpointsTests(ApiTest):
     """Tests the root endpoint"""
 
     def test_endpoints(self):
-        resp = self.test_client.get('/api/')
+        resp = self.test_client.get('/')
         doc = hal_loads(resp.data)
 
         resp.status_code.should.equal(200)

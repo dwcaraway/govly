@@ -73,7 +73,7 @@ class ClassyAPI(RestfulAPI):
             return True
         # Check ClassyAPI ownership 
         for bp_name in self.classy_blueprints.keys():
-            if endpoint.startswith(bp_name) and 'API:' in endpoint:
+            if endpoint.startswith(bp_name) and 'View' in endpoint:
                 return True
 
     def error_router(self, original_handler, e):

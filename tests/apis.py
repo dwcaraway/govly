@@ -22,6 +22,6 @@ class SecureView(api.BaseView):
 
 def classy_api(app):
     """Create an Flask-Classy-based API on app"""
-    bp = api.v1.create_blueprint('test', url_prefix='/api/tests')
+    bp = api.v1.create_blueprint('test')
     SecureView.register(bp)
     api.register_blueprint(app, bp)

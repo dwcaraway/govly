@@ -29,6 +29,8 @@ application = create_app(override_settings=DevelopmentConfig)
 manager = Manager(application.app)
 TEST_CMD = "py.test tests"
 
+from app.framework.extensions import celery
+celery.init_app(application.mounts['/api'])
 
 class Worker(Command):
 

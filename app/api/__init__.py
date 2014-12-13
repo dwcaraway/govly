@@ -9,7 +9,7 @@
 
     templated from https://github.com/ryanolson/cookiecutter-webapp
 """
-from . import v1
+from .v1 import create_blueprint
 from .. import framework
 from .base import (ClassyAPI, BaseView, secure_endpoint,
                    json_required, )
@@ -27,10 +27,9 @@ def create_app(settings_override=None):
     # Initialize extensions
     app.extensions['classy_api'] = ClassyAPI(app, catch_all_404s=True)
 
-    # Register API versions
-    for version in [v1]:
-        bp = version.create_blueprint()
-        register_blueprint(app, bp)
+    # Register API
+    bp = create_blueprint()
+    register_blueprint(app, bp)
 
     return app
 
