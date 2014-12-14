@@ -13,6 +13,8 @@ import logging
 
 from . import extensions
 from . import views
+from frontend import assets
+
 
 _log = logging.getLogger(__name__)
 
@@ -20,7 +22,6 @@ _log = logging.getLogger(__name__)
 def create_app(settings_override=None):
     """Returns a vitals frontend application instance"""
 
-    from . import assets
     from .. import framework
 
     app = framework.create_app(__name__, __path__, settings_override,

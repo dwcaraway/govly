@@ -9,9 +9,9 @@
 
     templated from https://github.com/ryanolson/cookiecutter-webapp
 """
-from .auth import AuthView
-from .legal import LegalView
-from .todos import TodosView
+from .frontend.views.auth import AuthView
+from .frontend.views.legal import LegalView
+from .frontend.views.todos import TodosView
 
 def init_app(app):
     AuthView.register(app)

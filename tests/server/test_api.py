@@ -17,7 +17,7 @@ from jsonschema import Draft4Validator
 from tests.factories import UserFactory
 
 @pytest.fixture
-def user(db):
+def user(apidb):
     return UserFactory(password='myprecious')
 
 class TestAPI:

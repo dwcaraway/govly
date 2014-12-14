@@ -21,11 +21,11 @@ import os
 
 application = create_app(override_settings=os.environ.get('APPLICATION_SETTINGS', 'app.settings.DevelopmentConfig'))
 
-manager = Manager(application.app)
+manager = Manager(application)
 TEST_CMD = "py.test ./tests/server"
 
 from app.framework.extensions import celery
-celery.init_app(application.mounts['/api'])
+celery.init_app(application)
 
 class Worker(Command):
 
@@ -67,9 +67,7 @@ def _make_context():
     app, db, and the User model by default.
     """
     return {
-        'app': application,
-        'api': application.mounts['/api'],
-        'frontend': application.app,
+        'api': application,
         'db': db,
         'User': User
     }

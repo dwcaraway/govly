@@ -1,7 +1,7 @@
-app/frontend/static/js/sbirez.min.js
-app/frontend/static/css/sbirez.min.css
-app/frontend/static/.webassets-cache/
-app/frontend/static/js/bundled/
+frontend/static/js/sbirez.min.js
+frontend/static/css/sbirez.min.css
+frontend/static/.webassets-cache/
+frontend/static/js/bundled/
 .DS_Store
 scrapeddata
 bower_components
@@ -16,4 +16,4 @@ dist
 *.db
 *.egg-info
 *.lock
-app/frontend/static
+frontend/static

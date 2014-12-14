@@ -18,7 +18,7 @@ from app.models.users import User, Role
 from tests.factories import UserFactory
 
 
-@pytest.mark.usefixtures('db')
+@pytest.mark.usefixtures('apidb')
 class TestUser:
 
     def test_get(self, user):

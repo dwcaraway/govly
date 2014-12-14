@@ -13,7 +13,6 @@ import pytest
 from webtest import TestApp
 
 from app import api
-from app import frontend
 from app.framework.sql import db as _db
 from .settings import TestingConfig
 from .apis import classy_api
@@ -39,14 +38,6 @@ def hal(self):
 TestResponse.hal = property(hal)
 
 @pytest.yield_fixture(scope='function')
-def app():
-    _app = frontend.create_app(TestingConfig)
-    ctx = _app.test_request_context()
-    ctx.push()
-    yield _app
-    ctx.pop()
-
-@pytest.yield_fixture(scope='function')
 def apiapp(request):
     _app = api.create_app(TestingConfig)
     classy_api(_app)
@@ -56,22 +47,14 @@ def apiapp(request):
     ctx.pop()
 
 @pytest.fixture(scope='function')
-def testapp(app):
+def testapp(apiapp):
     """A Webtest app."""
-    return TestApp(app)
+    return TestApp(apiapp)
 
 @pytest.fixture(scope='function')
 def testapi(apiapp):
     """A Webtest app."""
     return TestApp(apiapp)
-
-@pytest.yield_fixture(scope='function')
-def db(app):
-    _db.app = app
-    with app.app_context():
-        _db.create_all()
-    yield _db
-    _db.drop_all()
 
 @pytest.yield_fixture(scope='function')
 def apidb(apiapp):
@@ -82,7 +65,7 @@ def apidb(apiapp):
     _db.drop_all()
 
 @pytest.fixture
-def user(db):
+def user(apidb):
     return UserFactory()
 
 @pytest.fixture

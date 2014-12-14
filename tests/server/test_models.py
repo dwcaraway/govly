@@ -32,7 +32,7 @@ class ApiFactory(BaseFactory):
     string_attr = Sequence(lambda n: "string {0}".format(n))
     hidden_attr = Sequence(lambda n: "hidden {0}".format(n))
 
-@pytest.mark.usefixtures('db')
+@pytest.mark.usefixtures('apidb')
 class TestModels:
 
     def test_to_dict(self):
