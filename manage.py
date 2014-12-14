@@ -10,10 +10,6 @@
 
     templated from https://github.com/ryanolson/cookiecutter-webapp
 """
-import os
-import sys
-import subprocess
-
 from flask.ext.script import Command, Manager, Option, Shell, Server
 from flask.ext.migrate import MigrateCommand
 from werkzeug.serving import run_simple
@@ -27,7 +23,7 @@ from app.config import DevelopmentConfig
 application = create_app(override_settings=DevelopmentConfig)
 
 manager = Manager(application.app)
-TEST_CMD = "py.test tests"
+TEST_CMD = "py.test ./tests/server"
 
 from app.framework.extensions import celery
 celery.init_app(application.mounts['/api'])
@@ -83,7 +79,7 @@ def _make_context():
 def test():
     """Run the tests."""
     import pytest
-    exit_code = pytest.main(['./tests/server'])
+    exit_code = pytest.main(['tests', '--verbose'])
     return exit_code
 
 manager.add_command('runserver', WSGI(host='0.0.0.0'), )
