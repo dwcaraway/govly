@@ -1,5 +1,6 @@
 -r framework.txt
 -r scraper.txt
+-r production.txt
 
 #Libraries for testing
 sure == 1.2.7
