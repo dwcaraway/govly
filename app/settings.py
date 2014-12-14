@@ -7,6 +7,7 @@
     :copyright: © 2014-2015, Fog Mine LLC
     :license: Proprietary, see LICENSE for more details.
 """
+import os
 
 class Config(object):
     """
@@ -101,7 +102,7 @@ class Config(object):
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitals'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     MAIL_SUPPRESS_SEND = False
 
 class DevelopmentConfig(Config):

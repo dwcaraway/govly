@@ -17,10 +17,9 @@ from werkzeug.serving import run_simple
 from app import create_app
 from app.framework.sql import db
 from app.models.users import User
+import os
 
-
-from app.config import DevelopmentConfig
-application = create_app(override_settings=DevelopmentConfig)
+application = create_app(override_settings=os.environ.get('APPLICATION_SETTINGS', 'app.settings.DevelopmentConfig'))
 
 manager = Manager(application.app)
 TEST_CMD = "py.test ./tests/server"
