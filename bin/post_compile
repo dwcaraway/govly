@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -veo pipefail
+
+# The post_compile hook is run by heroku-buildpack-python
+
+echo "-----> Running post-compile hook"
+
+# Work around Heroku bug whereby pylibmc isn't available during
+# compile phase. See: https://github.com/heroku/heroku-buildpack-python/issues/57
+export MEMCACHE_SERVERS='' MEMCACHIER_SERVERS=''
+
+if [ -f bin/install_nodejs ]; then
+#    echo "-----> Running install_nodejs"
+#    chmod +x bin/install_nodejs
+#    bin/install_nodejs
+
+    # PUT YOUR NPM INSTALL LINES HERE: (less and iced-coffee-script for example)
+    #npm install -g less
+    #npm install -g iced-coffee-script
+    npm install npm -g
+    npm install grunt
+    npm install -g bower grunt-cli
+    npm install
+fi
+
+# PUT ANY POST-BUILD STUFF HERE (like database migrations)
+#python app/manage.py syncdb --noinput
+#python app/manage.py migrate --noinput
+
+echo "-----> Post-compile done"
