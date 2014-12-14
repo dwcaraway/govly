@@ -77,6 +77,5 @@ module.exports = (grunt) ->
 
   grunt.registerTask 'default', ['bowercopy', 'coffee', 'cjsx']
   grunt.registerTask 'develop', ['default, watch:app']
-  grunt.registerTask 'heroku:development', ['bowercopy', 'coffee', 'cjsx']
   grunt.registerTask 'heroku:production', ['bowercopy', 'coffee', 'cjsx']
 
