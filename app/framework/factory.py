@@ -65,6 +65,10 @@ def create_app(package_name, package_path, settings_override=None,
     jwt.user_handler(load_user)
 
     # Flask-SSLify to force SSL - only for production
+    if not app.debug and not app.testing:
+        from flask_sslify import SSLify
+        SSLify(app, permanent=True)
+
     # Sentry - only for production
     if not app.debug and not app.testing and 'SENTRY_DSN' in app.config:
         sentry = Sentry(app)

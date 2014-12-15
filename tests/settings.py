@@ -10,8 +10,8 @@
     templated from https://github.com/ryanolson/cookiecutter-webapp
 """
 class TestingConfig:
-    DEBUG = False
-    TESTING = False
+    DEBUG = True
+    TESTING = True
     SECRET_KEY = 'testing-secret-key'
 
     CELERY_ALWAYS_EAGER = True
