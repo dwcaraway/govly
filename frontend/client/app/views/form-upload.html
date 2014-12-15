@@ -1,0 +1,42 @@
+<h3>Form Upload</h3>
+<!-- START panel-->
+<div ng-controller="FileUploadController" class="panel panel-default">
+   <div class="panel-heading">Uploads</div>
+   <div class="panel-body">
+      <form method="get" class="form-horizontal">
+         <fieldset>
+            <div class="form-group">
+               <div class="col-sm-2">
+                  <div id="upload-drop" class="box-placeholder text-center">
+                     <p>
+                        <em class="fa fa-cloud-upload fa-2x"></em>
+                     </p>Upload files by dropping them here or
+                     <div class="btn-link form-file">selecting one
+                        <input id="upload-select" type="file" name="upfile" />
+                     </div>
+                  </div>
+                  <div id="progressbar" class="progress hidden">
+                     <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="progress-bar"></div>
+                  </div>
+               </div>
+               <div class="col-sm-10">
+                  <ul class="list-group">
+                     <li ng-show="!fileUploadList.length" class="list-group-item lead text-muted text-center">No files for upload..</li>
+                     <li ng-repeat="f in fileUploadList" class="list-group-item hover-visible">{{f.file}}
+                        <a href="#" ng-click="removeFile($index)" class="pull-right hover-hidden">
+                           <em class="fa fa-times fa-lg text-muted"></em>
+                        </a>
+                     </li>
+                  </ul>
+                  <div ng-show="fileUploadList.length" class="text-right">
+                     <button type="button" class="btn btn-primary">Confirm</button>
+                  </div>
+               </div>
+            </div>
+         </fieldset>
+      </form>
+   </div>
+</div>
+<div class="text-muted">
+   <small>This demo version doesn't store files on the server. Works only on Latest Chrome, Firefox, Safari, Opera &amp; IE +10</small>
+</div>

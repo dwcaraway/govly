@@ -1,0 +1,48 @@
+h3 Google Maps
+  small Easy usage directly from data attribute
+
+.row
+  .col-md-6
+    .panel.panel-default
+      .panel-heading Classic Map
+      .panel-body
+        .gmap(gmap="", data-address="276 N TUSTIN ST, ORANGE, CA 92867")
+  .col-md-6
+    .panel.panel-default
+      .panel-heading Custom zoom
+      .panel-body
+        .gmap(gmap="", data-address="276 N TUSTIN ST, ORANGE, CA 92867", data-zoom="19")
+.row
+  .col-md-6
+    .panel.panel-default
+      .panel-heading Different Map Type
+      .panel-body
+        .gmap(gmap="", data-address="276 N TUSTIN ST, ORANGE, CA 92867", data-maptype="SATELLITE")
+  .col-md-6
+    .panel.panel-default
+      .panel-heading Multiple Addresses
+      .panel-body
+        .gmap(gmap="", data-address="276 N TUSTIN ST, ORANGE, CA 92867; 376 N TUSTIN ST, ORANGE, CA 92867", data-title="Location 1; Location 2")
+
+.row
+  .col-md-12
+    .panel.panel-default
+      .panel-heading Styled Maps
+      .panel-body
+        .gmap(gmap="", data-address="276 N TUSTIN ST, ORANGE, CA 92867", data-maptype="ROADMAP", data-styled)
+        .text-center
+          h4 Open this map in a modal
+          // Modal Controller
+          div(ng-controller='ModalGmapController')
+            // Button trigger modal 
+            button.btn.btn-primary(ng-click='open()') Launch Modal
+
+            // Modal inline template
+            script(type='text/ng-template', id='/myModalContent.html')
+              .modal-header
+                button.close(type='button', data-dismiss='modal', aria-hidden='true') ×
+                h4#myMapModalLabel.modal-title Google Map Modal
+              .modal-body
+                .gmap(ng-if="initGmap", gmap="", data-address="276 N TUSTIN ST, ORANGE, CA 92867; 376 N TUSTIN ST, ORANGE, CA 92867", data-maptype="ROADMAP", data-styled)
+              .modal-footer
+                button.btn.btn-primary(ng-click='ok()') OK

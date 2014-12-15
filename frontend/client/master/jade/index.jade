@@ -1,0 +1,11 @@
+doctype html
+html(lang="en", data-ng-app="angle")
+  
+  head
+    include views/partials/_head
+  
+  body(data-ng-class="{ 'layout-fixed' : app.layout.isFixed, 'aside-collapsed' : app.layout.isCollapsed, 'layout-boxed' : app.layout.isBoxed }")
+    
+    .wrapper(data-ui-view="", data-autoscroll='false', data-ng-class="mainViewAnimation")
+
+    include views/partials/_scripts

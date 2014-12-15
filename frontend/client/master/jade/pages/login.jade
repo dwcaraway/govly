@@ -1,0 +1,37 @@
+.block-center.mt-xl.wd-xl(ng-controller="LoginFormController")
+  // START panel
+  .panel.panel-dark.panel-flat
+    .panel-heading.text-center
+      a(href="#")
+        img.block-center.img-rounded(src='app/img/logo.png', alt='Image')
+    .panel-body
+      p.text-center.pv SIGN IN TO CONTINUE.
+      form(role='form', ng-submit="login()", validate-form='', novalidate='').mb-lg
+        .form-group.has-feedback
+          input#exampleInputEmail1.form-control(type='email', placeholder='Enter email', autocomplete="off", ng-model="account.email", required)
+          span.fa.fa-envelope.form-control-feedback.text-muted
+        .form-group.has-feedback
+          input#exampleInputPassword1.form-control(type='password', placeholder='Password', ng-model="account.password", required)
+          span.fa.fa-lock.form-control-feedback.text-muted
+        .clearfix
+          .checkbox.c-checkbox.pull-left.mt0
+            label
+              input(type='checkbox', value='', name="remember", ng-model="account.remember")
+              span.fa.fa-check
+              |  Remember Me
+          .pull-right
+            a.text-muted(ui-sref="page.recover") Forgot your password?
+        
+        button.btn.btn-block.btn-primary.mt-lg(type='submit') Login
+      
+      .alert.alert-danger.text-center(ng-show='authMsg') {{authMsg}}
+      p.pt-lg.text-center Need to Signup?
+      a(ui-sref="page.register").btn.btn-block.btn-default Register Now
+  // END panel
+  .p-lg.text-center
+    span &copy; 
+    span(ng-bind="app.year") 
+    span  - 
+    span(ng-bind="app.name")
+    br
+    span(ng-bind="app.description")

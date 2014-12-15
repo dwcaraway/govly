@@ -1,0 +1,311 @@
+h3 Form Wizards
+
+
+// START panel
+.panel.panel-default
+  .panel-heading  Form Wizard Horizontal (no validation)
+  .panel-body
+    form-wizard(action='/', method='POST')
+      .form-wizard.wizard-horizontal
+        // START wizard steps indicator
+        ol.row
+          li.col-lg-3
+            h4 Login
+            small.text-muted Duis volutpat nunc at ligula tincidunt non aliquam. 
+          li.col-lg-3
+            h4 Personal Information
+            small.text-muted Nulla pharetra imperdiet sapien ac faucibus. 
+          li.col-lg-3
+            h4 Contact Information
+            small.text-muted Sed elementum lorem dolor, id fermentum metus. 
+          li.col-lg-3
+            h4 Done!
+            small.text-muted Nullam sit amet magna vestibulum libero.
+        // END wizard steps indicator
+
+        // START Wizard Step inputs 
+        div
+          fieldset
+            legend Login
+            // START row 
+            .row
+              .col-md-4
+                .form-group
+                  label Username
+                  .controls
+                    input.form-control(type='text', name='username', placeholder='Your nick here')
+              .col-md-4
+                .form-group
+                  label Password
+                  .controls
+                    input.form-control(type='password', name='password', placeholder='Your password')
+              .col-md-4
+                .form-group
+                  label Retype Password
+                  .controls
+                    input.form-control(type='password', name='password2', placeholder='Confirmed password')
+            // END row 
+        // END Wizard Step inputs 
+        // START Wizard Step inputs 
+        div
+          fieldset
+            legend Personal Information
+            // START row 
+            .row
+              .col-md-6
+                .form-group
+                  label First Name
+                  input.form-control(type='text', name='first-name', placeholder='John')
+              .col-md-6
+                .form-group
+                  label Last Name
+                  input.form-control(type='text', name='last-name', placeholder='Snow')
+            // END row 
+        // END Wizard Step inputs 
+        // START Wizard Step inputs 
+        div
+          fieldset
+            legend Contact Information
+            // START row 
+            .row
+              .col-md-6
+                .form-group
+                  label Email
+                  input.form-control(type='text', name='email', placeholder='john@snow.com')
+              .col-md-6
+                .form-group
+                  label Phone
+                  input.form-control(type='text', name='phone', placeholder='11-2345-6789')
+            // END row 
+        // END Wizard Step inputs 
+        // START Wizard Step inputs 
+        div
+          .jumbotron
+            h1 Done!
+            p In vulputate mattis ipsum vitae vehicula. Praesent at arcu non arcu convallis pellentesque. Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+            p
+              button.btn.btn-info.btn-lg(type='button') You can Proceed Now
+        // END Wizard Step inputs 
+// END panel 
+
+// START row
+.row
+  .col-lg-6
+    // START panel
+    .panel.panel-default
+      .panel-heading  Form Wizard Vertical (no validation)
+      .panel-body
+        form-wizard(action='/', method='POST')
+          .form-wizard.wizard-vertical
+            // START wizard steps indicator
+            ol
+              li
+                h4.mb0 Login
+              li
+                h4.mb0 Personal Information
+              li
+                h4.mb0 Contact Information
+              li
+                h4.mb0 Done!
+            // END wizard steps indicator
+            // START Wizard Step inputs 
+            div
+              fieldset
+                .form-group
+                  label Username
+                  .controls
+                    input.form-control(type='text', name='username', placeholder='Your nick here')
+                .form-group
+                  label Password
+                  .controls
+                    input.form-control(type='password', name='password', placeholder='Your password')
+                .form-group
+                  label Retype Password
+                  .controls
+                    input.form-control(type='password', name='password2', placeholder='Confirmed password')
+            // END Wizard Step inputs 
+            // START Wizard Step inputs 
+            div
+              fieldset
+                .form-group
+                  label First Name
+                  input.form-control(type='text', name='first-name', placeholder='John')
+                .form-group
+                  label Last Name
+                  input.form-control(type='text', name='last-name', placeholder='Snow')
+            // END Wizard Step inputs 
+            // START Wizard Step inputs 
+            div
+              fieldset
+                .form-group
+                  label Email
+                  input.form-control(type='text', name='email', placeholder='john@snow.com')
+                .form-group
+                  label Phone
+                  input.form-control(type='text', name='phone', placeholder='11-2345-6789')
+            // END Wizard Step inputs 
+            // START Wizard Step inputs 
+            div
+              .jumbotron.m0
+                h3.mt0 Done!
+                p In vulputate mattis ipsum vitae vehicula. 
+                p.m0
+                  button.btn.btn-info(type='button') You can Proceed Now
+            // END Wizard Step inputs 
+    // END panel 
+
+  .col-lg-6
+    // START panel
+    .panel.panel-default
+      .panel-heading  Form Wizard No indicator (no validation)
+      .panel-body
+        form-wizard(action='/', method='POST')
+          .form-wizard
+            // START wizard steps indicator
+              ol
+                li
+                  h4.mb0 Login
+                li
+                  h4.mb0 Personal Information
+                li
+                  h4.mb0 Contact Information
+                li
+                  h4.mb0 Done!
+            // END wizard steps indicator
+            // START Wizard Step inputs 
+            div
+              legend 1. Login
+              fieldset
+                .form-group
+                  label Username
+                  .controls
+                    input.form-control(type='text', name='username', placeholder='Your nick here')
+                .form-group
+                  label Password
+                  .controls
+                    input.form-control(type='password', name='password', placeholder='Your password')
+                .form-group
+                  label Retype Password
+                  .controls
+                    input.form-control(type='password', name='password2', placeholder='Confirmed password')
+            // END Wizard Step inputs 
+            // START Wizard Step inputs 
+            div
+              legend 2. Personal Information
+              fieldset
+                .form-group
+                  label First Name
+                  input.form-control(type='text', name='first-name', placeholder='John')
+                .form-group
+                  label Last Name
+                  input.form-control(type='text', name='last-name', placeholder='Snow')
+            // END Wizard Step inputs 
+            // START Wizard Step inputs 
+            div
+              legend 3. Contact Information
+              fieldset
+                .form-group
+                  label Email
+                  input.form-control(type='text', name='email', placeholder='john@snow.com')
+                .form-group
+                  label Phone
+                  input.form-control(type='text', name='phone', placeholder='11-2345-6789')
+            // END Wizard Step inputs 
+            // START Wizard Step inputs 
+            div
+              legend 4. Last Step
+              .jumbotron
+                h3.mt0 Done!
+                p In vulputate mattis ipsum vitae vehicula. 
+                p.m0
+                  button.btn.btn-info(type='button') You can Proceed Now
+            // END Wizard Step inputs 
+    // END panel 
+// END row
+
+// START panel
+.panel.panel-default
+  .panel-heading  Form Wizard Horizontal (with validation)
+  .panel-body
+    form(action='/', method='POST', form-wizard="", validate-step="true", validate-form="")
+      .form-wizard.wizard-horizontal
+        // START wizard steps indicator
+        ol.row
+          li.col-lg-3
+            h4 Login
+            small.text-muted Duis volutpat nunc at ligula tincidunt non aliquam. 
+          li.col-lg-3
+            h4 Personal Information
+            small.text-muted Nulla pharetra imperdiet sapien ac faucibus. 
+          li.col-lg-3
+            h4 Contact Information
+            small.text-muted Sed elementum lorem dolor, id fermentum metus. 
+          li.col-lg-3
+            h4 Done!
+            small.text-muted Nullam sit amet magna vestibulum libero dapibus iaculis. 
+        // END wizard steps indicator
+
+        // START Wizard Step inputs 
+        div
+          fieldset
+            legend Login
+            // START row 
+            .row
+              .col-md-4
+                .form-group
+                  label Username
+                  .controls
+                    input.form-control(type='text', name='username', data-parsley-group="step1", placeholder='Your nick here', required)
+              .col-md-4
+                .form-group
+                  label Password
+                  .controls
+                    input.form-control(type='password', name='password', data-parsley-group="step1", placeholder='Your password', required)
+              .col-md-4
+                .form-group
+                  label Retype Password
+                  .controls
+                    input.form-control(type='password', name='password2', data-parsley-group="step1", placeholder='Confirmed password', required)
+            // END row 
+        // END Wizard Step inputs 
+        // START Wizard Step inputs 
+        div
+          fieldset
+            legend Personal Information
+            // START row 
+            .row
+              .col-md-6
+                .form-group
+                  label First Name
+                  input.form-control(type='text', name='first-name', data-parsley-group="step2", placeholder='John', required)
+              .col-md-6
+                .form-group
+                  label Last Name
+                  input.form-control(type='text', name='last-name', data-parsley-group="step2", placeholder='Snow', required)
+            // END row 
+        // END Wizard Step inputs 
+        // START Wizard Step inputs 
+        div
+          fieldset
+            legend Contact Information
+            // START row 
+            .row
+              .col-md-6
+                .form-group
+                  label Email
+                  input.form-control(type='text', name='email', data-parsley-group="step3", placeholder='john@snow.com', required)
+              .col-md-6
+                .form-group
+                  label Phone
+                  input.form-control(type='text', name='phone', data-parsley-group="step3", placeholder='11-2345-6789', required)
+            // END row 
+        // END Wizard Step inputs 
+        // START Wizard Step inputs 
+        div
+          .jumbotron
+            h1 Done!
+            p In vulputate mattis ipsum vitae vehicula. Praesent at arcu non arcu convallis pellentesque. Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+            p
+              button.btn.btn-info.btn-lg(type='button') You can Proceed Now
+        // END Wizard Step inputs 
+// END panel 

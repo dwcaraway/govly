@@ -1,0 +1,44 @@
+.block-center.mt-xl.wd-xl(ng-controller="RegisterFormController")
+  // START panel
+  .panel.panel-dark.panel-flat
+    .panel-heading.text-center
+      a(href="#")
+        img.block-center.img-rounded(src='app/img/logo.png', alt='Image')
+    .panel-body
+      p.text-center.pv SIGNUP TO GET INSTANT ACCESS.
+      form(role='form', validate-form='', novalidate='', ng-submit="register()").mb-lg
+        .form-group.has-feedback
+          label.text-muted(for='signupInputEmail1') Email address
+          input#signupInputEmail1.form-control(type='email', placeholder='Enter email', autocomplete="off", ng-model="account.email", required)
+          span.fa.fa-envelope.form-control-feedback.text-muted
+        .form-group.has-feedback
+          label.text-muted(for='signupInputPassword1') Password
+          input#signupInputPassword1.form-control(type='password', placeholder='Password', autocomplete="off", ng-model="account.password", required)
+          span.fa.fa-lock.form-control-feedback.text-muted
+        .form-group.has-feedback
+          label.text-muted(for='signupInputRePassword1') Retype Password
+          input#signupInputRePassword1.form-control(type='password', placeholder='Retype Password', autocomplete="off", ng-model="account.password2", required, data-parsley-equalto="#signupInputPassword1")
+          span.fa.fa-lock.form-control-feedback.text-muted
+        .clearfix
+          .checkbox.c-checkbox.pull-left.mt0
+            label
+              input(type='checkbox', value='', required, name="agreed", ng-model="account.agreed")
+              span.fa.fa-check
+              |  I agree with the 
+              a(href="#") terms
+        
+        button.btn.btn-block.btn-primary.mt-lg(type='submit') Create account
+      
+      .alert.alert-danger.text-center(ng-show='authMsg') {{authMsg}}      
+      
+      p.pt-lg.text-center Have an account?
+      a(ui-sref="page.login").btn.btn-block.btn-default Signup
+
+  // END panel
+  .p-lg.text-center
+    span &copy; 
+    span(ng-bind="app.year") 
+    span  - 
+    span(ng-bind="app.name")
+    br
+    span(ng-bind="app.description")

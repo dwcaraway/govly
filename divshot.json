@@ -1,6 +1,7 @@
 {
   "name": "fogmine-vitals",
-  "root": "dist",
+  "root": "frontend/client",
   "clean_urls": true,
-  "error_page": "error.html"
+  "error_page": "error.html",
+    "exclude":"coffee/*"
 }

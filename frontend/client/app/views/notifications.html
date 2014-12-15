@@ -1,0 +1,271 @@
+<h3>Notifications
+   <small>A complete set of notification posibilities</small>
+</h3>
+<ol class="breadcrumb">
+   <li><a href="#">Home</a>
+   </li>
+   <li><a href="#">Elements</a>
+   </li>
+   <li class="active">Notifications</li>
+</ol>
+<div class="panel panel-default">
+   <div class="panel-heading">Toaster notifications for Angular</div>
+   <div ng-controller="ToasterDemoCtrl" class="panel-body">
+      <toaster-container toaster-options="{'position-class': 'toast-top-right', 'close-button':true}"></toaster-container>
+      <div class="row">
+         <div class="col-sm-6">
+            <div class="form-group">
+               <label>Title</label>
+               <input type="text" placeholder="Enter a title..." ng-model="toaster.title" class="form-control" />
+            </div>
+            <div class="form-group">
+               <label>Message</label>
+               <textarea placeholder="Enter a message" rows="5" ng-model="toaster.text" class="form-control"></textarea>
+            </div>
+         </div>
+         <div class="col-sm-6">
+            <div class="row">
+               <div class="col-md-6">
+                  <!-- icon-classes: .toast-error,.toast-info,.toast-wait,.toast-success,.toast-warning-->
+                  <label>Toast Type</label>
+                  <div class="radio c-radio">
+                     <label>
+                        <input type="radio" name="toasts" ng-model="toaster.type" value="success" />
+                        <span class="fa fa-circle"></span>Success</label>
+                  </div>
+                  <div class="radio c-radio">
+                     <label>
+                        <input type="radio" name="toasts" ng-model="toaster.type" value="info" />
+                        <span class="fa fa-circle"></span>Info</label>
+                  </div>
+                  <div class="radio c-radio">
+                     <label>
+                        <input type="radio" name="toasts" ng-model="toaster.type" value="wait" />
+                        <span class="fa fa-circle"></span>Wait</label>
+                  </div>
+                  <div class="radio c-radio">
+                     <label>
+                        <input type="radio" name="toasts" ng-model="toaster.type" value="warning" />
+                        <span class="fa fa-circle"></span>Warning</label>
+                  </div>
+                  <div class="radio c-radio">
+                     <label>
+                        <input type="radio" name="toasts" ng-model="toaster.type" value="error" />
+                        <span class="fa fa-circle"></span>Error</label>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <button ng-click="pop()" class="btn btn-info">Show a Toaster</button>
+   </div>
+</div>
+<!-- START row-->
+<div class="row">
+   <div class="col-lg-6">
+      <!-- START panel-->
+      <div class="panel panel-default">
+         <div class="panel-heading">Notify Alerts</div>
+         <div class="panel-body">
+            <p>Create toggleable notifications that fade out automatically.</p>
+            <p>
+               <button type="button" notify="" data-message="Message .." class="btn btn-default">Message</button>
+            </p>
+            <p>You can use HTML inside your notification message</p>
+            <p>
+               <button type="button" notify="" data-message="&lt;em class='fa fa-check'&gt;&lt;/em&gt; Message with icon.." class="btn btn-default">Message with Icon</button>
+            </p>
+         </div>
+      </div>
+      <!-- END panel-->
+      <!-- START panel-->
+      <div class="panel panel-default">
+         <div class="panel-heading">Alert Styles</div>
+         <div class="panel-body">
+            <div class="alert alert-success">Lorem ipsum dolor sit amet, consectetur adipisicing elit. <a href="#" class="alert-link">Alert Link</a>
+            </div>
+            <div class="alert alert-info">Lorem ipsum dolor sit amet, consectetur adipisicing elit. <a href="#" class="alert-link">Alert Link</a>
+            </div>
+            <div ng-controller="AlertDemoCtrl">
+               <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+               <button ng-click="addAlert()" class="btn btn-info">Add Alert</button>
+            </div>
+         </div>
+      </div>
+      <!-- END panel-->
+      <!-- START panel-->
+      <div ng-controller="ProgressDemoCtrl" class="panel panel-default">
+         <div class="panel-heading">Progress Bar
+            <div class="btn-group pull-right">
+               <button type="button" ng-click="randomStacked()" class="btn btn-xs btn-primary">Stacked</button>
+               <button type="button" ng-click="random()" class="btn btn-xs btn-primary">Randomize</button>
+            </div>
+         </div>
+         <div class="panel-body">
+            <h4>Static</h4>
+            <div class="row">
+               <div class="col-sm-4">
+                  <progressbar value="55"></progressbar>
+               </div>
+               <div class="col-sm-4">
+                  <progressbar value="22" type="warning" class="progress-striped">22%</progressbar>
+               </div>
+               <div class="col-sm-4">
+                  <progressbar max="200" value="166" type="danger" class="progress-striped active"><i>166 / 200</i>
+                  </progressbar>
+               </div>
+            </div>
+            <h4>Dynamic</h4>
+            <progressbar max="max" value="dynamic">
+               <span class="text-nowrap">{{dynamic}} / {{max}}</span>
+            </progressbar>
+            <small>
+               <em>No animation</em>
+            </small>
+            <progressbar animate="false" value="dynamic" type="success"><b>{{dynamic}}%</b>
+            </progressbar>
+            <small>
+               <em>Object (changes type based on value)</em>
+            </small>
+            <progressbar value="dynamic" type="{{type}}" class="progress-striped active">{{type}}<i ng-show="showWarning">!!! Watch out !!!</i>
+            </progressbar>
+            <h4>Stacked</h4>
+            <progress>
+               <bar ng-repeat="bar in stacked track by $index" value="bar.value" type="{{bar.type}}">
+                  <span ng-hide="ng-hide" bar.value="bar.value"></span>
+               </bar>
+            </progress>
+         </div>
+      </div>
+      <!-- END panel-->
+      <!-- START panel-->
+      <div class="panel panel-default">
+         <div class="panel-heading">Tooltips</div>
+         <div class="panel-body">
+            <div ng-controller="TooltipDemoCtrl">
+               <div class="form-group">
+                  <label>Dynamic Tooltip Text</label>
+                  <input type="text" ng-model="dynamicTooltipText" class="form-control" />
+               </div>
+               <div class="form-group">
+                  <label>Dynamic Tooltip Popup Text</label>
+                  <input type="text" ng-model="dynamicTooltip" class="form-control" />
+               </div>
+               <p>Pellentesque <a href="#" tooltip="{{dynamicTooltip}}">{{dynamicTooltipText}}</a>, sit amet venenatis urna cursus eget nunc scelerisque viverra mauris, in aliquam. Tincidunt lobortis feugiat vivamus at <a href="#" tooltip-placement="left"
+                  tooltip="On the Left!">left </a>eget arcu dictum varius duis at consectetur lorem. Vitae elementum curabitur <a href="#" tooltip-placement="right" tooltip="On the Right!">right </a>nunc sed velit dignissim sodales ut eu sem integer vitae.
+                  Turpis egestas <a href="#" tooltip-placement="bottom" tooltip="On the Bottom!">bottom </a>pharetra convallis posuere morbi leo urna, <a href="#" tooltip-animation="false" tooltip="I don't fade. :-(">fading </a>at elementum eu, facilisis
+                  sed odio morbi quis commodo odio. In cursus <a href="#" tooltip-popup-delay="1000" tooltip="appears with delay">delayed</a>turpis massa tincidunt dui ut.</p>
+               <p>I can even contain HTML. <a href="#" tooltip-html-unsafe="{{htmlTooltip}}">Check me out!</a>
+               </p>
+               <form role="form">
+                  <div class="form-group">
+                     <label>Or use custom triggers, like focus:</label>
+                     <input type="text" value="Click me!" tooltip="See? Now click away..." tooltip-trigger="focus" tooltip-placement="top" class="form-control" />
+                  </div>
+               </form>
+            </div>
+         </div>
+      </div>
+      <!-- END panel-->
+   </div>
+   <div class="col-lg-6">
+      <!-- START panel-->
+      <div class="panel panel-default">
+         <div class="panel-heading">Notify with Status</div>
+         <div class="panel-body">
+            <p>Uses builtin alert status to apply notifications</p>
+            <p>
+               <button type="button" notify="" data-message="Message with status.." data-options="{&quot;status&quot;:&quot;danger&quot;}" class="btn btn-danger">Danger</button>
+               <button type="button" notify="" data-message="Message with status.." data-options="{&quot;status&quot;:&quot;info&quot;}" class="btn btn-info">Info</button>
+               <button type="button" notify="" data-message="Message with status.." data-options="{&quot;status&quot;:&quot;warning&quot;}" class="btn btn-warning">Warning</button>
+               <button type="button" notify="" data-message="Message with status.." data-options="{&quot;status&quot;:&quot;success&quot;}" class="btn btn-success">Success</button>
+            </p>
+            <p>Show in different positions</p>
+            <p>
+               <button type="button" notify="" data-message="Message in position.." data-options="{&quot;pos&quot;:&quot;bottom-center&quot;}" class="btn btn-default">Bottom Cener</button>
+               <button type="button" notify="" data-message="Message in position.." data-options="{&quot;pos&quot;:&quot;top-left&quot;}" class="btn btn-default">Top Left</button>
+               <button type="button" notify="" data-message="Message in position.." data-options="{&quot;pos&quot;:&quot;top-right&quot;}" class="btn btn-default">Top Right</button>
+               <button type="button" notify="" data-message="Message in position.." data-options="{&quot;status&quot;:&quot;success&quot;, &quot;pos&quot;:&quot;bottom-right&quot;}" class="btn btn-default">Succes at Bottom Right</button>
+            </p>
+         </div>
+      </div>
+      <!-- END panel-->
+      <!-- START panel-->
+      <div class="panel panel-default">
+         <div class="panel-heading">Modals</div>
+         <div class="panel-body">
+            <!-- Modal Controller-->
+            <div ng-controller="ModalController">
+               <!-- Modal inline template-->
+               <script type="text/ng-template" id="/myModalContent.html">
+                  <div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">×</button><h4 id="myModalLabel" class="modal-title">Modal title</h4></div><div class="modal-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div><div class="modal-footer"><button ng-click="ok()" class="btn btn-primary">OK</button><button ng-click="cancel()" class="btn btn-warning">Cancel</button></div>
+               </script>
+               <p>Launch Demo Modal</p>
+               <!-- Button trigger modal -->
+               <button ng-click="open()" class="btn btn-primary">Open me!</button>
+               <button ng-click="open('lg')" class="btn btn-primary">Large modal</button>
+               <button ng-click="open('sm')" class="btn btn-primary">Small modal</button>
+               <div id="modal-state"></div>
+            </div>
+         </div>
+      </div>
+      <!-- END panel-->
+      <!-- START panel-->
+      <div class="panel panel-default">
+         <div class="panel-heading">Popovers</div>
+         <div class="panel-body">
+            <div ng-controller="PopoverDemoCtrl">
+               <h4>Dynamic</h4>
+               <div class="form-group">
+                  <label>Popup Text:</label>
+                  <input type="text" ng-model="dynamicPopover" class="form-control" />
+               </div>
+               <div class="form-group">
+                  <label>Popup Title:</label>
+                  <input type="text" ng-model="dynamicPopoverTitle" class="form-control" />
+               </div>
+               <button popover="{{dynamicPopover}}" popover-title="{{dynamicPopoverTitle}}" class="btn btn-warning">Dynamic Popover</button>
+               <h4>Positional</h4>
+               <button popover-placement="top" popover="On the Top!" class="btn btn-default">Top</button>
+               <button popover-placement="left" popover="On the Left!" class="btn btn-default">Left</button>
+               <button popover-placement="right" popover="On the Right!" class="btn btn-default">Right</button>
+               <button popover-placement="bottom" popover="On the Bottom!" class="btn btn-default">Bottom</button>
+               <h4>Triggers</h4>
+               <p>
+                  <button popover="I appeared on mouse enter!" popover-trigger="mouseenter" class="btn btn-success">Mouseenter</button>
+               </p>
+               <input type="text" value="Click me!" popover="I appeared on focus! Click away and I'll vanish..." popover-trigger="focus" class="form-control" />
+               <h4>Other</h4>
+               <button popover-animation="true" popover="I fade in and out!" class="btn btn-default">fading</button>
+               <button popover="I have a title!" popover-title="The title." class="btn btn-default">title</button>
+            </div>
+         </div>
+      </div>
+      <!-- END panel-->
+      <!-- START panel-->
+      <div class="panel panel-default">
+         <div class="panel-heading">Ratings</div>
+         <div class="panel-body">
+            <div ng-controller="RatingDemoCtrl">
+               <h4>Default</h4>
+               <rating ng-model="rate" max="max" readonly="isReadonly" on-hover="hoveringOver(value)" on-leave="overStar = null" state-on="'fa fa-star text-yellow'" state-off="'fa fa-star-o'"></rating>
+               <span ng-class="{'label-warning': percent&lt;30, 'label-info': percent&gt;=30 &amp;&amp; percent&lt;70, 'label-success': percent&gt;=70}" ng-show="overStar &amp;&amp; !isReadonly" class="label">{{percent}}%</span>
+               <div class="well mt"><b>Rate: </b><b>{{rate}}</b> - Readonly is: <i>{{isReadonly}}</i> - Hovering over: <b>{{overStar || "none"}}</b>
+               </div>
+               <button ng-click="rate = 0" ng-disabled="isReadonly" class="btn btn-sm btn-danger">Clear</button>
+               <button ng-click="isReadonly = ! isReadonly" class="btn btn-sm btn-default">Toggle Readonly</button>
+               <hr/>
+               <h4>Custom icons</h4>
+               <div ng-init="x = 5" class="mb">
+                  <rating ng-model="x" max="15" state-on="'fa fa-tree text-success'" state-off="'fa fa-tree'"></rating><b>(<i>Trees:</i>{{x}})</b>
+               </div>
+               <div ng-init="y = 2" class="mb">
+                  <rating ng-model="y" rating-states="ratingStates"></rating><b>(<i>Things:</i>{{y}})</b>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- END panel-->
+   </div>
+</div>
+<!-- END row-->

@@ -1,0 +1,45 @@
+<h3>Todo List
+   <button ng-click="clearAll()" class="pull-right btn btn-danger">Clear All Items</button>
+   <small>Keeping track of tasks</small>
+</h3>
+<div class="table-grid todo">
+   <div class="col col-lg">
+      <div class="pr-lg">
+         <form ng-submit="addTodo(todo)" class="mb-xl">
+            <div class="form-group">
+               <input ng-trim="true" type="text" ng-model="todo.title" placeholder="Task title.." required="required" class="form-control" />
+            </div>
+            <div class="form-group">
+               <textarea ng-trim="true" ng-model="todo.description" placeholder="Type a description.." rows="8" class="form-control"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">{{editingTodo ? 'Edit Todo' : 'Add Todo'}}</button>
+         </form>
+      </div>
+   </div>
+   <div class="col todo-item-list">
+      <div ng-show="!items.length" class="lead text-muted text-center">No tasks...</div>
+      <accordion close-others="true">
+         <accordion-group ng-repeat="item in items" ng-class="{'todo-complete': item.complete}" is-disabled="item.complete" class="todo-item">
+            <accordion-heading>
+               <span ng-click="removeTodo($index, $event)" class="close">×</span>
+               <div class="inline checkbox c-checkbox">
+                  <label ng-click="$event.stopPropagation()">
+                     <input type="checkbox" ng-model="item.complete" id="{{'todo-item-'+$index}}" ng-disabled="editingTodo" />
+                     <span class="fa fa-check"></span>
+                  </label>
+               </div>
+               <span ng-bind="item.todo.title" class="todo-title">Task title</span>
+               <span ng-click="editTodo($index, $event)" class="todo-edit fa fa-pencil"></span>
+            </accordion-heading>
+            <p>
+               <span ng-bind="item.todo.description"></span>
+               <span ng-if="item.todo.description === ''" class="text-muted">No item description</span>
+            </p>
+         </accordion-group>
+      </accordion>
+      <p ng-if="items.length &gt; 0" class="text-right">
+         <span>{{ totalCompleted() }} Completed</span>-
+         <span>{{ totalPending() }} Pending</span>
+      </p>
+   </div>
+</div>

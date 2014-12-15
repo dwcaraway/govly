@@ -1,0 +1,115 @@
+<h3>Interaction
+   <small>Advanced bootstrap components for user interaction</small>
+</h3>
+<div class="row">
+   <div class="col-lg-6">
+      <h3 class="page-header mt0">Carousel</h3>
+      <div ng-controller="CarouselDemoCtrl" animate-enabled="false">
+         <div>
+            <carousel interval="myInterval">
+               <slide ng-repeat="slide in slides" active="slide.active">
+                  <img ng-src="{{slide.image}}" style="margin: auto;" alt="" />
+                  <div class="carousel-caption">
+                     <h4>Slide {{$index}}</h4>
+                     <p>{{slide.text}}</p>
+                  </div>
+               </slide>
+            </carousel>
+         </div>
+         <div class="row pv">
+            <div class="col-lg-6">
+               <p>Interval, in milliseconds:</p>
+               <input type="number" ng-model="myInterval" class="form-control" />
+            </div>
+            <div class="col-lg-6">
+               <p>Add a slide with a random image</p>
+               <button type="button" ng-click="addSlide()" class="btn btn-info">Add Slide</button>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="col-lg-6">
+      <h3 class="page-header mt0">Typeahead</h3>
+      <script type="text/ng-template" id="customTemplate.html">
+         <a><img ng-src="http://upload.wikimedia.org/wikipedia/commons/thumb/{{match.model.flag}}" width="16" alt=""/><span bind-html-unsafe="match.label | typeaheadHighlight:query"></span></a>
+      </script>
+      <div ng-controller="TypeaheadCtrl" class="typeahead-ctrl">
+         <h5>Static arrays</h5>
+         <div class="well well-sm">Model: {{selected | json}}</div>
+         <input type="text" ng-model="selected" typeahead="state for state in states | filter:$viewValue | limitTo:8" class="form-control" />
+         <h5>Asynchronous results</h5>
+         <div class="well well-sm">Model: {{asyncSelected | json}}</div>
+         <input type="text" ng-model="asyncSelected" placeholder="Locations loaded via $http" typeahead="address for address in getLocation($viewValue)" typeahead-loading="loadingLocations" class="form-control" /><i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+         <h5>Custom templates for results</h5>
+         <div class="well well-sm">Model: {{customSelected | json}}</div>
+         <input type="text" ng-model="customSelected" placeholder="Custom template" typeahead="state as state.name for state in statesWithFlags | filter:{name:$viewValue}" typeahead-template-url="customTemplate.html"
+         class="form-control" />
+      </div>
+   </div>
+</div>
+<div class="row">
+   <div class="col-lg-6">
+      <h3 class="page-header">Calendar</h3>
+      <div ng-controller="DatepickerDemoCtrl">
+         <div class="well well-sm">
+            <p class="m0">Selected date is:
+               <em>{{dt | date:'fullDate' }}</em>
+            </p>
+         </div>
+         <div class="row">
+            <div class="col-md-6">
+               <h5>Inline</h5>
+               <datepicker ng-model="dt" min-date="minDate" show-weeks="true" class="ui-datepicker well well-sm"></datepicker>
+            </div>
+            <div class="col-md-6">
+               <h5>Popup</h5>
+               <div class="row">
+                  <div class="col-md-12">
+                     <p class="input-group">
+                        <input type="text" datepicker-popup="{{format}}" ng-model="dt" is-open="opened" min-date="minDate" max-date="'2015-06-22'" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close"
+                        class="form-control" />
+                        <span class="input-group-btn">
+                           <button type="button" ng-click="open($event)" class="btn btn-default">
+                              <em class="fa fa-calendar"></em>
+                           </button>
+                        </span>
+                     </p>
+                  </div>
+               </div>
+               <div class="row">
+                  <div class="col-md-12">
+                     <label>Format:</label>
+                     <select ng-model="format" ng-options="f for f in formats" class="form-control">
+                        <option></option>
+                     </select>
+                  </div>
+               </div>
+               <hr/>
+               <button type="button" ng-click="today()" class="btn btn-sm btn-info">Today</button>
+               <button type="button" ng-click="dt = '2009-08-24'" class="btn btn-sm btn-default">2009-08-24</button>
+               <button type="button" ng-click="clear()" class="btn btn-sm btn-danger">Clear</button>
+               <button type="button" ng-click="toggleMin()" tooltip="After today restriction" class="btn btn-sm btn-default">Min date</button>
+            </div>
+         </div>
+      </div>
+   </div>
+   <div class="col-lg-6">
+      <h3 class="page-header">Time picker</h3>
+      <div ng-controller="TimepickerDemoCtrl">
+         <timepicker ng-model="mytime" ng-change="changed()" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></timepicker>
+         <pre class="alert alert-info">Time is: {{mytime | date:'shortTime' }}</pre>
+         <div class="row">
+            <div class="col-xs-6">Hours step is:
+               <select ng-model="hstep" ng-options="opt for opt in options.hstep" class="form-control"></select>
+            </div>
+            <div class="col-xs-6">Minutes step is:
+               <select ng-model="mstep" ng-options="opt for opt in options.mstep" class="form-control"></select>
+            </div>
+         </div>
+         <hr/>
+         <button ng-click="toggleMode()" class="btn btn-info">12H / 24H</button>
+         <button ng-click="update()" class="btn btn-default">Set to 14:00</button>
+         <button ng-click="clear()" class="btn btn-danger">Clear</button>
+      </div>
+   </div>
+</div>

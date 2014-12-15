@@ -1,0 +1,19 @@
+/* ========================================================================
+   Component: form-dragdrop.less
+ ========================================================================== */
+ 
+/**
+ * Provides a dragover state for uploads
+ */
+
+@upload-dragover-box-shadow:                 rgba(100,100,100,0.3);
+@upload-dragover-box-shadow-blur:            20px;
+
+
+
+// Create a box-shadow when dragging a file over the upload area
+
+.dragover { 
+  box-shadow: 0 0 @upload-dragover-box-shadow-blur @upload-dragover-box-shadow; 
+}
+
