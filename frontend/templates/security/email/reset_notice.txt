@@ -1,3 +1,0 @@
-Hey {{ user.first_name|title }} -Just a heads up... Your password at Vitals [https://colliderproject.org] has been changed.
-
-- Fog Mine, LLC

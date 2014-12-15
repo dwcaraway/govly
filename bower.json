@@ -8,7 +8,18 @@
   "license": "Private, not for public use",
   "private": true,
   "dependencies": {
-    "ember": "~1.7.0",
+    "angular": ">=1.2.*",
+    "json3": "~3.2.6",
+    "es5-shim": "~2.1.0",
+    "jquery": ">=1.11.0",
+    "bootstrap-sass-official": "~3.1.1",
+    "angular-resource": ">=1.2.*",
+    "angular-cookies": ">=1.2.*",
+    "angular-sanitize": ">=1.2.*",
+    "angular-route": ">=1.2.*",
+    "ng-file-upload": "~1.5.1",
+    "ngDialog": "~0.2.11",
+    "angular-ui-router": "~0.2.10",
     "backbone": "",
     "bootstrap": "~3",
     "font-awesome": "",
@@ -22,5 +33,15 @@
     "requirejs": "",
     "respond": "",
     "zeroclipboard": ""
+  },
+  "devDependencies": {
+    "angular-mocks": ">=1.2.*",
+    "angular-scenario": ">=1.2.*",
+    "jasmine": "~2.0.1",
+    "karma": "~0.2.2"
+  },
+  "testPath": "test/client/spec",
+  "resolutions": {
+    "angular": "1.2.26"
   }
 }
