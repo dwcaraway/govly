@@ -23,8 +23,8 @@ module.exports = function (grunt) {
     // Project settings
     yeoman: {
       // configurable paths
-      app: 'frontend',
-      dist: 'dist'
+      app: require('./bower.json').appPath || 'frontend',
+      dist: 'frontend/dist'
     },
     sync: {
       dist: {
@@ -37,23 +37,23 @@ module.exports = function (grunt) {
     },
     open: {
       server: {
-        url: 'http://localhost:4000'
+        url: 'http://localhost:5000'
       }
     },
     watch: {
       js: {
-        files: ['<%= yeoman.app %>/app/**/*.js'],
+        files: ['<%= yeoman.app %>/js/{,*/}*.js'],
         tasks: ['newer:jshint:all'],
         options: {
           livereload: true
         }
       },
       jsTest: {
-        files: ['tests/client/spec/**/*.js'],
+        files: ['test/client/spec/{,*/}*.js'],
         tasks: ['newer:jshint:test', 'karma']
       },
       compass: {
-        files: ['<%= yeoman.app %>/styles/**/*.{scss,sass}'],
+        files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
         tasks: ['compass:server', 'autoprefixer']
       },
       gruntfile: {
@@ -76,9 +76,9 @@ module.exports = function (grunt) {
       server: {
         proxies: [
           {
-            context: '/vitals',
+            context: '/afsbirez',
             host: 'localhost',
-            port: 4000,
+            port: 5000,
             https: false,
             changeOrigin: false
           }
@@ -97,7 +97,7 @@ module.exports = function (grunt) {
             middleware: function (connect) {
               return [
                 proxySnippet,
-                connect.static(require('path').resolve('<%= yeoman.app %>'))
+                connect.static(require('path').resolve('app/frontend/static'))
               ];
             }
           }
@@ -134,6 +134,16 @@ module.exports = function (grunt) {
           ]
         }]
       },
+      heroku: {
+        files: [{
+          dot: true,
+          src: [
+            'heroku/*',
+            '!heroku/.git*',
+            '!heroku/Procfile'
+          ]
+        }]
+      },
       server: '.tmp'
     },
 
@@ -162,16 +172,13 @@ module.exports = function (grunt) {
     },
 
     // Automatically inject Bower components into the app
-      'bowerInstall': {
-          app: {
-              //Point to files that should be updated when you run `grunt bower-install`
-              src: [
-                  '<%= yeoman.dist %>/index.html'
-              ],
-              ignorePath: 'frontend/',
-              exclude: ['bootstrap-sass']
-          }
-      },
+    'bower-install': {
+      app: {
+        html: 'app/templates/index.html',
+        ignorePath: 'app/',
+        exclude: ['bootstrap-sass']
+      }
+    },
 
     // Compiles Sass to CSS and generates necessary files if requested
     compass: {
@@ -182,7 +189,7 @@ module.exports = function (grunt) {
         imagesDir: '<%= yeoman.app %>/images',
         javascriptsDir: '<%= yeoman.app %>/js',
         fontsDir: '<%= yeoman.app %>/styles/fonts',
-        importPath: '<%= yeoman.app %>/libs',
+        importPath: '<%= yeoman.app %>/lib',
         httpImagesPath: '/images',
         httpGeneratedImagesPath: '/images/generated',
         httpFontsPath: '/styles/fonts',
@@ -293,6 +300,13 @@ module.exports = function (grunt) {
       }
     },
 
+    // Replace Google CDN references
+    cdnify: {
+      dist: {
+        html: ['<%= yeoman.dist %>/views/*.html']
+      }
+    },
+
     // Copies remaining files to places other tasks can use
     copy: {
       dist: {
@@ -392,7 +406,7 @@ module.exports = function (grunt) {
     grunt.log.writeln('Starting Flask development server.');
     // stdio: 'inherit' let us see flask output in grunt
     var PIPE = {stdio: 'inherit'};
-    spawn('python', ['manage.py', 'runserver'], PIPE);
+    spawn('python', ['run.py'], PIPE);
     
     spawn.on('close', function (code) {
       grunt.log.write('child process exited with code ' + code + '\n');
@@ -408,7 +422,7 @@ module.exports = function (grunt) {
     if (target === 'debug') {
       return grunt.task.run([
         'clean:server',
-        'bowerInstall',
+        'bower-install',
         'concurrent:server',
         'autoprefixer',
         'concurrent:debug'
@@ -417,7 +431,7 @@ module.exports = function (grunt) {
 
     grunt.task.run([
       'clean:server',
-      'bowerInstall',
+      'bower-install',
       'concurrent:server',
       'autoprefixer',
 //      'configureProxies:server',
@@ -458,7 +472,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'clean:dist',
-    'bowerInstall',
+    'bower-install',
     'useminPrepare',
     'concurrent:dist',
     'autoprefixer',

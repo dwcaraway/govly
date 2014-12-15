@@ -11,23 +11,19 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'app/frontend/static/lib/angular/angular.js',
-      'app/frontend/static/lib/angular-mocks/angular-mocks.js',
-      'app/frontend/static/lib/angular-resource/angular-resource.js',
-      'app/frontend/static/lib/angular-cookies/angular-cookies.js',
-      'app/frontend/static/lib/angular-sanitize/angular-sanitize.js',
-      'app/frontend/static/lib/angular-route/angular-route.js',
-      'app/frontend/static/lib/angular-schema-form/dist/schema-form.min.js',
-      'app/frontend/static/lib/ng-file-upload/angular-file-upload.js',
-      'app/frontend/static/lib/ngDialog/js/ngDialog.min.js',
-      'app/frontend/static/lib/angular-ui-router/release/angular-ui-router.js',
-      'app/frontend/static/js/*.js',
-      'app/frontend/static/js/**/*.js',
+      'bower_components/angular/angular.js',
+      'bower_components/angular-mocks/angular-mocks.js',
+      'bower_components/angular-resource/angular-resource.js',
+      'bower_components/angular-cookies/angular-cookies.js',
+      'bower_components/angular-sanitize/angular-sanitize.js',
+      'bower_components/angular-route/angular-route.js',
+      'bower_components/angular-schema-form/dist/schema-form.min.js',
+      'bower_components/ng-file-upload/angular-file-upload.js',
+      'bower_components/ngDialog/js/ngDialog.min.js',
+      'bower_components/angular-ui-router/release/angular-ui-router.js',
+      'frontend/app/**/*.js',
       'tests/client/spec/**/*.js'
     ],
-
-    // list of files / patterns to exclude
-    exclude: ['app/frontend/static/js/vendor/*.js'],
 
     // web server port
     port: 8080,
