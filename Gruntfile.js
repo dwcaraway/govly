@@ -121,6 +121,20 @@ module.exports = function (grunt) {
       }
     },
 
+      bower: {
+          install: {
+              options: {
+                  targetDir: '<%= yeoman.app %>/assets/libs',
+                  layout: 'byType',
+                  install: true,
+                  verbose: false,
+                  cleanTargetDir: false,
+                  cleanBowerDir: false,
+                  bowerOptions: {}
+              }
+          }
+      },
+
     // Empties folders to start fresh
     clean: {
       dist: {
@@ -170,26 +184,64 @@ module.exports = function (grunt) {
         }
       }
     },
+      
+     // By default, your `index.html`'s <!-- Usemin block --> will take care of
+    // minification. These next options are pre-configured if you do not wish
+    // to use the Usemin blocks.
+     cssmin: {
+       dist: {
+//         files: {
+//           '<%= yeoman.dist %>/styles/main.css': [
+//             '.tmp/styles/{,*/}*.css',
+//             '<%= yeoman.app %>/assets/styles/{,*/}*.css'
+//           ]
+//         }
+       }
+     },
+     uglify: {
+       dist: {
+//         files: {
+//           '<%= yeoman.dist %>/scripts/scripts.js': [
+//             '<%= yeoman.app %>/assets/js/*.js'
+//           ]
+//         }
+       }
+     },
+     concat: {
+       dist: {}
+     },
 
     // Automatically inject Bower components into the app
-    'bower-install': {
-      app: {
-        html: 'app/templates/index.html',
-        ignorePath: 'app/',
-        exclude: ['bootstrap-sass']
-      }
-    },
+      'wiredep': {
+          task: {
+              // Point to the files that should be updated when
+              // you run `grunt wiredep`
+              src: [
+                  '<%= yeoman.app =>/index.html',
+                  '<%= yeoman.app =>/**/*.html',
+                  '<%= yeoman.app =>/**/*.jade'
+              ],
+
+              options: {
+                  // See wiredep's configuration documentation for the options
+                  // you may pass:
+
+                  // https://github.com/taptapship/wiredep#configuration
+              }
+
+          }
+      },
 
     // Compiles Sass to CSS and generates necessary files if requested
     compass: {
       options: {
-        sassDir: '<%= yeoman.app %>/sass',
-        cssDir: '<%= yeoman.app %>/css',
+        sassDir: '<%= yeoman.app %>/assets/styles',
+        cssDir: '<%= yeoman.app %>/assets/styles',
         generatedImagesDir: '.tmp/images/generated',
-        imagesDir: '<%= yeoman.app %>/images',
-        javascriptsDir: '<%= yeoman.app %>/js',
-        fontsDir: '<%= yeoman.app %>/styles/fonts',
-        importPath: '<%= yeoman.app %>/lib',
+        imagesDir: '<%= yeoman.app %>/assets/img',
+        javascriptsDir: '<%= yeoman.app %>/assets/js',
+        fontsDir: '<%= yeoman.app %>/assets/styles/fonts',
+        importPath: '<%= yeoman.app %>/assets/styles/libs',
         httpImagesPath: '/images',
         httpGeneratedImagesPath: '/images/generated',
         httpFontsPath: '/styles/fonts',
@@ -227,8 +279,7 @@ module.exports = function (grunt) {
     // concat, minify and revision files. Creates configurations in memory so
     // additional tasks can operate on them
     useminPrepare: {
-      html: ['app/templates/index.html',
-             'app/templates/index.jade'],
+      html: ['frontend/app/index.html'],
       options: {
         dest: '<%= yeoman.dist %>/public'
       }
@@ -422,7 +473,7 @@ module.exports = function (grunt) {
     if (target === 'debug') {
       return grunt.task.run([
         'clean:server',
-        'bower-install',
+        'load-dep',
         'concurrent:server',
         'autoprefixer',
         'concurrent:debug'
@@ -431,7 +482,7 @@ module.exports = function (grunt) {
 
     grunt.task.run([
       'clean:server',
-      'bower-install',
+      'load-dep',
       'concurrent:server',
       'autoprefixer',
 //      'configureProxies:server',
@@ -470,16 +521,21 @@ module.exports = function (grunt) {
     ]);
   });
 
+  //run `bower install` and then update the html to reflect the dependencies
+  grunt.registerTask('load-dep', [
+  'bower:install',
+      'wiredep'
+  ]);
+
   grunt.registerTask('build', [
     'clean:dist',
-    'bower-install',
+    'load-dep',
     'useminPrepare',
     'concurrent:dist',
     'autoprefixer',
     'concat',
     'ngmin',
     'copy:dist',
-    'cdnify',
     'cssmin',
     'uglify',
     'rev',
@@ -488,7 +544,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', [
     'newer:jshint',
-    'test',
     'build'
+//      , test
   ]);
 };
