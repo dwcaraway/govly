@@ -3,6 +3,7 @@ scrapeddata
 bower_components
 node_modules
 build
+libs
 env
 .idea
 dist

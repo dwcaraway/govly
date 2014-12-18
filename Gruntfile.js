@@ -26,15 +26,17 @@ module.exports = function (grunt) {
       app: require('./bower.json').appPath || 'frontend',
       dist: 'frontend/dist'
     },
-    sync: {
-      dist: {
-        files: [{
-          cwd: '<%= yeoman.app %>',
-          dest: '<%= yeoman.dist %>',
-          src: '**'
-        }]
-      }
-    },
+//    sync: {
+//      main: {
+//        files: [{
+//          cwd: '<%= yeoman.app %>',
+//          dest: '<%= yeoman.dist %>',
+//          src: ['**', '!dist', '!*.md']
+//        }],
+//         verbose: true
+//
+//      }
+//    },
     open: {
       server: {
         url: 'http://localhost:5000'
@@ -92,7 +94,7 @@ module.exports = function (grunt) {
           options: {
             open: true,
             base: [
-              '<%= yeoman.app %>'
+              '<%= yeoman.dist %>'
             ],
             middleware: function (connect) {
               return [
@@ -143,22 +145,12 @@ module.exports = function (grunt) {
           src: [
             '.tmp',
             '<%= yeoman.dist %>/*',
-            '!<%= yeoman.dist %>/.git*',
-            '!<%= yeoman.dist %>/Procfile'
-          ]
-        }]
-      },
-      heroku: {
-        files: [{
-          dot: true,
-          src: [
-            'heroku/*',
-            '!heroku/.git*',
-            '!heroku/Procfile'
+            '!<%= yeoman.dist %>/.git*'
           ]
         }]
       },
       server: '.tmp'
+
     },
 
     // Add vendor prefixed styles
@@ -217,9 +209,7 @@ module.exports = function (grunt) {
               // Point to the files that should be updated when
               // you run `grunt wiredep`
               src: [
-                  '<%= yeoman.app =>/index.html',
-                  '<%= yeoman.app =>/**/*.html',
-                  '<%= yeoman.app =>/**/*.jade'
+                  '<%= yeoman.dist %>/index.html'
               ],
 
               options: {
@@ -239,9 +229,8 @@ module.exports = function (grunt) {
         cssDir: '<%= yeoman.app %>/assets/styles',
         generatedImagesDir: '.tmp/images/generated',
         imagesDir: '<%= yeoman.app %>/assets/img',
-        javascriptsDir: '<%= yeoman.app %>/assets/js',
-        fontsDir: '<%= yeoman.app %>/assets/styles/fonts',
-        importPath: '<%= yeoman.app %>/assets/styles/libs',
+        javascriptsDir: '<%= yeoman.dist %>/js',
+        fontsDir: '<%= yeoman.app %>/assets/fonts',
         httpImagesPath: '/images',
         httpGeneratedImagesPath: '/images/generated',
         httpFontsPath: '/styles/fonts',
@@ -351,48 +340,34 @@ module.exports = function (grunt) {
       }
     },
 
-    // Replace Google CDN references
-    cdnify: {
-      dist: {
-        html: ['<%= yeoman.dist %>/views/*.html']
-      }
-    },
-
     // Copies remaining files to places other tasks can use
     copy: {
       dist: {
         files: [{
           expand: true,
           dot: true,
-          cwd: '<%= yeoman.app %>',
-          dest: '<%= yeoman.dist %>/public',
+          cwd: '<%= yeoman.app %>/',
+          dest: '<%= yeoman.dist %>/',
           src: [
-            '*.{ico,png,txt}',
-            '.htaccess',
-            'lib/**/*',
-            'images/{,*/}*.{webp}',
-            'fonts/**/*'
+            'assets/**/*',
+              '*.html'
           ]
-        }, {
-          expand: true,
-          dot: true,
-          cwd: '<%= yeoman.app %>/views',
-          dest: '<%= yeoman.dist %>/views',
-          src: '**/*.jade'
-        }, {
-          expand: true,
-          cwd: '.tmp/images',
-          dest: '<%= yeoman.dist %>/public/images',
-          src: ['generated/*']
-        }, {
-          expand: true,
-          dest: '<%= yeoman.dist %>',
-          src: [
-            'package.json',
-            'server.js',
-            'lib/**/*'
-          ]
-        }]
+        },{
+            expand: true,
+            flatten: true,
+            cwd: '<%= yeoman.app %>/app/',
+            dest: '<%= yeoman.dist %>/js/',
+            src: [
+            '**/*.js'
+            ]
+        }
+//            ,{
+//          expand: true,
+//          cwd: '.tmp/images',
+//          dest: '<%= yeoman.dist %>/public/images',
+//          src: ['generated/*']
+//        }
+        ]
       },
       styles: {
         expand: true,
@@ -406,8 +381,6 @@ module.exports = function (grunt) {
     concurrent: {
       server: [
         'compass:server'
-      ],
-      test: [
       ],
       debug: {
         tasks: [
@@ -431,12 +404,6 @@ module.exports = function (grunt) {
         configFile: 'karma.conf.js',
         singleRun: true 
       }
-    },
-
-    env: {
-      test: {
-        NODE_ENV: 'test'
-      }
     }
   });
 
@@ -457,7 +424,7 @@ module.exports = function (grunt) {
     grunt.log.writeln('Starting Flask development server.');
     // stdio: 'inherit' let us see flask output in grunt
     var PIPE = {stdio: 'inherit'};
-    spawn('python', ['run.py'], PIPE);
+    spawn('python', ['manage.py', 'runserver'], PIPE);
     
     spawn.on('close', function (code) {
       grunt.log.write('child process exited with code ' + code + '\n');
@@ -488,38 +455,19 @@ module.exports = function (grunt) {
 //      'configureProxies:server',
 //      'connect:livereload',
 //      'watch'
-      'flask',
+//      'flask'
       'open',
       'watch'
     ]);
   });
 
-  grunt.registerTask('server', function () {
-    grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
-    grunt.task.run(['serve']);
-  });
-
-  grunt.registerTask('test', function(target) {
-    if (target === 'server') {
-      return grunt.task.run([
-        'env:test'
-      ]);
-    }
-
-    else if (target === 'client') {
-      return grunt.task.run([
-        'clean:server',
-        'concurrent:test',
-        'autoprefixer',
-        'karma'
-      ]);
-    }
-
-    else grunt.task.run([
-      'test:server',
-      'test:client'
-    ]);
-  });
+    grunt.registerTask('test', function (target) {
+        return grunt.task.run([
+            'clean:server',
+            'autoprefixer',
+            'karma'
+        ]);
+    });
 
   //run `bower install` and then update the html to reflect the dependencies
   grunt.registerTask('load-dep', [
@@ -529,22 +477,22 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'clean:dist',
-    'load-dep',
-    'useminPrepare',
-    'concurrent:dist',
-    'autoprefixer',
-    'concat',
-    'ngmin',
+//    'useminPrepare',
+//    'concurrent:dist',
+//    'autoprefixer',
+//    'concat',
+//    'ngmin',
     'copy:dist',
-    'cssmin',
-    'uglify',
-    'rev',
-    'usemin'
+//    'cssmin',
+//    'uglify',
+//    'rev',
+//    'usemin'
+    'load-dep'
   ]);
 
   grunt.registerTask('default', [
     'newer:jshint',
     'build'
-//      , test
+//    'test'
   ]);
 };
