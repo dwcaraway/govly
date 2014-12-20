@@ -1,35 +1,21 @@
 {
-  "name": "Vitals",
-  "version": "0.0.1",
-  "authors": [
-    "David Caraway"
-  ],
-  "description": "Federal market research dashboard",
-  "license": "Private, not for public use",
-  "private": true,
+  "name": "vitals",
+  "version": "0.0.0",
   "dependencies": {
-    "json3": "~3.2.6",
-    "es5-shim": "~2.1.0",
-    "jquery": "~2.1.2",
-    "bootstrap-sass-official": "~3.1.1",
-    "bootstrap": "~3.3.1",
-    "font-awesome": "~4.2.0",
-    "interact": "~1.1.3",
-    "jquery-easing-original": "~1.3.1",
-    "jquery-shorten": "~0.9.0",
-    "angular-resource": "~1.3.7",
-    "smoothscroll": "~0.0.4",
-    "angular": "~1.3.7",
-    "angular-bootstrap": "~0.12.0"
+    "angular": "^1.3.0",
+    "json3": "^3.3.0",
+    "es5-shim": "^4.0.0",
+    "bootstrap-sass-official": "^3.2.0",
+    "angular-animate": "^1.3.0",
+    "angular-cookies": "^1.3.0",
+    "angular-resource": "^1.3.0",
+    "angular-route": "^1.3.0",
+    "angular-sanitize": "^1.3.0",
+    "angular-touch": "^1.3.0"
   },
   "devDependencies": {
-    "angular-mocks": ">=1.2.*",
-    "angular-scenario": ">=1.2.*",
-    "jasmine": "~2.0.1",
-    "karma": "~0.2.2"
+    "angular-mocks": "~1.3.0",
+    "angular-scenario": "~1.3.0"
   },
-  "testPath": "test/client/spec",
-  "resolutions": {
-    "angular": "~1.3.7"
-  }
+  "appPath": "frontend"
 }

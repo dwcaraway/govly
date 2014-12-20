@@ -1,4 +1,4 @@
 {
-  "directory": "frontend/dist/assets/libs",
+  "directory": "bower_components",
   "analytics": false
 }

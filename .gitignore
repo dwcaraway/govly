@@ -13,3 +13,5 @@ dist
 *.db
 *.egg-info
 *.lock
+.tmp
+.sass-cache
