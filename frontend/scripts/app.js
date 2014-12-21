@@ -15,7 +15,10 @@ angular
     'ngResource',
     'ngRoute',
     'ngSanitize',
-    'ngTouch'
+    'ngTouch',
+    'angulartics',
+    'angulartics.google.analytics',
+        'angular-jwt'
   ])
   .config(function ($routeProvider) {
     $routeProvider
@@ -27,6 +30,10 @@ angular
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl'
       })
+        .when('/register', {
+            templateUrl: 'views/register.html',
+            controller: 'RegisterCtrl'
+        })
       .otherwise({
         redirectTo: '/'
       });
