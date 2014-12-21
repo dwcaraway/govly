@@ -16,6 +16,7 @@ from flask.ext.jwt import JWTError
 from flask.ext.security.utils import verify_and_update_password
 from werkzeug.local import LocalProxy
 
+
 _log = logging.getLogger(__name__)
 _security = LocalProxy(lambda: current_app.extensions['security'])
 _datastore = LocalProxy(lambda: _security.datastore)

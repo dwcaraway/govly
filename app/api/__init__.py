@@ -31,6 +31,19 @@ def create_app(settings_override=None):
     bp = create_blueprint()
     register_blueprint(app, bp)
 
+
+
+    # Log the sent email to the console
+    if app.debug:
+        import logging
+        from flask_security.signals import user_registered
+        from flask import url_for
+
+        _log = logging.getLogger(__name__)
+        user_registered.connect(lambda(user, confirm_token): _log.info(
+            '{0} registered, confirm at {1}'.format(user, url_for('security.confirm_email', token=confirm_token))
+        ))
+
     return app
 
 
