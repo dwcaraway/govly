@@ -52,6 +52,7 @@ class Config(object):
     SECURITY_FLASH_MESSAGES = True
     SECURITY_PASSWORD_HASH = 'bcrypt'
     SECURITY_PASSWORD_SALT = 'another super secret key'
+    WTF_CSRF_ENABLED = False
 
     # NOTE: We are supplying our own password context from passlib; no additional
     # password salts are requried. We have to override the default of

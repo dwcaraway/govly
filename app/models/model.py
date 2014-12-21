@@ -1,5 +1,4 @@
 from datetime import datetime
-from flask.ext.security import UserMixin, RoleMixin
 
 import json
 # Define the database functions
