@@ -170,7 +170,23 @@ module.exports = function (grunt) {
       sass: {
         src: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
         ignorePath: /(\.\.\/){1,2}bower_components\//
+      },
+      test: {
+          src: 'tests/client/karma.conf.js',
+          ignorePath:  /\.\.\/\.\.\//,
+        fileTypes: {
+            js: {
+                block: /(([\s\t]*)\/\/\s*bower:*(\S*))(\n|\r|.)*?(\/\/\s*endbower)/gi,
+                detect: {
+                    js: /'(.*\.js)'/gi
+                },
+                replace: {
+                    js: '\'{{filePath}}\','
+                }
+            }
+        }
       }
+
     },
 
     // Compiles Sass to CSS and generates necessary files if requested
@@ -411,6 +427,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('test', [
     'clean:server',
+//    'wiredep:test',
     'concurrent:test',
     'autoprefixer',
     'connect:test',
