@@ -67,7 +67,7 @@ def _make_context():
     app, db, and the User model by default.
     """
     return {
-        'api': application,
+        'app': application,
         'db': db,
         'User': User
     }

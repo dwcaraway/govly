@@ -28,8 +28,9 @@ class Config(object):
 
     # Flask-Mail
     MAIL_SERVER = 'smtp.mandrillapp.com'
-    MAIL_PORT = 465
-    MAIL_USE_SSL = True
+    MAIL_PORT = 587
+    MAIL_USE_SSL = False
+    MAIL_USE_TLS = False
     MAIL_USERNAME = 'dave@fogmine.com'
     MAIL_PASSWORD = 'ltmoxva9xIa5qUM789D5MA' #Test API Key
 
@@ -87,10 +88,22 @@ class Config(object):
     }
 
 class ProductionConfig(Config):
+    DEBUG = True
+    TESTING = False
+
     SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+
+    # Flask-Mail
+    MAIL_SERVER = 'smtp.mandrillapp.com'
+    # MAIL_PORT = 465
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
+    MAIL_USERNAME = 'dave@fogmine.com'
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_SUPPRESS_SEND = False
+
 
 class DevelopmentConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitalsdev'

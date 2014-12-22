@@ -6,6 +6,7 @@ build
 libs
 env
 .idea
+*.ipynb*
 dist
 *.swp
 *.log
