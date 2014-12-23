@@ -17,7 +17,10 @@ class Config(object):
     # Flask
     DEBUG = True
     TESTING = False
-    SECRET_KEY = 'super secret key - override with instance configuration'
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'super secret key - override with instance configuration')
+
+    # Database
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'postgresql://vitals:vitals@localhost:5432/vitalsdev')
 
     # Framework
     USE_CDN = False
@@ -27,12 +30,12 @@ class Config(object):
     DEBUG_TB_INTERCEPT_REDIRECTS = False
 
     # Flask-Mail
-    MAIL_SERVER = 'smtp.mandrillapp.com'
-    MAIL_PORT = 587
+    MAIL_SERVER = 'mailtrap.io'
+    MAIL_PORT = 2525
     MAIL_USE_SSL = False
     MAIL_USE_TLS = False
-    MAIL_USERNAME = 'dave@fogmine.com'
-    MAIL_PASSWORD = 'ltmoxva9xIa5qUM789D5MA' #Test API Key
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME', '278853aff981f06a9') #Mailtrap.io Username
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', 'a0fc2ab5a08c7f') #Mailtrap Test SMTP Key
 
     # Flask-Security basics
     SECURITY_CHANGEABLE = True
@@ -55,23 +58,14 @@ class Config(object):
     SECURITY_PASSWORD_SALT = 'another super secret key'
     WTF_CSRF_ENABLED = False
 
-    # NOTE: We are supplying our own password context from passlib; no additional
-    # password salts are requried. We have to override the default of
-    # Flask-Security in order to make this happen.
-    #
-    # You can generate random salts for the remaining Flask-Security salts by using
-    # the scripts/generate_salts script in the playbooks directory.  This will
-    # generate a new vars/salts.yml file. You should protect that file using
-    # ansible-vault.
-
     # Flask-Security email options
     SECURITY_SEND_PASSWORD_CHANGE_EMAIL = True
     SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = True
     SECURITY_SEND_REGISTER_EMAIL = True
 
     # Celery
-    CELERY_BROKER_URL='redis://127.0.0.1:6379'
-    CELERY_RESULT_BACKEND='redis://127.0.0.1:6379'
+    CELERY_BROKER_URL= os.environ.get('REDISTOGO_URL', 'redis://127.0.0.1:6379')
+    CELERY_RESULT_BACKEND=os.environ.get('REDISTOGO_URL', 'redis://127.0.0.1:6379')
     CELERYD_PREFETCH_MULTIPLIER=0
     CELERY_IMPORT = [
         'vitals.tasks',
@@ -88,27 +82,16 @@ class Config(object):
     }
 
 class ProductionConfig(Config):
-    DEBUG = True
+    DEBUG = False
     TESTING = False
 
-    SECRET_KEY = os.environ.get('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
-
     # Flask-Mail
-    MAIL_SERVER = 'smtp.mandrillapp.com'
-    # MAIL_PORT = 465
+    MAIL_SERVER = 'smtp.sendgrid.net'
     MAIL_PORT = 587
-    MAIL_USE_TLS = True
     MAIL_USE_SSL = False
-    MAIL_USERNAME = 'dave@fogmine.com'
+    MAIL_USE_TLS = False
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    MAIL_SUPPRESS_SEND = False
-
 
 class DevelopmentConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitalsdev'
     DEBUG = True
-
-# class TestingConfig(Config):
-#     SQLALCHEMY_DATABASE_URI = 'postgresql://vitals:vitals@localhost:5432/vitalstest'
-#     TESTING = True
