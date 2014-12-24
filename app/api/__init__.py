@@ -22,7 +22,7 @@ def create_app(settings_override=None):
     """Returns an API application instance."""
 
     # Create and extend a minimal application
-    app = framework.create_app(__name__, __path__, settings_override, security_register_blueprint=True)
+    app = framework.create_app(__name__, __path__, settings_override, security_register_blueprint=False)
 
     # Initialize extensions
     app.extensions['classy_api'] = ClassyAPI(app, catch_all_404s=True)
@@ -30,8 +30,6 @@ def create_app(settings_override=None):
     # Register API
     bp = create_blueprint()
     register_blueprint(app, bp)
-
-
 
     # Log the sent email to the console
     if app.debug:

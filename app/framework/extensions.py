@@ -27,4 +27,7 @@ security = Security()
 from flask.ext.celery import Celery
 celery = Celery()
 
-__all__ = ("db", "migrate", "jwt", "mail", "security", "celery")
+from flask.ext.cors import CORS
+cors = CORS()
+
+__all__ = ("db", "migrate", "jwt", "mail", "security", "celery", 'cors')

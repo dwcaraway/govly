@@ -81,6 +81,12 @@ class Config(object):
     #   }
     }
 
+    #Flask-CORS
+    CORS_HEADERS = 'Content-Type' #allow browsers to cross origin POST JSON, which is an OPTIONS followed by POST
+
+    #Flask-JWT
+    JWT_AUTH_URL_RULE = '/auth/login'
+
 class ProductionConfig(Config):
     DEBUG = False
     TESTING = False

@@ -28,6 +28,7 @@ org_parser.add_argument('order', type=str,
 class OrganizationsView(BaseView):
     """A complete Flask-Classy-based Organizations API resource."""
 
+    @secure_endpoint()
     def index(self):
         """Returns a Collection of Organizations."""
         args = org_parser.parse_args()
@@ -60,6 +61,7 @@ class OrganizationsView(BaseView):
         org = Organization.create(**data)
         return org.to_dict(), 201
 
+    @secure_endpoint()
     def get(self, id):
         """Returns a specific of Organization."""
 

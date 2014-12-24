@@ -40,3 +40,29 @@ class AuthView(BaseView):
                 "message": "Unsupported media type",
             }, 415
         return dict(token=generate_token(current_user))
+
+    @route('/register', methods=['POST'])
+    def register_user(self):
+        #TODO
+        return {'TO':'DO'}, 501
+
+    @route('/confirm', methods=['POST'])
+    def confirm_user(self):
+        #TODO
+        return {'TO':'DO'}, 501
+
+    @route('/logout', methods=['GET'])
+    def logout_user(self):
+        #TODO
+        return {'TO':'DO'}, 501
+
+    @route('/change', methods=['POST'])
+    def change_password(self):
+        #TODO
+        return {'TO':'DO'}, 501
+
+    @route('/reset', methods=['POST'])
+    def reset_password(self):
+        #TODO
+        return {'TO':'DO'}, 501
+

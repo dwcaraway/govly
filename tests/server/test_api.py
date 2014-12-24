@@ -14,11 +14,16 @@
 import pytest
 from flask import url_for
 from jsonschema import Draft4Validator
+from flask_jwt import generate_token
 from tests.factories import UserFactory
 
 @pytest.fixture
 def user(apidb):
     return UserFactory(password='myprecious')
+
+@pytest.fixture
+def token(user):
+    return generate_token(user)
 
 class TestAPI:
     """
@@ -80,16 +85,14 @@ class TestAPILoggingIn:
         resp = testapi.get("/secure", expect_errors=True)
         assert resp.status_code == 401
 
-    def test_secure_endpoint_succeeds_with_jwt_token(self, user, testapi):
-        token = self.test_jwt_log_in_returns_200_with_token(user, testapi)
+    def test_secure_endpoint_succeeds_with_jwt_token(self, user, token, testapi):
         resp = testapi.get("/secure", headers={
             "Authorization": "Bearer {token}".format(token=token),
         })
         assert resp.status_code == 200
         assert 'secret' in resp.json
 
-    def test_secure_endpoint_fails_after_user_reset_secret(self, user, testapi):
-        token = self.test_jwt_log_in_returns_200_with_token(user, testapi)
+    def test_secure_endpoint_fails_after_user_reset_secret(self, user, token, testapi):
         resp = testapi.get("/secure", headers={
             "Authorization": "Bearer {token}".format(token=token),
         })
@@ -110,8 +113,6 @@ class TestLinkRelation:
         """
         Get all members of Link Relations collection and verify that it's an empty data set
         """
-        # url_for('v1.LinkRelationsView:index')
-
         resp = testapi.get(url_for('v1.LinkRelationsView:index'))
         resp.status_code.should.equal(200)
         len(resp.json.keys()).should.be.greater_than(1)
@@ -135,28 +136,34 @@ class TestLinkRelation:
 class TestOrganizations:
     """Test of 'Organization' resource"""
 
-    def test_link_relation_curie(self, apidb, testapi):
+    def test_link_relation_curie(self, apidb, token, testapi):
         """Verify that resource has a link relation curie in HAL response"""
-        resp = testapi.get(url_for('v1.OrganizationsView:index'))
+        resp = testapi.get(url_for('v1.OrganizationsView:index'), headers={
+            "Authorization": "Bearer {token}".format(token=token),
+        })
         expected_template = url_for('v1.LinkRelationsView:index')+'/{rel}'
         resp.hal.links.curies['r'].template.should.equal(expected_template)
 
-    def test_empty_organizations(self, apidb, testapi):
+    def test_empty_organizations(self, apidb, token, testapi):
         """
         Get all members of Organization collection and verify that it's an empty data set
         """
-        resp = testapi.get(url_for('v1.OrganizationsView:index'))
+        resp = testapi.get(url_for('v1.OrganizationsView:index'), headers={
+            "Authorization": "Bearer {token}".format(token=token),
+        })
         doc = resp.hal
         doc.links['self'].url().should.equal(url_for('v1.OrganizationsView:index', page=1))
         doc.properties['total'].should.equal(0)
         doc.embedded.should.be.empty
 
-    def test_single_organization(self, org, testapi):
+    def test_single_organization(self, org, token, testapi):
         """
         Call to Organization collection with single organization
         """
 
-        resp = testapi.get(url_for('v1.OrganizationsView:index'))
+        resp = testapi.get(url_for('v1.OrganizationsView:index'), headers={
+            "Authorization": "Bearer {token}".format(token=token),
+        })
         doc = resp.hal
 
         #There should only be links
@@ -167,22 +174,26 @@ class TestOrganizations:
         doc.links.keys().shouldnot.contain('last')
         doc.embedded.should.be.empty
 
-    def test_large_business_collection(self, testapi, orgs):
+    def test_large_business_collection(self, testapi, token, orgs):
         """
         Create a bunch of organizations and verify the links are correct
         """
 
-        resp = testapi.get(url_for('v1.OrganizationsView:index'))
+        resp = testapi.get(url_for('v1.OrganizationsView:index'), headers={
+            "Authorization": "Bearer {token}".format(token=token),
+        })
         doc = resp.hal
 
         doc.links.keys().shouldnot.contain('first')
         doc.links['last'].url().should.equal(url_for('v1.OrganizationsView:index', page=5))
 
-    def test_get(self, testapi, org):
+    def test_get(self, testapi, org, token):
         """
         Get single organization
         """
-        resp = testapi.get(url_for('v1.OrganizationsView:get', id=org.id))
+        resp = testapi.get(url_for('v1.OrganizationsView:get', id=org.id), headers={
+            "Authorization": "Bearer {token}".format(token=token),
+        })
 
         doc = resp.hal
         doc.links['r:organizations'].url().should.equal(url_for('v1.OrganizationsView:index', page=1))
