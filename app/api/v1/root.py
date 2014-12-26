@@ -20,7 +20,8 @@ class RootView(BaseView):
     @route('/')
     def index(self):
         """Starting endpoint for all available endpoints"""
-        b = Builder(url_for('v1.RootView:index')).add_curie('r', url_for('v1.LinkRelationsView:get', id='foo').replace('foo', '{rel}')).set_property('welcome', 'Welcome to the Fogmine API!')
+        b = Builder(url_for('v1.RootView:index')).add_curie('r', url_for('v1.LinkRelationsView:get', id='foo')\
+                                    .replace('foo', '{rel}')).set_property('welcome', 'Welcome to the Fogmine API!')
 
         for cls in get_views():
             if cls.__name__ in ['RootView', 'AuthView']:

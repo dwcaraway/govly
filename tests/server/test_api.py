@@ -72,7 +72,7 @@ class TestAPI:
         return resp.json['token']
 
 
-class TestAPILoggingIn:
+class TestLoggingIn:
 
     def test_jwt_log_in_returns_200_with_token(self, user, testapi):
         data = dict(username=user.email, password='myprecious')
@@ -105,6 +105,26 @@ class TestAPILoggingIn:
         assert resp.status_code == 400
         assert resp.json['error'] == 'Invalid JWT'
         assert resp.json['description'] == 'Invalid secret'
+
+class TestRegistration:
+    """Test user registration via the API"""
+
+    def test_register_data_invalid_email_generates_400(self, testapi):
+        data = {"email":"notareal email address", "password":"supersecret"}
+        resp = testapi.post_json(url_for('v1.AuthView:register_user'), data, expect_errors=True)
+
+        resp.status_code.should.equal(400)
+        resp.json['status'].should.equal(400)
+        resp.json['message'].should.contain("is not a 'email'")
+
+    # def test_register_user(selfs, apidb, testapi):
+    #     data = {"email":"agent@secret.com", "password":"supersecret"}
+    #     resp = testapi.post_json(url_for('v1.AuthView:register_user'), data)
+    #
+    #     resp.status_code.should.equal(201)
+    #     resp.json['status'].should.equal(201)
+    #     resp.json['message'].should.contain("A confirmation email has been sent.")
+
 
 class TestLinkRelation:
     """Test of API 'LinkRelation' resource"""

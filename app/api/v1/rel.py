@@ -9,8 +9,6 @@ __author__ = 'DavidWCaraway'
 RELS = {
     "event":
         {
-            "$schema": "http://json-schema.org/schema#",
-
             "type": "object",
             "properties": {
                 "name": {"type": "string"},
@@ -21,8 +19,6 @@ RELS = {
 
     "source":
         {
-            "$schema": "http://json-schema.org/schema#",
-
             "type": "object",
             "properties": {
                 "name": {"type": "string"},
@@ -46,17 +42,17 @@ RELS = {
         {
             "to": "do"
         },
-    "signup": {
-        "post": {
-            "$schema": "http://json-schema.org/schema#",
-
-            "type": "object",
+    "v1.AuthView:register": {
+        "POST": {
             "properties": {
-                "email": {"type": "string"},
-                "password": {"type": "string"},
-                "real_name": {"type": "string"}
+                "password": {"type": "string",
+                             "minLength":8,
+                             "maxLength":120
+                             },
+                "email": {"type": "string", "format":"email"}
             },
-            "required": ["email", "password"]
+            "required": ["email", "password"],
+            "additionalProperties": False
         },
     }
 }
@@ -76,3 +72,4 @@ class LinkRelationsView(BaseView):
             return RELS[id]
         except KeyError:
             abort(404)
+

@@ -57,7 +57,6 @@ class User(UserMixin, Model):
 
     __tablename__ = "users"
 
-    #username = db.Column(db.String(64), unique, nullable=False)
     email = db.Column(db.String(128), unique=True, nullable=False)
     password = db.Column(db.String(120))
     active = db.Column(db.Boolean())
