@@ -41,15 +41,8 @@ TestResponse.hal = property(hal)
 def apiapp(request):
     _app = api.create_app(TestingConfig)
     classy_api(_app)
-    ctx = _app.test_request_context()
-    ctx.push()
-    yield _app
-    ctx.pop()
-
-@pytest.fixture(scope='function')
-def testapp(apiapp):
-    """A Webtest app."""
-    return TestApp(apiapp)
+    with _app.test_request_context():
+        yield _app
 
 @pytest.fixture(scope='function')
 def testapi(apiapp):

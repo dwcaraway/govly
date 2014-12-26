@@ -14,6 +14,8 @@ class TestingConfig:
     TESTING = True
     SECRET_KEY = 'testing-secret-key'
 
+    PRESERVE_CONTEXT_ON_EXCEPTION = False
+
     CELERY_ALWAYS_EAGER = True
     CELERY_EAGER_PROPAGATES_EXCEPTIONS=True
     BROKER_BACKEND='memory'
