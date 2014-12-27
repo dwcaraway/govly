@@ -12,8 +12,11 @@
 import base64
 import os
 
-from flask import flash
+from flask import flash, current_app
+from werkzeug.local import LocalProxy
+from flask.ext.mail import Message
 
+_mail = LocalProxy(lambda: current_app.extensions['mail'])
 
 def flash_errors(form, category="warning"):
     """Flash all errors for a form."""
@@ -26,3 +29,10 @@ def flash_errors(form, category="warning"):
 def generate_salt():
     """Generate a random string used for salts and secret keys."""
     return base64.b64encode(os.urandom(32)).decode('utf-8')
+
+def send_message(subject, sender, recipients, text_body, html_body):
+    """Sends an email message out"""
+    msg = Message(subject, sender = sender, recipients = recipients)
+    msg.body = text_body
+    msg.html = html_body
+    _mail.send(msg)

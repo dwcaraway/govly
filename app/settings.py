@@ -53,7 +53,7 @@ class Config(object):
     SECURITY_POST_RESET_VIEW = None
 
     # Flask-Security options
-    SECURITY_FLASH_MESSAGES = True
+    SECURITY_FLASH_MESSAGES = False
     SECURITY_PASSWORD_HASH = 'bcrypt'
     SECURITY_PASSWORD_SALT = 'another super secret key'
     WTF_CSRF_ENABLED = False
@@ -62,6 +62,7 @@ class Config(object):
     SECURITY_SEND_PASSWORD_CHANGE_EMAIL = True
     SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = True
     SECURITY_SEND_REGISTER_EMAIL = True
+
 
     # Celery
     CELERY_BROKER_URL= os.environ.get('REDISTOGO_URL', 'redis://127.0.0.1:6379')

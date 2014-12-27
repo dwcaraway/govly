@@ -39,8 +39,11 @@ def create_app(package_name, package_path, settings_override=None,
     # Instance Path
     instance_path = os.environ.get("VITALS_INSTANCE_PATH", None)
 
+    # Templates Directory
+    tmpl_dir = os.path.abspath(os.path.join(os.path.abspath(__file__), '../../templates'))
+
     app = Flask(package_name, instance_relative_config=True,
-                instance_path=instance_path)
+                instance_path=instance_path, template_folder=tmpl_dir)
 
     # Initialize settings
     app.config.from_object(settings_override)

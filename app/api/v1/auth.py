@@ -9,53 +9,71 @@
 
     templated from https://github.com/ryanolson/cookiecutter-webapp
 """
-from flask import request
+from flask import request, render_template, Flask
 from flask.ext.classy import route
-from flask.ext.jwt import generate_token
+from flask.ext.jwt import generate_token, SignatureExpired, BadSignature
 from flask.ext.restful.reqparse import RequestParser
 from flask.ext.security import current_user
-from flask_security.registerable import register_user
+from flask_security.registerable import encrypt_password
 from ..base import BaseView, secure_endpoint
 from .rel import RELS
+from app.models.users import User
 from jsonschema import validate, ValidationError, FormatChecker
 
-request_jwt_token_options = RequestParser()
-request_jwt_token_options.add_argument('Content-Type', type=str, location='headers')
+from itsdangerous import URLSafeTimedSerializer
+from flask import current_app, url_for
+from app.framework.utils import send_message
 
 request_register_options = RequestParser()
 request_register_options.add_argument('email', type=str, location='json', required=True)
 request_register_options.add_argument('password', type=str, location='json', required=True)
 
+request_confirm_options = RequestParser()
+request_confirm_options.add_argument('token', type=str, location='args', required=True)
+
+SECONDS_IN_A_DAY = 86400
+
 class AuthView(BaseView):
 
-    @route('/jwt/token', methods=['POST'])
-    def jwt_token(self):
-        """
-        Returns a JWT token if the user is logged in and the post has
-        content type application/json.  All errors are returned as json.
-        """
-        if not current_user.is_authenticated():
-            return {
-                "status": 401,
-                "message": "No user authenticated",
-            }, 401, {"WWW-Authenticate": "None"}
-        options = request_jwt_token_options.parse_args()
-        content_json = '/json' in options.get('Content-Type')
-        if not content_json:
-            return {
-                "status": 415,
-                "message": "Unsupported media type",
-            }, 415
-        return dict(token=generate_token(current_user))
+    ts = None
+
+    # @route('/jwt/token', methods=['POST'])
+    # def jwt_token(self):
+    #     """
+    #     Given valid user credentials, return a JWT token
+    #     """
+    #     options = request_register_options.parse_args()
+    #
+    #     #TODO attempt user login
+    #     if not current_user.is_authenticated():
+    #         return {
+    #             "status": 401,
+    #             "message": "No user authenticated",
+    #         }, 401, {"WWW-Authenticate": "None"}
+    #
+    #     return dict(token=generate_token(current_user))
 
     @route('/register', methods=['POST'])
     def register_user(self):
-        data = request_register_options.parse_args()
+
         schema = RELS['v1.AuthView:register'][request.method]
+        data = request_register_options.parse_args()
 
         try:
             validate(data, schema, format_checker=FormatChecker())
-            register_user(email=data['email'], password=data['password'])
+
+            password = encrypt_password(data['password'])
+            user = User.create(email=data['email'], password=password)
+            confirmation_link = self.generate_confirmation_link(user)
+
+            send_message(
+                subject='Please Confirm Your Fogmine Account',
+                sender="do-not-reply@fogmine.com",
+                recipients = [user.email],
+                html_body=render_template('email/activate.html', user=user, confirmation_link=confirmation_link),
+                text_body=render_template('email/activate.txt', user=user, confirmation_link=confirmation_link)
+            )
+
             return {'status': 201, 'message':'A confirmation email has been sent.'}, 201
         except ValidationError as e:
             return {
@@ -63,10 +81,31 @@ class AuthView(BaseView):
                 'message': e.message
             }, 400
 
-    @route('/confirm', methods=['POST'])
-    def confirm_user(self):
-        #TODO
-        return {'TO':'DO'}, 501
+    @route('/confirm', methods=['GET'])
+    def confirm_email(self):
+        if not self.ts:
+            self.ts = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+
+        args = request_confirm_options.parse_args()
+        token = args.get('token')
+
+        try:
+            email = self.ts.loads(token, salt="email-confirm-key", max_age=SECONDS_IN_A_DAY)
+            user = User.query.filter_by(email=email).first_or_404()
+            user.email_confirmed = True
+            user.save()
+        except BadSignature as e:
+            return {
+                'status': 401,
+                'message': "Invalid confirmation token."
+            }, 401, {"WWW-Authenticate": "None"}
+        except SignatureExpired as e:
+            return {
+                'status': 401,
+                'message': "Confirmation token has expired."
+            }, 401,  {"WWW-Authenticate": "None"}
+
+        return {'status':200, 'message': 'Account confirmed.'}
 
     @route('/change', methods=['POST'])
     @secure_endpoint()
@@ -78,4 +117,12 @@ class AuthView(BaseView):
     def reset_password(self):
         #TODO
         return {'TO':'DO'}, 501
+
+    def generate_confirmation_link(self, user):
+        """Generates a random link for confirming emails with timestamp for expiry"""
+        if not self.ts:
+            self.ts = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+
+        token = self.ts.dumps(user.email, salt='email-confirm-key')
+        return url_for('v1.AuthView:confirm_email', token=token, _external=True)
 

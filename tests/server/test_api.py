@@ -16,6 +16,7 @@ from flask import url_for
 from jsonschema import Draft4Validator
 from flask_jwt import generate_token
 from tests.factories import UserFactory
+from app.models.users import User
 
 @pytest.fixture
 def user(apidb):
@@ -24,6 +25,10 @@ def user(apidb):
 @pytest.fixture
 def token(user):
     return generate_token(user)
+
+@pytest.fixture
+def mail(apiapp):
+    return apiapp.extensions['mail']
 
 class TestAPI:
     """
@@ -117,14 +122,60 @@ class TestRegistration:
         resp.json['status'].should.equal(400)
         resp.json['message'].should.contain("is not a 'email'")
 
-    # def test_register_user(selfs, apidb, testapi):
-    #     data = {"email":"agent@secret.com", "password":"supersecret"}
-    #     resp = testapi.post_json(url_for('v1.AuthView:register_user'), data)
-    #
-    #     resp.status_code.should.equal(201)
-    #     resp.json['status'].should.equal(201)
-    #     resp.json['message'].should.contain("A confirmation email has been sent.")
+    def test_register_user(self, apidb, testapi):
+        data = {"email":"agent@secret.com", "password":"supersecret"}
+        resp = testapi.post_json(url_for('v1.AuthView:register_user'), data)
 
+        #test register user creates user but confirmed_at is not set
+        u = User.query.filter_by(email='agent@secret.com').first()
+
+        from flask_security.utils import verify_and_update_password
+        verify_and_update_password(user=u, password='supersecret').should_not.be.none
+        u.confirmed_at.should.be.none
+
+        return resp
+
+    def test_register_user_returns_201(self, apidb, testapi):
+        resp = self.test_register_user(apidb, testapi)
+        resp.status_code.should.equal(201)
+        resp.json['status'].should.equal(201)
+        resp.json['message'].should.contain("A confirmation email has been sent.")
+
+    def test_register_user_sends_confirmation_email(self, apidb, testapi, mail):
+        with mail.record_messages() as outbox:
+            self.test_register_user(apidb, testapi)
+            outbox.should.have.length_of(1)
+            m = outbox[0]
+            return m
+
+    def test_registered_but_unconfirmed_user_can_not_login(self, apidb, testapi):
+        self.test_register_user(apidb, testapi)
+        u = User.query.filter_by(email='agent@secret.com').first()
+        resp = testapi.post_json(url_for('jwt'), dict(username=u.email, password='supersecret'), expect_errors=True)
+        resp.status_code.should.equal(400)
+
+        resp.json['status_code'].should.equal(400)
+        resp.json['description'].should.equal('Invalid credentials')
+        resp.json['error'].should.equal('Bad Request')
+
+    def test_confirm_user(self, apidb, testapi, mail):
+        m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail)
+
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(m.html)
+        href = soup.a['href']
+        resp = testapi.get(href)
+
+        # confirmed user should receive not receive a token
+        resp.status_code.should.equal(200)
+        resp.json.get('token').should.be.none
+
+    def test_confirm_user_with_bad_token_401(self, apidb, testapi, mail):
+        m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail)
+        resp = testapi.get(url_for('v1.AuthView:confirm_email', token='notarealtoken'), expect_errors=True)
+        resp.status_code.should.equal(401)
+        resp.json['status'].should.equal(401)
+        resp.json['message'].should.contain('Invalid')
 
 class TestLinkRelation:
     """Test of API 'LinkRelation' resource"""

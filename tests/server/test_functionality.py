@@ -24,15 +24,15 @@ def user(apidb):
 
 class TestLoggingIn:
 
-    def test_jwt_log_in_returns_200_with_token(self, user, testapp):
+    def test_jwt_log_in_returns_200_with_token(self, user, testapi):
         data = dict(username=user.email, password='myprecious')
-        res = testapp.post_json('/auth', data)
+        res = testapi.post_json('/auth', data)
         assert res.status_code == 200
         assert 'token' in res.json
 
-    # def test_log_in_returns_200_with_email_on_page(self, user, testapp):
+    # def test_log_in_returns_200_with_email_on_page(self, user, testapi):
     #     # Goes to homepage
-    #     res = testapp.get("/")
+    #     res = testapi.get("/")
     #     # Clicks Login link
     #     res = res.click("Login")
     #     # Fills out login form
@@ -44,21 +44,21 @@ class TestLoggingIn:
     #     assert res.status_code == 200
     #     assert user.email in res
 
-    # def test_sees_login_link_on_log_out(self, user, testapp):
-    #     res = testapp.get("/login", expect_errors=True)
+    # def test_sees_login_link_on_log_out(self, user, testapi):
+    #     res = testapi.get("/login", expect_errors=True)
     #     # Fills out login form on the login page
     #     form = res.forms['login_form']
     #     form['email'] = user.email
     #     form['password'] = 'myprecious'
     #     # Submits
     #     res = form.submit().follow()
-    #     res = testapp.get(url_for('security.logout')).follow()
+    #     res = testapi.get(url_for('security.logout')).follow()
     #     # sees login link
     #     assert url_for('security.login') in res
     #
-    # def test_sees_error_message_if_password_is_incorrect(self, user, testapp):
+    # def test_sees_error_message_if_password_is_incorrect(self, user, testapi):
     #     # Goes to homepage
-    #     res = testapp.get("/login")
+    #     res = testapi.get("/login")
     #     # Fills out login form, password incorrect
     #     form = res.forms['login_form']
     #     form['email'] = user.email
@@ -68,9 +68,9 @@ class TestLoggingIn:
     #     # sees error
     #     assert "Invalid password" in res
     #
-    # def test_sees_error_message_if_username_doesnt_exist(self, user, testapp):
+    # def test_sees_error_message_if_username_doesnt_exist(self, user, testapi):
     #     # Goes to homepage
-    #     res = testapp.get("/login")
+    #     res = testapi.get("/login")
     #     # Fills out login form with an unknown email
     #     form = res.forms['login_form']
     #     form['email'] = 'unknown'
@@ -80,28 +80,28 @@ class TestLoggingIn:
     #     # sees error
     #     assert "user does not exist" in res
 
-    # def test_auth_jwt_token_succeeds_with_logged_in_user_and_json_post(self, user, testapp):
-    #     self.test_log_in_returns_200_with_email_on_page(user, testapp)
-    #     resp = testapp.post_json("/auth/jwt/token", {})
+    # def test_auth_jwt_token_succeeds_with_logged_in_user_and_json_post(self, user, testapi):
+    #     self.test_log_in_returns_200_with_email_on_page(user, testapi)
+    #     resp = testapi.post_json("/auth/jwt/token", {})
     #     assert resp.status_code == 200
     #     assert 'token' in resp.json
 
-    # def test_auth_jwt_token_fails_with_logged_in_user_and_non_json_post(self, user, testapp):
-    #     self.test_log_in_returns_200_with_email_on_page(user, testapp)
-    #     resp = testapp.post("/auth/jwt/token", {}, expect_errors=True)
+    # def test_auth_jwt_token_fails_with_logged_in_user_and_non_json_post(self, user, testapi):
+    #     self.test_log_in_returns_200_with_email_on_page(user, testapi)
+    #     resp = testapi.post("/auth/jwt/token", {}, expect_errors=True)
     #     assert resp.status_code == 415
 
-    def test_auth_jwt_token_fails_without_logged_in_user(self, user, testapp):
-        resp = testapp.post_json("/auth/jwt/token", {}, expect_errors=True)
-        assert resp.status_code == 401
+    # def test_auth_jwt_token_fails_without_logged_in_user(self, user, testapi):
+    #     resp = testapi.post_json("/auth/jwt/token", {}, expect_errors=True)
+    #     assert resp.status_code == 401
 
 
 # class TestRegistering:
 #
-#     def test_can_register(self, user, testapp):
+#     def test_can_register(self, user, testapi):
 #         old_count = len(User.all())
 #         # Goes to homepage
-#         res = testapp.get("/")
+#         res = testapi.get("/")
 #         # Clicks Create Account button
 #         res = res.click("Login")
 #         res = res.click("register")
@@ -116,9 +116,9 @@ class TestLoggingIn:
 #         # A new user was created
 #         assert len(User.all()) == old_count + 1
 #
-#     def test_sees_error_message_if_the_password_is_too_short(self, user, testapp):
+#     def test_sees_error_message_if_the_password_is_too_short(self, user, testapi):
 #         # Goes to registration page
-#         res = testapp.get(url_for("security.register"))
+#         res = testapi.get(url_for("security.register"))
 #         # Fills out registration form, but password is too short
 #         form = res.forms["register_form"]
 #         form['email'] = 'foo@bar.com'
@@ -129,9 +129,9 @@ class TestLoggingIn:
 #         # sees error
 #         assert "Password must be at least 6 characters" in res
 #
-#     def test_sees_error_message_if_passwords_dont_match(self, user, testapp):
+#     def test_sees_error_message_if_passwords_dont_match(self, user, testapi):
 #         # Goes to registration page
-#         res = testapp.get(url_for("security.register"))
+#         res = testapi.get(url_for("security.register"))
 #         # Fills out form, but passwords don't match
 #         form = res.forms["register_form"]
 #         form['email'] = 'foobar'
@@ -143,11 +143,11 @@ class TestLoggingIn:
 #         # sees error message
 #         assert "Passwords do not match" in res
 #
-#     def test_sees_error_message_if_user_already_registered(self, user, testapp):
+#     def test_sees_error_message_if_user_already_registered(self, user, testapi):
 #         user = UserFactory(active=True)  # A registered user
 #         user.save()
 #         # Goes to registration page
-#         res = testapp.get(url_for("security.register"))
+#         res = testapi.get(url_for("security.register"))
 #         # Fills out form, but username is already registered
 #         form = res.forms["register_form"]
 #         form['email'] = user.email

@@ -9,7 +9,7 @@ backend via a Hypermedia Application Language (HAL) REST interface.
 
 Installation (Server)
 ---------------------
-Install Python 2.7.x, pip and virtualenv
+Install Python 2.7.x, pip, virtualenv
 ```
 $ sudo apt-get update
 $ sudo apt-get install python2.7 python-setuptools libxml2-dev libxslt-dev python-dev lib32z1-dev
@@ -17,6 +17,9 @@ $ sudo easy_install pip
 $ sudo pip install virtualenv
 ```
 ** Note ** mac users should run ``` xcode-select --install``` for libxml support
+
+Install [Redis](http://vvv.tobiassjosten.net/linux/installing-redis-on-ubuntu-with-apt/) -- TODO add instructions
+Install PostGreSQL -- TODO need instructions
 
 Create and activate the virtual environment
 ```

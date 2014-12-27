@@ -23,13 +23,18 @@ _datastore = LocalProxy(lambda: _security.datastore)
 
 def authenticate(username, password):
     user = _datastore.get_user(username)
-    if user and verify_and_update_password(password, user):
+
+    if user and user.confirmed_at and verify_and_update_password(password, user):
         _log.info("%s authenticated successfully", username)
         return user
+
     if not user:
         _log.warn("Authentication failed; unknown username %s", username)
     else:
         _log.warn("Authentication failed; invalid password for %s", username)
+
+    if user and not user.confirmed_at:
+        _log.warn("Account has not been confirmed!")
 
 
 def load_user(payload):
