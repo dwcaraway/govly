@@ -28,7 +28,6 @@ module.exports = function(config) {
       'bower_components/angulartics/src/angulartics-ga.js',
       'bower_components/angular-jwt/dist/angular-jwt.js',
       'frontend/scripts/**/*.js',
-//      'tests/client/spec/mock/**/*.js',
       'tests/client/spec/**/*.js'
     ],
 
@@ -47,7 +46,7 @@ module.exports = function(config) {
     // - PhantomJS
     // - IE (only Windows)
     browsers: [
-      'PhantomJS'
+      'PhantomJS',
     ],
 
     // Which plugins to enable

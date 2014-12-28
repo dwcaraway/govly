@@ -18,7 +18,9 @@ angular
     'ngTouch',
     'angulartics',
     'angulartics.google.analytics',
-        'angular-jwt'
+    'angular-jwt',
+    'schemaForm',
+    'CommonService'
   ])
   .config(function ($routeProvider) {
     $routeProvider
