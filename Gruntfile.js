@@ -401,7 +401,18 @@ module.exports = function (grunt) {
         configFile: '<%=yeoman.test%>/karma.conf.js',
         singleRun: true
       }
-    }
+    },
+
+    // SauceLabs testing for running multiple concurrent tests
+      sauce_connect: {
+          your_target: {
+              // Target-specific file lists and/or options go here.
+              options: {
+                  username: process.env.SAUCE_USER,
+                  accessKey: process.env.SAUCE_API_KEY
+              }
+          }
+      }
   });
 
 
@@ -432,6 +443,12 @@ module.exports = function (grunt) {
     'autoprefixer',
     'connect:test',
     'karma'
+  ]);
+
+  grunt.registerTask('test-sauce', [
+      'sauce_connect:your_target',
+      'test',
+      'sauce-connect-close'
   ]);
 
   grunt.registerTask('build', [
