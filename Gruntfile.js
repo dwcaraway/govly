@@ -450,6 +450,24 @@ module.exports = function (grunt) {
                   }
               }
           }
+      },
+
+
+      protractor: {
+          options: {
+              keepAlive: true,
+              configFile: "tests/client/protractor.conf.js"
+          },
+          run: {}
+      },
+
+      protractor_webdriver: {
+          options: {
+              // Task-specific options go here.
+          },
+          your_target: {
+              // Target-specific file lists and/or options go here.
+          }
       }
 
   });
@@ -476,19 +494,34 @@ module.exports = function (grunt) {
     grunt.task.run(['serve:' + target]);
   });
 
-  grunt.registerTask('test', [
-    'clean:server',
-//    'wiredep:test',
-    'ngconstant:development',
-    'concurrent:test',
-    'autoprefixer',
-    'connect:test',
-    'karma'
-  ]);
+    grunt.registerTask('test', 'Run unit or end-to-end tests', function (target) {
+        if (target === 'e2e') {
+            return grunt.task.run([
+                'clean:server',
+                'ngconstant:development',
+                'concurrent:test',
+                'autoprefixer',
+                'connect:test',
+                'protractor_webdriver',
+                'protractor:run'
+            ]);
+        }
+
+        grunt.task.run([
+            'clean:server',
+            'ngconstant:development',
+            'concurrent:test',
+            'autoprefixer',
+            'connect:test',
+            'karma'
+        ]);
+
+    });
 
   grunt.registerTask('test-sauce', [
       'sauce_connect:your_target',
       'test',
+      'test:e2e',
       'sauce-connect-close'
   ]);
 
