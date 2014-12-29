@@ -158,6 +158,14 @@ class TestRegistration:
         resp.json['description'].should.equal('Invalid credentials')
         resp.json['error'].should.equal('Bad Request')
 
+
+    def test_user_may_not_register_twice(self, apidb, testapi, user):
+        resp = testapi.post_json(url_for('v1.AuthView:register_user'), dict(email=user.email, password='doesnt_matter'), expect_errors=True)
+        resp.status_code.should.equal(409)
+        resp.json['status'].should.equal(409)
+        resp.json['description'].should.contain('email already exists')
+
+
     def test_confirm_user(self, apidb, testapi, mail):
         m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail)
 

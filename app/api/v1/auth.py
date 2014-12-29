@@ -63,6 +63,9 @@ class AuthView(BaseView):
         try:
             validate(data, schema, format_checker=FormatChecker())
 
+            if User.query.filter_by(email=data['email']).first():
+                return {'status': 409, 'description':'An account with that email already exists.'}, 409
+
             password = encrypt_password(data['password'])
             user = User.create(email=data['email'], password=password)
             confirmation_link = self.generate_confirmation_link(user)
