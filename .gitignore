@@ -6,6 +6,7 @@ build
 libs
 env
 .idea
+config.js
 *.ipynb*
 dist
 *.swp
