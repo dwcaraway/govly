@@ -505,6 +505,17 @@ module.exports = function (grunt) {
                 'protractor_webdriver',
                 'protractor:run'
             ]);
+        }else if (target === 'all'){
+            return grunt.task.run([
+                'clean:server',
+                'ngconstant:development',
+                'concurrent:test',
+                'autoprefixer',
+                'connect:test',
+                'protractor_webdriver',
+                'karma',
+                'protractor:run'
+            ]);
         }
 
         grunt.task.run([
@@ -520,8 +531,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('test-sauce', [
       'sauce_connect:your_target',
-      'test',
-      'test:e2e',
+      'test:all',
       'sauce-connect-close'
   ]);
 
