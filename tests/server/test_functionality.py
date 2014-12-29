@@ -26,7 +26,7 @@ class TestLoggingIn:
 
     def test_jwt_log_in_returns_200_with_token(self, user, testapi):
         data = dict(username=user.email, password='myprecious')
-        res = testapi.post_json('/auth', data)
+        res = testapi.post_json(url_for('jwt'), data)
         assert res.status_code == 200
         assert 'token' in res.json
 

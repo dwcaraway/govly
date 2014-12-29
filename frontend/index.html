@@ -14,6 +14,7 @@
     <!-- build:css(.tmp) styles/main.css -->
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
+
   </head>
   <body ng-app="vitalsApp">
     <!--[if lt IE 7]>
@@ -24,18 +25,14 @@
     <div class="container">
       <div class="header">
         <ul class="nav nav-pills pull-right">
-          <li class="active"><a ng-href="#">Home</a></li>
-          <li><a ng-href="#/about">About</a></li>
-          <li><a ng-href="#">Contact</a></li>
+          <li class="active"><a ng-href="#/">Home</a></li>
+          <li><a ng-href="#/register">Register</a></li>
         </ul>
-        <h3 class="text-muted">vitals</h3>
+        <h3 class="text-muted"><i class="fa fa-line-chart"></i>Fogmine</h3>
       </div>
 
       <div ng-view=""></div>
 
-      <div class="footer">
-        <p><span class="glyphicon glyphicon-heart"></span> from the Yeoman team</p>
-      </div>
     </div>
 
     <script>
@@ -107,9 +104,9 @@
         <!-- build:js({.tmp,frontend}) scripts/scripts.js -->
         <script src="scripts/app.js"></script>
         <script src="scripts/controllers/main.js"></script>
-        <script src="scripts/controllers/about.js"></script>
         <script src="scripts/controllers/register.js"></script>
         <script src="scripts/services/CommonService.js"></script>
+        <script src="scripts/config.js" />
         <!-- endbuild -->
 </body>
 </html>

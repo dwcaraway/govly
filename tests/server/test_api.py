@@ -71,7 +71,7 @@ class TestAPI:
 
     def test_jwt_log_in_returns_200_with_token(self, user, testapi):
         data = dict(username=user.email, password='myprecious')
-        resp = testapi.post_json('/auth', data)
+        resp = testapi.post_json(url_for('jwt'), data)
         assert resp.status_code == 200
         assert 'token' in resp.json
         return resp.json['token']
@@ -81,7 +81,7 @@ class TestLoggingIn:
 
     def test_jwt_log_in_returns_200_with_token(self, user, testapi):
         data = dict(username=user.email, password='myprecious')
-        resp = testapi.post_json('/auth', data)
+        resp = testapi.post_json(url_for('jwt'), data)
         assert resp.status_code == 200
         assert 'token' in resp.json
         return resp.json['token']

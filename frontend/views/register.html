@@ -1,8 +1,11 @@
 <div class="container">
-    <h1>Register for Access</h1>
-
-    <div ng-controller="RegisterCtrl">
-        <form sf-schema="schema" sf-form="form" sf-model="model"></form>
-    </div>
+    <h1>Register</h1>
+    <form novalidate role="form">
+        <label for="registerInputEmail">Email</label>
+        <input id="registerInputEmail" type="email" class="form-control" required ng-model="user.email">
+        <label for="registerInputPassword">Password</label>
+        <input type="password" name="password" class="form-control" required ng-model="user.password">
+        <input type="submit" value="Register" class="btn btn-default" ng-click="register()"/>
+    </form>
 </div>
 

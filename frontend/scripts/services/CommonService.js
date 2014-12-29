@@ -1,15 +1,14 @@
-'use strict'
+'use strict';
 
-angular.module('CommonService', [])
-    .factory('LinkRelation', ['$log', '$http', function ($log, $http) {
-        var SCHEMA_URL = 'https://api.fogmine.com/rels';
+angular.module('CommonService', ['config'])
+    .factory('LinkRelation', ['$log', '$http', 'ENV', function ($log, $http, ENV) {
+        var SCHEMA_URL = ENV.apiEndpoint+'/rels';
         var schemas = {};
 
         $http.get(SCHEMA_URL).success(function (data) {
-            $log.debug('schemas: ' + JSON.stringify(data));
             schemas = data;
-        }).error(function (status) {
-            $log.debug('could not reach server');
+        }).error(function () {
+            $log.warn('could not reach server');
         });
 
         var getSchemas = function() {
@@ -17,4 +16,22 @@ angular.module('CommonService', [])
         };
 
         return {'getSchemas':getSchemas};
+    }])
+    .factory('Security', ['$http', 'ENV', function ($http, ENV) {
+       var AUTH_BASE_URL = ENV.apiEndpoint + '/auth';
+
+        var register = function(user, success_callback, error_callback){
+            $http.post(AUTH_BASE_URL+'/register', user).
+            success(success_callback).
+            error(error_callback);
+        };
+
+        var confirm = function(token, success_callback, error_callback){
+            $http.post(AUTH_BASE_URL+'/confirm?token='+token, user).
+            success(success_callback).
+            error(error_callback);
+        };
+
+        return {'register': register, 'confirm': confirm};
+
     }]);

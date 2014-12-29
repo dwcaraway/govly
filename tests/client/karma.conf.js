@@ -27,6 +27,10 @@ module.exports = function(config) {
       'bower_components/angulartics/src/angulartics.js',
       'bower_components/angulartics/src/angulartics-ga.js',
       'bower_components/angular-jwt/dist/angular-jwt.js',
+      'bower_components/tv4/tv4.js',
+      'bower_components/objectpath/lib/ObjectPath.js',
+      'bower_components/angular-schema-form/dist/schema-form.min.js',
+      'bower_components/angular-schema-form/dist/bootstrap-decorator.min.js',
       'frontend/scripts/**/*.js',
       'tests/client/spec/**/*.js'
     ],

@@ -19,6 +19,7 @@ from ..base import BaseView, secure_endpoint
 from .rel import RELS
 from app.models.users import User
 from jsonschema import validate, ValidationError, FormatChecker
+from urlparse import urljoin
 
 from itsdangerous import URLSafeTimedSerializer
 from flask import current_app, url_for
@@ -124,5 +125,5 @@ class AuthView(BaseView):
             self.ts = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
 
         token = self.ts.dumps(user.email, salt='email-confirm-key')
-        return url_for('v1.AuthView:confirm_email', token=token, _external=True)
+        return urljoin(current_app.config['CLIENT_DOMAIN'], url_for('v1.AuthView:confirm_email', token=token))
 

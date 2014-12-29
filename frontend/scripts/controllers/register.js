@@ -8,29 +8,17 @@
  * Controller of the vitalsApp
  */
 angular.module('vitalsApp')
-    .controller('RegisterCtrl', ['LinkRelation', '$scope', function (LinkRelation, $scope) {
+    .controller('RegisterCtrl', ['LinkRelation', 'Security', '$scope', '$http','$log' ,function (LinkRelation, Security, $scope, $http, $log) {
 
-//        $scope.schema = LinkRelation.getSchemas().event;
-$scope.schema =  {
-            "$schema": "http://json-schema.org/schema#",
+        $scope.user = {};
 
-            "type": "object",
-            "properties": {
-                "password": {"type": "string", "minLength":8, "maxLength":120
-},
-                "email": {"type": "string", "format":"email"}
-            },
-            "required": ["email", "password"]
+        $scope.register = function(){
+            Security.register($scope.user, function(){
+                $log.info('Registration successful. A confirmation email has been sent.');
+            }, function(){
+                $log.info('Registration failed!');
+            });
+
         }
-
-        $scope.form = [
-            "*",
-            {
-                type: "submit",
-                title: "Save"
-            }
-        ];
-
-        $scope.model = {};
 
     }]);

@@ -19,6 +19,8 @@ class Config(object):
     TESTING = False
     SECRET_KEY = os.environ.get('SECRET_KEY', 'super secret key - override with instance configuration')
 
+    CLIENT_DOMAIN = 'http://localhost:9000'
+
     # Database
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'postgresql://vitals:vitals@localhost:5432/vitalsdev')
 
@@ -91,6 +93,8 @@ class Config(object):
 class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
+
+    CLIENT_DOMAIN = 'https://dash.fogmine.com'
 
     # Flask-Mail
     MAIL_SERVER = 'smtp.sendgrid.net'

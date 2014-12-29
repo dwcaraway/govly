@@ -9,10 +9,14 @@
 
     templated from https://github.com/ryanolson/cookiecutter-webapp
 """
-class TestingConfig:
+from app.settings import Config
+
+class TestingConfig(Config):
     DEBUG = True
     TESTING = True
     SECRET_KEY = 'testing-secret-key'
+
+    CLIENT_DOMAIN = 'http://localhost:9000'
 
     PRESERVE_CONTEXT_ON_EXCEPTION = False
 
