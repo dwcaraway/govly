@@ -1,11 +1,30 @@
 <div class="container">
     <h1>Register</h1>
-    <form novalidate role="form">
-        <label for="registerInputEmail">Email</label>
-        <input id="registerInputEmail" type="email" class="form-control" required ng-model="user.email">
-        <label for="registerInputPassword">Password</label>
-        <input type="password" name="password" class="form-control" required ng-model="user.password">
-        <input type="submit" value="Register" class="btn btn-default" ng-click="register()"/>
+
+    <form name="registerForm" novalidate role="form" ng-submit="register(registerForm.$valid)">
+        <alert ng-repeat="alert in alerts" type="{{ alert.type }}" close="closeAlert($index)">{{ alert.msg }}</alert>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input name="email" type="email" class="form-control" required ng-model="user.email">
+              <span class="error" ng-show="registerForm.email.$error.required">
+      Required!</span>
+    <span class="error" ng-show="registerForm.email.$error.email">
+      Not valid email!</span>
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" class="form-control" required ng-minlength="5"
+                   ng-model="user.password">
+            <!--       <button ng-click="displayPassword = !displayPassword" ng-if="displayPassword">{{ true: 'Show', false: 'Hide' }} Password</button> -->
+                      <span class="error" ng-show="registerForm.password.$error.required">
+      Required!</span>
+
+            <p ng-show="registerForm.password.$error.minlength" class="help-block">Password is too short.</p>
+        </div>
+
+        <button id="registerSubmit" type="submit" class="btn btn-primary" ng-disabled="registerForm.$invalid">Register</button>
     </form>
 </div>
 

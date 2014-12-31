@@ -452,6 +452,20 @@ module.exports = function (grunt) {
           }
       },
 
+      protractor_webdriver: {
+          e2eUpdate: {
+              options: {
+                  path: './node_modules/.bin/',
+                  command: 'webdriver-manager update --standalone'
+              }
+          },
+          e2eStart: {
+              options: {
+                  path: './node_modules/.bin/',
+                  command: 'webdriver-manager start'
+              }
+          }
+      },
 
       protractor: {
           options: {
@@ -459,17 +473,7 @@ module.exports = function (grunt) {
               configFile: "tests/client/protractor.conf.js"
           },
           run: {}
-      },
-
-      protractor_webdriver: {
-          options: {
-              // Task-specific options go here.
-          },
-          your_target: {
-              // Target-specific file lists and/or options go here.
-          }
       }
-
   });
 
 
@@ -502,7 +506,7 @@ module.exports = function (grunt) {
                 'concurrent:test',
                 'autoprefixer',
                 'connect:test',
-                'protractor_webdriver',
+                'protractor_webdriver:e2eStart',
                 'protractor:run'
             ]);
         }else if (target === 'all'){
@@ -512,7 +516,7 @@ module.exports = function (grunt) {
                 'concurrent:test',
                 'autoprefixer',
                 'connect:test',
-                'protractor_webdriver',
+                'protractor_webdriver:e2eStart',
                 'karma',
                 'protractor:run'
             ]);

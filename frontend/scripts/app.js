@@ -20,6 +20,7 @@ angular
     'angulartics.google.analytics',
     'angular-jwt',
     'schemaForm',
+    'ui.bootstrap',
     'CommonService'
   ])
   .config(function ($routeProvider) {
