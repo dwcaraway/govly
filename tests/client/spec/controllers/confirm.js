@@ -5,20 +5,17 @@ describe('Controller: ConfirmationCtrl', function () {
   // load the controller's module
   beforeEach(module('vitalsApp'));
 
-  var RegisterCtrl,
-    scope, httpBackend;
+  var confirmationCtrl,
+    scope, httpBackend, routeParams;
 
   // Initialize the controller and a mock scope
-  beforeEach(inject(function ($controller, $rootScope, $httpBackend) {
+  beforeEach(inject(function ($controller, $rootScope, $httpBackend, $routeParams) {
     scope = $rootScope.$new();
-    RegisterCtrl = $controller('RegisterCtrl', {
+    confirmationCtrl = $controller('ConfirmationCtrl', {
       $scope: scope
     });
     httpBackend = $httpBackend;
+      routeParams = $routeParams;
   }));
-
-  it('should forward a token in the URL to the API', function () {
-      httpBackend.expectGET('http://localhost:5000/auth/confirm?token=foo');
-  });
 
 });

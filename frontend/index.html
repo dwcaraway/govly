@@ -16,7 +16,7 @@
     <!-- endbuild -->
 
   </head>
-  <body ng-app="vitalsApp">
+  <body ng-app="vitalsApp" ng-csp>
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
@@ -25,13 +25,13 @@
     <div class="container">
       <div class="header">
         <ul class="nav nav-pills pull-right">
-          <li class="active"><a ng-href="#/">Home</a></li>
-          <li><a ng-href="#/register">Register</a></li>
+          <li class="active"><a ui-sref="main">Home</a></li>
+          <li><a ui-sref="register">Register</a></li>
         </ul>
         <h3 class="text-muted"><i class="fa fa-line-chart"></i>Fogmine</h3>
       </div>
 
-      <div ng-view=""></div>
+      <div ui-view></div>
 
     </div>
 
@@ -68,10 +68,8 @@
     <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/modal.js"></script>
     <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tooltip.js"></script>
     <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/popover.js"></script>
-    <script src="bower_components/angular-animate/angular-animate.js"></script>
     <script src="bower_components/angular-cookies/angular-cookies.js"></script>
     <script src="bower_components/angular-resource/angular-resource.js"></script>
-    <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
     <script src="bower_components/angular-touch/angular-touch.js"></script>
     <script src="bower_components/jquery-waypoints/waypoints.js"></script>
@@ -94,12 +92,11 @@
     <script src="bower_components/angulartics/src/angulartics-marketo.js"></script>
     <script src="bower_components/angulartics/src/angulartics-intercom.js"></script>
     <script src="bower_components/angular-jwt/dist/angular-jwt.js"></script>
-    <script src="bower_components/tv4/tv4.js"></script>
-    <script src="bower_components/objectpath/lib/ObjectPath.js"></script>
-    <script src="bower_components/angular-schema-form/dist/schema-form.min.js"></script>
-    <script src="bower_components/angular-schema-form/dist/bootstrap-decorator.min.js"></script>
     <script src="bower_components/angular-mocks/angular-mocks.js"></script>
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+    <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="bower_components/angular-permission/dist/angular-permission.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
@@ -107,6 +104,7 @@
         <script src="scripts/app.js"></script>
         <script src="scripts/controllers/main.js"></script>
         <script src="scripts/controllers/register.js"></script>
+        <script src="scripts/controllers/confirm.js"></script>
         <script src="scripts/services/CommonService.js"></script>
         <script src="scripts/config.js" />
         <!-- endbuild -->

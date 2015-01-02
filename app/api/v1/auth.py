@@ -109,7 +109,7 @@ class AuthView(BaseView):
                 'message': "Confirmation token has expired."
             }, 401,  {"WWW-Authenticate": "None"}
 
-        return {'status':200, 'message': 'Account confirmed.'}
+        return {'status':200, 'message': 'Account confirmed.', 'token':generate_token(user)}
 
     @route('/change', methods=['POST'])
     @secure_endpoint()

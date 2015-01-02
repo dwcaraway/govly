@@ -174,9 +174,9 @@ class TestRegistration:
         href = soup.a['href']
         resp = testapi.get(href)
 
-        # confirmed user should receive not receive a token
+        # confirmed user should receive a token
         resp.status_code.should.equal(200)
-        resp.json.get('token').should.be.none
+        resp.json.get('token').should_not.be.none
 
     def test_confirm_user_with_bad_token_401(self, apidb, testapi, mail):
         m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail)
