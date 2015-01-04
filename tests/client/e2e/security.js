@@ -64,7 +64,7 @@ describe('vitals security', function () {
             browser.get('/#/confirm?token=foo');
         });
 
-        it('should forward a token in the URL to the API for validation', function () {
+        it('should notify the user of success when token is valid', function () {
             expect(element(by.css('div.alert-success')).isPresent()).toBeTruthy();
         });
 

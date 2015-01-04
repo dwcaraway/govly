@@ -18,6 +18,7 @@ class Config(object):
     DEBUG = True
     TESTING = False
     SECRET_KEY = os.environ.get('SECRET_KEY', 'super secret key - override with instance configuration')
+    EMAIL_CONFIRM_SALT = os.environ.get('EMAIL_CONFIRM_SALT', 'email-confirm-key')
 
     CLIENT_DOMAIN = 'http://localhost:9000'
 

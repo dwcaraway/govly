@@ -21,7 +21,7 @@ from app.models.users import User
 from jsonschema import validate, ValidationError, FormatChecker
 from urlparse import urljoin
 
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeTimedSerializer, TimestampSigner
 from flask import current_app, url_for
 from app.framework.utils import send_message
 from datetime import datetime
@@ -95,8 +95,18 @@ class AuthView(BaseView):
         token = args.get('token')
 
         try:
-            email = self.ts.loads(token, salt="email-confirm-key", max_age=SECONDS_IN_A_DAY*3)
+            email_signed = self.ts.loads(token, salt="email-confirm-key", max_age=SECONDS_IN_A_DAY*3)
+
+            groups = email_signed.split('.')
+            email = '.'.join(groups[:-2])
+
             user = User.query.filter_by(email=email).first_or_404()
+
+            if not user:
+                raise BadSignature
+
+            s = TimestampSigner(secret_key=user.secret)
+            payload = s.unsign(email_signed, max_age=SECONDS_IN_A_DAY*3)
 
             if user.confirmed_at:
                 return {
@@ -135,6 +145,8 @@ class AuthView(BaseView):
         if not self.ts:
             self.ts = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
 
-        token = self.ts.dumps(user.email, salt='email-confirm-key')
+        s = TimestampSigner(secret_key=user.secret)
+
+        token = self.ts.dumps(s.sign(user.email), salt=current_app.config["EMAIL_CONFIRM_SALT"])
         return urljoin(current_app.config['CLIENT_DOMAIN'], url_for('v1.AuthView:confirm_email', token=token))
 

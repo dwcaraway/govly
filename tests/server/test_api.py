@@ -164,7 +164,7 @@ class TestRegistration:
         resp = testapi.post_json(url_for('v1.AuthView:register_user'), dict(email=user.email, password='doesnt_matter'), expect_errors=True)
         resp.status_code.should.equal(409)
         resp.json['status'].should.equal(409)
-        resp.json['description'].should.contain('email already exists')
+        resp.json['message'].should.contain('email already exists')
 
 
     def test_confirm_user(self, apidb, testapi, mail):
@@ -192,6 +192,11 @@ class TestRegistration:
         resp2 = testapi.get(href, expect_errors=True)
 
         resp2.status_code.should.equal(409)
+
+    def test_user_may_not_use_expired_token(self, apidb, testapi, mail):
+        #Token used via itsdangerous.URLSafeTimedSerializer
+        old_token = {'secret':'super secret', 'salt':'salty', 'token':'ImZvbyI.B4ovjQ.UAh0LfwlwReM9_FTughkAHpvxkQ'}
+        resp = testapi.get(url_for('v1.AuthView:confirm_email', token='notarealtoken'), expect_errors=True)
 
     def get_confirmation_link_from_email(self, message):
 

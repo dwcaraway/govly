@@ -14,7 +14,7 @@ import logging
 from flask import request
 from flask.ext.classy import FlaskView
 from flask.ext.jwt import verify_jwt, JWTError
-from flask.ext.restful import Api as RestfulAPI, Resource
+from flask.ext.restful import Api as RestfulAPI
 from flask.ext.restful import abort, representations, fields
 from flask.ext.restful.representations.json import output_json
 from flask.ext.restful.reqparse import RequestParser
