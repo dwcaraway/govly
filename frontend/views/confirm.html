@@ -1,7 +1,7 @@
-<div class="container">
+<div class="container" ng-controller="ConfirmationCtrl">
     <h1>Account Confirmation</h1>
 
-    <alert ng-repeat="alert in alerts" type="{{ alert.type }}" close="closeAlert($index)">{{ alert.msg }}</alert>
+        <alert ng-repeat="alert in alerts" type="{{ alert.type }}" close="closeAlert($index)">{{ alert.msg }}</alert>
 
 </div>
 

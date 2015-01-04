@@ -27,7 +27,7 @@ angular.module('CommonService', ['config'])
         };
 
         var confirm = function(token, success_callback, error_callback){
-            $http.post(AUTH_BASE_URL+'/confirm?token='+token, user).
+            $http.get(AUTH_BASE_URL+'/confirm?token='+token).
             success(success_callback).
             error(error_callback);
         };

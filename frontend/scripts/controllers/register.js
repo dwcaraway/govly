@@ -13,20 +13,17 @@ angular.module('vitalsApp')
         $scope.alerts = [];
 
         var alertOnError = function (data, status) {
-            var msg;
-
+            $log.debug('data='+data +', status= '+status);
             if (status === 0) {
-                msg = 'No connection';
-            } else if (status == 409) {
-                msg = 'Email address already registered.';
-            } else if (status == 500) {
-                msg = 'Internal Server Error';
-            } else {
-                msg = 'Registration failed!';
-            }
-            $scope.alerts = [
-                {type: 'danger', msg: msg}
+                            $scope.alerts = [
+                {type: 'danger', msg: 'No connection!'}
             ];
+            }else{
+                            $scope.alerts = [
+                {type: 'danger', msg: data.message}
+            ];
+            }
+
         };
 
         $scope.register = function(isValid){

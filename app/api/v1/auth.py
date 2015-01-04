@@ -24,6 +24,7 @@ from urlparse import urljoin
 from itsdangerous import URLSafeTimedSerializer
 from flask import current_app, url_for
 from app.framework.utils import send_message
+from datetime import datetime
 
 request_register_options = RequestParser()
 request_register_options.add_argument('email', type=str, location='json', required=True)
@@ -64,7 +65,7 @@ class AuthView(BaseView):
             validate(data, schema, format_checker=FormatChecker())
 
             if User.query.filter_by(email=data['email']).first():
-                return {'status': 409, 'description':'An account with that email already exists.'}, 409
+                return {'status': 409, 'message':'An account with that email already exists.'}, 409
 
             password = encrypt_password(data['password'])
             user = User.create(email=data['email'], password=password)
@@ -94,20 +95,27 @@ class AuthView(BaseView):
         token = args.get('token')
 
         try:
-            email = self.ts.loads(token, salt="email-confirm-key", max_age=SECONDS_IN_A_DAY)
+            email = self.ts.loads(token, salt="email-confirm-key", max_age=SECONDS_IN_A_DAY*3)
             user = User.query.filter_by(email=email).first_or_404()
-            user.email_confirmed = True
+
+            if user.confirmed_at:
+                return {
+                    'status': 409,
+                    'message': 'Email already confirmed'
+                }, 409
+
+            user.confirmed_at = datetime.now()
             user.save()
         except BadSignature as e:
             return {
-                'status': 401,
-                'message': "Invalid confirmation token."
-            }, 401, {"WWW-Authenticate": "None"}
+                'status': 409,
+                'message': "Invalid confirmation token"
+            }, 409
         except SignatureExpired as e:
             return {
-                'status': 401,
+                'status': 409,
                 'message': "Confirmation token has expired."
-            }, 401,  {"WWW-Authenticate": "None"}
+            }, 409
 
         return {'status':200, 'message': 'Account confirmed.', 'token':generate_token(user)}
 

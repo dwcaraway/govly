@@ -47,7 +47,7 @@ angular
 
           })
           .state('confirm', {
-            url: '/confirm',
+            url: '/confirm?token',
                 templateUrl: 'views/confirm.html',
               controller: 'ConfirmationCtrl'
         })

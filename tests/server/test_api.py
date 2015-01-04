@@ -17,6 +17,7 @@ from jsonschema import Draft4Validator
 from flask_jwt import generate_token
 from tests.factories import UserFactory
 from app.models.users import User
+from bs4 import BeautifulSoup
 
 @pytest.fixture
 def user(apidb):
@@ -169,21 +170,35 @@ class TestRegistration:
     def test_confirm_user(self, apidb, testapi, mail):
         m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail)
 
-        from bs4 import BeautifulSoup
-        soup = BeautifulSoup(m.html)
-        href = soup.a['href']
+        href = self.get_confirmation_link_from_email(m)
         resp = testapi.get(href)
 
         # confirmed user should receive a token
         resp.status_code.should.equal(200)
         resp.json.get('token').should_not.be.none
 
-    def test_confirm_user_with_bad_token_401(self, apidb, testapi, mail):
+    def test_confirm_user_with_bad_token_409(self, apidb, testapi, mail):
         m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail)
         resp = testapi.get(url_for('v1.AuthView:confirm_email', token='notarealtoken'), expect_errors=True)
-        resp.status_code.should.equal(401)
-        resp.json['status'].should.equal(401)
+        resp.status_code.should.equal(409)
+        resp.json['status'].should.equal(409)
         resp.json['message'].should.contain('Invalid')
+
+    def test_user_may_not_confirm_twice(self, apidb, testapi, mail):
+        m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail)
+
+        href = self.get_confirmation_link_from_email(m)
+        resp1 = testapi.get(href)
+        resp2 = testapi.get(href, expect_errors=True)
+
+        resp2.status_code.should.equal(409)
+
+    def get_confirmation_link_from_email(self, message):
+
+        """Retrieves the confirmation link from the message"""
+
+        soup = BeautifulSoup(message.html)
+        return soup.a['href']
 
 class TestLinkRelation:
     """Test of API 'LinkRelation' resource"""
