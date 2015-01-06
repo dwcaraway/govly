@@ -51,6 +51,16 @@ angular
                 templateUrl: 'views/confirm.html',
               controller: 'ConfirmationCtrl'
         })
+        .state('login', {
+            url: '/login',
+                templateUrl: 'views/login.html',
+              controller: 'LoginCtrl',
+              data:{
+                  permissions: {
+                      only: ['anonymous']
+                  }
+              }
+        })
           .state('main', {
               url: '/',
               templateUrl: "views/main.html",

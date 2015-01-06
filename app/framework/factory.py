@@ -68,7 +68,7 @@ def create_app(package_name, package_path, settings_override=None,
     jwt.user_handler(load_user)
 
     # Flask-CORS
-    cors.init_app(app, supports_credentials=True)
+    cors.init_app(app, allow_headers=['Content-Type','Authorization'], supports_credentials=True)
 
     # Flask-SSLify to force SSL - only for production
     if not app.debug and not app.testing:

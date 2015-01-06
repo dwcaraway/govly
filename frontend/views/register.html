@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container" ng-controller="RegisterCtrl">
     <h1>Register</h1>
 
     <form name="registerForm" novalidate role="form" ng-submit="register(registerForm.$valid)">
@@ -7,9 +7,9 @@
         <div class="form-group">
             <label>Email</label>
             <input name="email" type="email" class="form-control" required ng-model="user.email">
-              <span class="error" ng-show="registerForm.email.$error.required">
+              <span class="help-block" ng-show="registerForm.email.$dirty && registerForm.email.$error.required">
       Required!</span>
-    <span class="error" ng-show="registerForm.email.$error.email">
+    <span class="help-block" ng-show="registerForm.email.$dirty && registerForm.email.$error.email">
       Not valid email!</span>
         </div>
 
@@ -18,13 +18,16 @@
             <input type="password" name="password" class="form-control" required ng-minlength="5"
                    ng-model="user.password">
             <!--       <button ng-click="displayPassword = !displayPassword" ng-if="displayPassword">{{ true: 'Show', false: 'Hide' }} Password</button> -->
-                      <span class="error" ng-show="registerForm.password.$error.required">
+                      <span class="help-block"
+                            ng-show="registerForm.password.$dirty && registerForm.password.$error.required">
       Required!</span>
 
-            <p ng-show="registerForm.password.$error.minlength" class="help-block">Password is too short.</p>
+            <p ng-show="registerForm.password.$dirty && registerForm.password.$error.minlength" class="help-block">
+                Password is too short.</p>
         </div>
 
-        <button id="registerSubmit" type="submit" class="btn btn-primary" ng-disabled="registerForm.$invalid">Register</button>
+        <button id="registerSubmit" type="submit" class="btn btn-primary" ng-disabled="registerForm.$invalid">Register
+        </button>
     </form>
 </div>
 

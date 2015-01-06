@@ -18,6 +18,7 @@ from flask_jwt import generate_token
 from tests.factories import UserFactory
 from app.models.users import User
 from bs4 import BeautifulSoup
+import re
 
 @pytest.fixture
 def user(apidb):
@@ -69,14 +70,6 @@ class TestAPI:
         for schema in resp.json.itervalues():
             schema_errors = Draft4Validator.check_schema(schema)
             schema_errors.should.be.none
-
-    def test_jwt_log_in_returns_200_with_token(self, user, testapi):
-        data = dict(username=user.email, password='myprecious')
-        resp = testapi.post_json(url_for('jwt'), data)
-        assert resp.status_code == 200
-        assert 'token' in resp.json
-        return resp.json['token']
-
 
 class TestLoggingIn:
 
@@ -203,7 +196,9 @@ class TestRegistration:
         """Retrieves the confirmation link from the message"""
 
         soup = BeautifulSoup(message.html)
-        return soup.a['href']
+        token = re.search('token=(.*)', soup.a['href']).group(1)
+        return url_for('v1.AuthView:confirm_email', token=token)
+
 
 class TestLinkRelation:
     """Test of API 'LinkRelation' resource"""

@@ -148,5 +148,5 @@ class AuthView(BaseView):
         s = TimestampSigner(secret_key=user.secret)
 
         token = self.ts.dumps(s.sign(user.email), salt=current_app.config["EMAIL_CONFIRM_SALT"])
-        return urljoin(current_app.config['CLIENT_DOMAIN'], url_for('v1.AuthView:confirm_email', token=token))
+        return urljoin(current_app.config['CLIENT_DOMAIN'], '/#/confirm?token='+token)
 

@@ -21,17 +21,17 @@ angular.module('CommonService', ['config'])
        var AUTH_BASE_URL = ENV.apiEndpoint + '/auth';
 
         var register = function(user, success_callback, error_callback){
-            $http.post(AUTH_BASE_URL+'/register', user).
-            success(success_callback).
-            error(error_callback);
+            return $http.post(AUTH_BASE_URL+'/register', user);
         };
 
         var confirm = function(token, success_callback, error_callback){
-            $http.get(AUTH_BASE_URL+'/confirm?token='+token).
-            success(success_callback).
-            error(error_callback);
+            return $http.get(AUTH_BASE_URL+'/confirm?token='+token);
         };
 
-        return {'register': register, 'confirm': confirm};
+        var login = function(username, password){
+            return $http.post(AUTH_BASE_URL+'/login', {'username':username, 'password':password});
+        };
+
+        return {'register': register, 'confirm': confirm, 'login': login};
 
     }]);
