@@ -86,7 +86,7 @@ class Config(object):
     }
 
     #Flask-CORS
-    CORS_HEADERS = 'Content-Type' #allow browsers to cross origin POST JSON, which is an OPTIONS followed by POST
+    CORS_ALLOW_HEADERS = ['Authorization', 'Content-Type'] #allow browsers to cross origin PUT and POST JSON, which is an OPTIONS followed by POST
 
     #Flask-JWT
     JWT_AUTH_URL_RULE = '/auth/login'
@@ -104,6 +104,9 @@ class ProductionConfig(Config):
     MAIL_USE_TLS = False
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+
+    #Flask-CORS
+    CORS_ALLOW_ORIGINS='https://dash.fogmine.com'
 
 class DevelopmentConfig(Config):
     DEBUG = True

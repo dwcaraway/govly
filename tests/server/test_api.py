@@ -105,6 +105,17 @@ class TestLoggingIn:
         assert resp.json['error'] == 'Invalid JWT'
         assert resp.json['description'] == 'Invalid secret'
 
+    def test_cors_allows_authorization_header(self, token, testapi):
+        """Verify that cross origin CORS posts with Authorization header are allowed"""
+        resp = testapi.options("/secure", headers={
+            "Authorization": "Bearer {token}".format(token=token),
+            'Access-Control-Request-Method': 'GET'
+        })
+
+        resp.headers.get('Access-Control-Allow-Origin').should.equal('*')
+        resp.headers.get('Access-Control-Allow-Headers').should.contain('Content-Type')
+        resp.headers.get('Access-Control-Allow-Headers').should.contain('Authorization')
+
 class TestRegistration:
     """Test user registration via the API"""
 
