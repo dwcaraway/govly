@@ -48,7 +48,7 @@ angular
           })
           .state('confirm', {
             url: '/confirm?token',
-                templateUrl: 'views/confirm.html',
+              templateUrl: 'views/confirm.html',
               controller: 'ConfirmationCtrl'
         })
         .state('login', {
@@ -76,7 +76,7 @@ angular
     .run(function (Permission) {
       // Define anonymous role
       Permission.defineRole('anonymous', function (stateParams) {
-        // If the returned value is *truthy* then the user has the role, otherwise they don't
-        return true;
+          //If token not set in storage, then user is anonymous
+          return localStorage.getItem('fogmine-token') === null;
       });
     });

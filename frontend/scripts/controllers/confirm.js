@@ -12,9 +12,7 @@ angular.module('vitalsApp')
         var token = $stateParams.token;
 
         if (token) {
-            $scope.alertss = [
-                {type: 'warning', msg: 'Contacting server...'}
-            ];
+            $log.debug('Contacting server')
 
             Security.confirm($stateParams.token).
                 success(
@@ -41,7 +39,7 @@ angular.module('vitalsApp')
                 });
         } else {
             $scope.alerts = [
-                {type: 'danger', msg: 'No token defined!'}
+                {type: 'danger', msg: 'Bad confirmation URL'}
             ];
         }
 
