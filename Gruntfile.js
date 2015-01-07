@@ -539,6 +539,10 @@ module.exports = function (grunt) {
       'sauce-connect-close'
   ]);
 
+  grunt.registerTask('pre-deploy', [
+      'ngconstant:production'
+  ]);
+
   grunt.registerTask('build', [
     'clean:dist',
     'wiredep',
