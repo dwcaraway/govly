@@ -8,39 +8,41 @@
  * Controller of the vitalsApp
  */
 angular.module('vitalsApp')
-    .controller('ConfirmationCtrl', ['Security', '$scope', '$stateParams', '$location', '$log', '$http', function (Security, $scope, $stateParams, $location, $log, $http) {
-
-        $log.info('Verifying token with server');
-
+    .controller('ConfirmationCtrl', ['Security', '$scope', '$stateParams', '$location', '$log', '$state', function (Security, $scope, $stateParams, $location, $log, $state) {
         var token = $stateParams.token;
 
         if (token) {
-            $scope.alertss = [{type: 'warning', msg: 'Contacting server...'}]
-            ;
-            $log.debug('token=' + $stateParams.token);
+            $scope.alertss = [
+                {type: 'warning', msg: 'Contacting server...'}
+            ];
 
-            $http.get('http://localhost:5000/auth/confirm?token=' + $stateParams.token).
+            Security.confirm($stateParams.token).
                 success(
-
-//        Security.confirm($stateParams.token,
                 function (data) {
                     $log.info('Confirmation successful');
-                    $scope.alerts = [{type: 'success', msg: 'Account Confirmed!'}];
+                    $scope.alerts = [
+                        {type: 'success', msg: 'Account Confirmed!'}
+                    ];
                     localStorage.setItem('fogmine-token', data.token);
-//                scope.$apply(function() { $location.path("/"); });
+                    $state.go('main');
                 }).error(
-//            ,
                 function (data, status) {
                     $log.warn('Confirmation failed');
 
                     if (status === 0) {
-                        $scope.alerts = [{type: 'danger', msg: "Unable to connect"}];
+                        $scope.alerts = [
+                            {type: 'danger', msg: "Unable to connect"}
+                        ];
                     } else {
-                        $scope.alerts = [{type: 'danger', msg: data.message}];
+                        $scope.alerts = [
+                            {type: 'danger', msg: data.message}
+                        ];
                     }
                 });
         } else {
-            $scope.alerts = [{type: 'danger', msg: 'No token defined!'}];
+            $scope.alerts = [
+                {type: 'danger', msg: 'No token defined!'}
+            ];
         }
 
         $scope.closeAlert = function (index) {
