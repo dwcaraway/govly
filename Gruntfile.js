@@ -218,6 +218,19 @@ module.exports = function (grunt) {
       }
     },
 
+  replace: {
+      production: {
+          src: ['<%= yeoman.dist %>/index.html'],   // source files array (supports minimatch)
+          dest: '<%= yeoman.dist %>/',             // destination directory or file
+          replacements: [
+              {
+                  from: 'UA-XXXXXXXX-X',
+                  to: 'UA-37455300-1'
+              }
+          ]
+      }
+  },
+
     // Renames files for browser caching purposes
     filerev: {
       dist: {
@@ -540,7 +553,8 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('pre-deploy', [
-      'ngconstant:production'
+      'ngconstant:production',
+      'replace:production'
   ]);
 
   grunt.registerTask('build', [
