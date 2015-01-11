@@ -1,23 +1,76 @@
-<div class="jumbotron">
-  <h1>'Allo, 'Allo!</h1>
-  <p class="lead">
-    <img src="images/yeoman.png" alt="I'm Yeoman"><br>
-    Always a pleasure scaffolding your apps.
-  </p>
-  <p><a class="btn btn-lg btn-success" ng-href="#">Splendid!<span class="glyphicon glyphicon-ok"></span></a></p>
+<div class="container" id="find" name="find" ng-controller="MainCtrl">
+    <h1 class="centered">Find Opportunities</h1>
+    <hr>
+    <div id="sidebar" class="col-sm-3 col-md-3" >
+        <form id="opps-form" novalidate role="form" class="form-inline">
+            <div id="form-search-grp">
+                <label class="sr-only" for="q">Search</label>
+                <input name="q" id="q" type="text" class="search-query" ng-model="filter.q" placeholder="Search..." autocomplete="off" >
+                <button class="btn-primary" ng-click="filterChanged(filter)"><span class="glyphicon glyphicon-search"></span></button>
+            </div>
+
+            <div class="form-group">
+                <a id="form-advanced-label" data-toggle="collapse" data-target="#form-advanced-options">
+                    <label for="advanced-toggle">ADVANCED</label>
+                    <button id="advanced-toggle" type="button" >+</button>
+                </a>
+            </div>
+
+            <div id="form-advanced-options" class="collapse">
+
+                <div class="checkbox">
+                    <label>
+                    <input id="show_closed" name="show_closed" type="checkbox" ng-model="filter.show_closed" ng-change="filterChanged(filter)"/> Show closed listings
+                </label>
+            </div>
+
+            <div id="opps-form-src" class="checkbox form-group-more">
+              <label>
+                <input id="show_noncompeted" name="show_noncompeted" type="checkbox" ng-model="filter.show_noncompeted" ng-change="filterChanged(filter)" /> Show non-competed listings (sole source)
+            </label>
+        </div>
+
+        <div id="opps-form-src">
+          <label for="data_source">Data Source:</label>
+          <select id="data_source" name="data_source" type="search" class="form-control" ng-model="filter.data_source" ng-change="filterChanged(filter)">
+            <option value="">All</option>
+            <option value="FBO">FedBizOpps (fbo.gov)</option>
+            <option value="grants.gov">grants.gov</option>
+        </select>
+
+    </div>
+
+</div>
+</form>
 </div>
 
-<div class="row marketing">
-  <h4>HTML5 Boilerplate</h4>
-  <p>
-    HTML5 Boilerplate is a professional front-end template for building fast, robust, and adaptable web apps or sites.
-  </p>
+ <div id="opps-found" class="col-md-9">
+    <div id="results-topline" class="row">
+    <div id="result-count" class="col-md-4 col-sm-4">
+  {{ opps.numFound }} Search Results
+    </div>
+    <div id="results-sorted-by" class="col-md-4 col-sm-4">
+        Sorted by relevancy
+      </div>
+    </div>
+    <pagination total-items="opps.numFound" ng-model="currentPage" ng-change="pageChanged()" max-size="5" ng-show="!opps.numFound"></pagination>
+  <div class="panel panel-info" ng-repeat="opp in opps.docs" shorten>
+    <div class="panel-heading">
+            <a href={{opp.listing_url}} target="_blank" class="text-danger">
+               <b>{{ opp.title }}</b>
+            </a>
 
-  <h4>Angular</h4>
-  <p>
-    AngularJS is a toolset for building the framework most suited to your application development.
-  </p>
+            <div id="rel-score">
+               -- Score {{ opp.score }}
+            </div>
+    </div>
+    <div class="panel-body shorten">
 
-  <h4>Karma</h4>
-  <p>Spectacular Test Runner for JavaScript.</p>
-</div>
+            {{ opp.description }}
+
+    </div>
+    </div>
+    <pagination total-items="opps.numFound" ng-model="currentPage" ng-change="pageChanged()" max-size="5" ng-show="!opps.numFound"></pagination>
+</div id="pagination-box">
+</div id="opps-found">
+</div id="find">

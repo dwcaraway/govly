@@ -131,6 +131,15 @@ module.exports = function (grunt) {
       }
     },
 
+    // Make sure HTML conforms to Bootstrap standards
+      bootlint: {
+                        options: {
+                                           stoponerror: false,
+                                                 relaxerror: []
+                                                         },
+                            files: ['frontend/**/*.html'],
+                                                                     },
+
     // Empties folders to start fresh
     clean: {
       dist: {
@@ -576,6 +585,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', [
     'newer:jshint',
+    'bootlint',
     'test',
     'build'
   ]);
