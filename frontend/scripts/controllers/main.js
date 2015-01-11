@@ -26,18 +26,18 @@ angular.module('vitalsApp')
         };
 
         $scope.pageChanged = function () {
-            console.log("page: " + $scope.currentPage);
+            console.log('page: ' + $scope.currentPage);
             $scope.filter = $scope.filter || {};
-            $scope.filter['start'] = 10 * ($scope.currentPage - 1);
+            $scope.filter.start = 10 * ($scope.currentPage - 1);
             console.log('start: ' + $scope.filter.start);
             $scope.getOpps($scope.filter);
         };
 
         $scope.filterChanged = function (filter) {
-            console.log("page: " + $scope.currentPage);
+            console.log('page: ' + $scope.currentPage);
             $scope.currentPage = 1;
             $scope.filter = $scope.filter || {};
-            $scope.filter['start'] = 0;
+            $scope.filter.start = 0;
             $scope.getOpps($scope.filter);
         };
 
@@ -54,9 +54,9 @@ angular.module('vitalsApp')
                 $scope.$on('dataloaded', function () {
                     $timeout(function () { // You might need this timeout to be sure its run after DOM render
                         $('div.shorten').shorten({
-                            "showChars": 255});
+                            'showChars': 255});
                     }, 0, false);
-                })
+                });
             }
         };
     }]);

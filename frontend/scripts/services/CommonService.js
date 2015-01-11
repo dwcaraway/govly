@@ -20,11 +20,11 @@ angular.module('CommonService', ['config'])
     .factory('Security', ['$http', 'ENV', function ($http, ENV) {
        var AUTH_BASE_URL = ENV.apiEndpoint + '/auth';
 
-        var register = function(user, success_callback, error_callback){
+        var register = function(user){
             return $http.post(AUTH_BASE_URL+'/register', user);
         };
 
-        var confirm = function(token, success_callback, error_callback){
+        var confirm = function(token){
             return $http.get(AUTH_BASE_URL+'/confirm?token='+token);
         };
 

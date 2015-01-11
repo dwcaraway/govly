@@ -14,7 +14,7 @@ angular.module('vitalsApp')
 
         $scope.register = function (isValid) {
             if (isValid) {
-                Security.register($scope.user).success(function (data, status) {
+                Security.register($scope.user).success(function () {
                     $scope.alerts = [
                         {type: 'success', msg: 'Registration successful. A confirmation email has been sent.'}
                     ];
