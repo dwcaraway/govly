@@ -30,4 +30,5 @@ describe('CommonService test', function () {
           expect(linkRelation.getSchemas()).toEqual(schemas);
       });
   });
+
 });

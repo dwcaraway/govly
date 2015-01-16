@@ -35,7 +35,9 @@ module.exports = function(config) {
       'bower_components/angular-schema-form/dist/schema-form.min.js',
       'bower_components/angular-schema-form/dist/bootstrap-decorator.min.js',
       'frontend/scripts/**/*.js',
-      'tests/client/spec/**/*.js'
+      'tests/client/spec/**/*.js',
+      'bower_components/localforage/dist/localforage.js',
+      'bower_components/angular-localforage/dist/angular-localForage.js'
     ],
 
     // list of files / patterns to exclude

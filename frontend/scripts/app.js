@@ -9,74 +9,61 @@
  * Main module of the application.
  */
 angular
-  .module('vitalsApp', [
+    .module('vitalsApp', [
         'config',
-    'ngResource',
-    'ngRoute',
-    'ui.router',
-    'ngSanitize',
-    'ngTouch',
-    'angulartics',
-    'angulartics.google.analytics',
-    'angular-jwt',
-    'ui.bootstrap',
-    'permission',
-    'CommonService'
-  ])
-  .config(function ($stateProvider, $urlRouterProvider, $httpProvider, jwtInterceptorProvider) {
+        'ngResource',
+        'ngRoute',
+        'ui.router',
+        'ngSanitize',
+        'ngTouch',
+        'angulartics',
+        'angulartics.google.analytics',
+        'angular-jwt',
+        'ui.bootstrap',
+        'LocalForageModule',
+        'CommonService',
+        'ngAnimate'
+    ])
+    .config(function ($stateProvider, $urlRouterProvider, $httpProvider, jwtInterceptorProvider) {
 
-              //Configure Jason Web Token support
+        //Configure Jason Web Token support
         jwtInterceptorProvider.tokenGetter = function () {
             return localStorage.getItem('fogmine_token');
         };
-     $httpProvider.interceptors.push('jwtInterceptor');
+        $httpProvider.interceptors.push('jwtInterceptor');
 
-      // For any unmatched url, send to /
-      $urlRouterProvider.otherwise("/");
+        // For any unmatched url, send to /
+        $urlRouterProvider.otherwise('/');
 
-      $stateProvider
-          .state('register',{
-              url: '/register',
-              templateUrl: "views/register.html",
-              controller: 'RegisterCtrl',
-              data:{
-                  permissions: {
-                      only: ['anonymous']
-                  }
-              }
-
-          })
-          .state('confirm', {
-            url: '/confirm?token',
-              templateUrl: 'views/confirm.html',
-              controller: 'ConfirmationCtrl'
-        })
-        .state('login', {
-            url: '/login',
+        $stateProvider
+            .state('register', {
+                url: '/register',
+                templateUrl: 'views/register.html',
+                controller: 'RegisterCtrl'
+            })
+            .state('confirm', {
+                url: '/confirm?token',
+                templateUrl: 'views/confirm.html',
+                controller: 'ConfirmationCtrl'
+            })
+            .state('login', {
+                url: '/login',
                 templateUrl: 'views/login.html',
-              controller: 'LoginCtrl',
-              data:{
-                  permissions: {
-                      only: ['anonymous']
-                  }
-              }
-        })
-          .state('main', {
-              url: '/',
-              templateUrl: "views/main.html",
-              controller: 'MainCtrl',
-              data: {
-              permissions: {
-                  except: ['anonymous'],
-                  redirectTo: 'register'
-              }
-              }
-          });
-  })
-    .run(function (Permission) {
-      // Define anonymous role
-      Permission.defineRole('anonymous', function (stateParams) {
-          //If token not set in storage, then user is anonymous
-          return localStorage.getItem('fogmine-token') === null;
-      });
+                controller: 'LoginCtrl',
+                data: {
+                    permissions: {
+                        only: ['anonymous']
+                    }
+                }
+            })
+            .state('logout', {
+                url: '/logout',
+                templateUrl: 'views/logout.html',
+                controller: 'LogoutCtrl'
+            })
+            .state('main', {
+                url: '/',
+                templateUrl: 'views/main.html',
+                controller: 'MainCtrl'
+            });
     });

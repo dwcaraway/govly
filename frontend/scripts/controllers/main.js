@@ -45,18 +45,18 @@ angular.module('vitalsApp')
         //On page load, get opportunities with no filtering.
         $scope.getOpps();
 
-    })
+    });
 
-// apply jquery shorten to all div children with class shorten
-    .directive('shorten', ['$timeout', function ($timeout) {
-        return {
-            link: function ($scope, element, attrs) {
-                $scope.$on('dataloaded', function () {
-                    $timeout(function () { // You might need this timeout to be sure its run after DOM render
-                        $('div.shorten').shorten({
-                            'showChars': 255});
-                    }, 0, false);
-                });
-            }
-        };
-    }]);
+//// apply jquery shorten to all div children with class shorten
+//    .directive('shorten', ['$timeout', function ($timeout) {
+//        return {
+//            link: function ($scope, element, attrs) {
+//                $scope.$on('dataloaded', function () {
+//                    $timeout(function () { // You might need this timeout to be sure its run after DOM render
+//                        $('div.shorten').shorten({
+//                            'showChars': 255});
+//                    }, 0, false);
+//                });
+//            }
+//        };
+//    }]);

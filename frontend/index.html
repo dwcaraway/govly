@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" ng-app="angular-login">
   <head>
     <meta charset="utf-8">
     <title></title>
@@ -16,22 +16,66 @@
     <!-- endbuild -->
 
   </head>
-  <body ng-app="vitalsApp">
+  <!-- <body ng-app="vitalsApp">-->
+
+  <body ng-controller="BodyController">
     <!--[if lt IE 7]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
     <!-- Add your site or application content here -->
     <div class="container">
-      <div class="header">
-        <ul class="nav nav-pills pull-right">
-          <li class="active"><a ui-sref="main">Home</a></li>
-          <li><a ui-sref="register">Register</a></li>
-        </ul>
-        <h3 class="text-muted"><i class="fa fa-line-chart"></i>Fogmine</h3>
+     <div class="navbar navbar-default" role="navigation">
+        <div class="navbar-collapse">
+          <!-- Navbar links -->
+          <ul class="nav navbar-nav">
+            <li ng-class="{ active: $state.is('app.home') }">
+              <a ui-sref="app.home">Home</a>
+            </li>
+            <li ng-class="{ active: $state.is('app.admin') }">
+              <a ui-sref="app.admin">Admin-Only page</a>
+            </li>
+            <li ng-class="{ active: $state.is('app.user') }">
+              <a ui-sref="app.user">Registered-Only page</a>
+            </li>
+            <li ng-class="{ active: $state.is('app.register') }">
+              <a ui-sref="app.register">Register <i class="fa fa-user"></i>+</a>
+            </li>
+          </ul>
+          <!-- Right side of the navbar -->
+          <!-- Login Form -->
+          <form class="navbar-form navbar-right" name="loginForm" role="login" ng-submit="loginMe()" ng-hide="ls.isLogged || !ls.doneLoading">
+            <div class="form-group">
+              <input type="text" class="form-control" ng-model="login.username" name="username" placeholder="Username">
+            </div>
+            <div class="form-group">
+              <input type="password" class="form-control" ng-model="login.password" name="password" placeholder="Password">
+            </div>
+            <button type="submit" class="btn btn-default hidden-devices" ng-disabled="login.working">Login <i class="fa" ng-class="login.working ? 'fa-cog fa-spin' : 'fa-sign-in'"></i></button>
+          </form>
+          <!-- Spinner -->
+          <button class="btn btn-default navbar-btn navbar-right" ng-hide="ls.doneLoading">
+            <i class="fa fa-spinner fa-spin"></i>
+          </button>
+          <!-- Logout Form -->
+          <form class="navbar-form navbar-right" role="logout" ng-submit="logoutMe()" ng-show="ls.isLogged">
+            <div class="form-group">
+              <label>Hello {{ ls.user.name }}</label>
+            </div>
+            <div class="form-group">
+              <button  type="submit" class="btn btn-default">Logout <i class="fa fa-signout"></i></button>
+            </div>
+          </form>
+        </div>
+        <div class="login-error" ng-class="{ 'active': login.wrong }">
+          <div class="alert alert-danger"><b>Error:</b> Server (WUT?) said your user/pass doesn't match existing users.</div>
+        </div>
       </div>
-
-      <div id="content" ui-view></div>
+      <ui-view ng-hide="doingResolve"></ui-view>
+      <div class="jumbotron loading-jumbo" ng-show="doingResolve">
+        <h1><i class="fa fa-refresh fa-2x fa-spin"></i> Loading</h1>
+      </div>
+    </div>
 
     </div>
 
@@ -95,20 +139,36 @@
     <script src="bower_components/angular-mocks/angular-mocks.js"></script>
     <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
     <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
-    <script src="bower_components/angular-permission/dist/angular-permission.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/jquery-shorten/jquery.shorten.js"></script>
+    <script src="bower_components/localforage/dist/localforage.js"></script>
+    <script src="bower_components/angular-localforage/dist/angular-localForage.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
 
         <!-- build:js({.tmp,frontend}) scripts/scripts.js -->
-        <script src="scripts/app.js"></script>
+     <!--<script src="scripts/app.js"></script> -->
+        <script src="scripts/nglogin.js"></script>
+    <script src="scripts/login-service.js"></script>
+    <script src="scripts/grandfather.js"></script>
+    <script src="scripts/mockhttp.js"></script>
+    <script src="scripts/directives/form-helpers.js"></script>
+    <script src="scripts/directives/form-helpers.js"></script>
+    <script src="scripts/error/error.js"></script>
+    <script src="scripts/home/home.js"></script>
+    <script src="scripts/pages/pages.js"></script>
+    <script src="scripts/register/register.js"></script>
+    <script src="templates-app.js"></script>
+    <script src="scripts/routing-config.js"></script>
+     <!--   <script src="scripts/controllers/nav.js"></script>
         <script src="scripts/controllers/main.js"></script>
         <script src="scripts/controllers/register.js"></script>
         <script src="scripts/controllers/confirm.js"></script>
         <script src="scripts/controllers/login.js"></script>
+        <script src="scripts/controllers/logout.js"></script>
         <script src="scripts/services/CommonService.js"></script>
-        <script src="scripts/config.js" />
+        <script src="scripts/config.js" />-->
         <!-- endbuild -->
 </body>
 </html>

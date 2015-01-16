@@ -1,22 +1,25 @@
-'use strict';
-
 var HttpBackend = require('http-backend-proxy');
 
 describe('vitals security', function () {
+    'use strict';
 
-    var  httpBackend = new HttpBackend(browser);
+    var httpBackend = new HttpBackend(browser);
 
     var httpBackendMock = function () {
         angular.module('httpBackendMock', ['ngMockE2E', 'vitalsApp'])
 
             .run(function ($httpBackend) {
                 $httpBackend.whenGET('http://localhost:5000/rels').respond(200, {});
-                $httpBackend.whenGET('http://localhost:5000/auth/confirm?token=foo').respond(200, {'code': 200, 'token': 'bar', 'message':'yay!'});
+                $httpBackend.whenGET('http://localhost:5000/auth/confirm?token=foo').respond(200, {
+                    'code': 200,
+                    'token': 'bar',
+                    'message': 'yay!'
+                });
                 $httpBackend.whenGET(/views.*/i).passThrough();
             });
     };
 
-    beforeEach(function(){
+    beforeEach(function () {
         browser.addMockModule('httpBackendMock', httpBackendMock);
     });
 
@@ -28,13 +31,15 @@ describe('vitals security', function () {
     describe('the registration page', function () {
 
         beforeEach(function () {
-
             browser.get('/#/register');
         });
 
         it('should display a confirmation message when registration succeeds', function () {
 
-            httpBackend.whenPOST('http://localhost:5000/auth/register').respond(200, {'code': 200, 'message': 'Registration successful!'});
+            httpBackend.whenPOST('http://localhost:5000/auth/register').respond(200, {
+                'code': 200,
+                'message': 'Registration successful!'
+            });
 
             element(by.model('user.email')).sendKeys('test@test.com');
             element(by.model('user.password')).sendKeys('supersecret');
@@ -46,7 +51,10 @@ describe('vitals security', function () {
 
         it('should display an error message when registration fails.', function () {
 
-            httpBackend.whenPOST('http://localhost:5000/auth/register').respond(409, {'code': 409, 'message': 'bad stuff happened!'});
+            httpBackend.whenPOST('http://localhost:5000/auth/register').respond(409, {
+                'code': 409,
+                'message': 'bad stuff happened!'
+            });
 
             element(by.model('user.email')).sendKeys('test@test.com');
             element(by.model('user.password')).sendKeys('supersecret');
@@ -60,7 +68,7 @@ describe('vitals security', function () {
 
     describe('as an anonymous user, when I navigate to the confirmation page', function () {
 
-       beforeEach(function () {
+        beforeEach(function () {
             browser.get('/#/confirm?token=foo');
         });
 
