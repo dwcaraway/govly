@@ -57,8 +57,7 @@ module.exports = function (grunt) {
         watch: {
             bower: {
                 files: ['bower.json'],
-                //tasks: ['wiredep']
-                tasks: ['bower_concat']
+                tasks: ['wiredep']
             },
             templates: {
                 files: ['<%= appConfig.app %>/**/*.tpl.html'],
@@ -115,8 +114,10 @@ module.exports = function (grunt) {
                     debug: true,
                     middleware: function (connect) {
                         return [
-                            connect.static(require('path').resolve('frontend')),
-
+                            connect().use(
+                                '/bower_components',
+                                connect.static('./bower_components')
+                            ),
                             //connect the font-awesome fonts
                             connect().use(
                                 '/fonts',
@@ -203,8 +204,7 @@ module.exports = function (grunt) {
         // Automatically inject Bower components into the app
         wiredep: {
             app: {
-                src: ['<%= appConfig.app %>/index.html'],
-                ignorePath: /\.\.\//
+                src: ['<%= appConfig.temp %>/index.html']
             },
             test: {
                 src: 'tests/client/karma.conf.js',
@@ -219,16 +219,6 @@ module.exports = function (grunt) {
                             js: '\'{{filePath}}\','
                         }
                     }
-                }
-            }
-        },
-
-        bower_concat: {
-            all: {
-                dest: '<%= appConfig.temp %>/scripts/_bower.js',
-                cssDest: '<%= appConfig.temp %>/styles/_bower.css',
-                mainFiles: {
-                    'angulartics': 'dist/angulartics-ga.min.js'
                 }
             }
         },
@@ -262,7 +252,7 @@ module.exports = function (grunt) {
         // concat, minify and revision files. Creates configurations in memory so
         // additional tasks can operate on them
         useminPrepare: {
-            html: '<%= appConfig.app %>/index.html',
+            html: '<%= appConfig.temp %>/index.html',
             options: {
                 dest: '<%= appConfig.dist %>',
                 flow: {
@@ -279,38 +269,11 @@ module.exports = function (grunt) {
 
         // Performs rewrites based on filerev and the useminPrepare configuration
         usemin: {
-            html: ['<%= appConfig.dist %>/{,*/}*.html'],
-            css: ['<%= appConfig.dist %>/styles/{,*/}*.css'],
+            html: ['<%= appConfig.temp %>/{,*/}*.html'],
             options: {
                 assetsDirs: ['<%= appConfig.dist %>', '<%= appConfig.dist %>/images']
             }
         },
-
-        // The following *-min tasks will produce minified files in the dist folder
-        // By default, your `index.html`'s <!-- Usemin block --> will take care of
-        // minification. These next options are pre-configured if you do not wish
-        // to use the Usemin blocks.
-        // cssmin: {
-        //   dist: {
-        //     files: {
-        //       '<%= appConfig.dist %>/styles/main.css': [
-        //         '.tmp/styles/{,*/}*.css'
-        //       ]
-        //     }
-        //   }
-        // },
-        // uglify: {
-        //   dist: {
-        //     files: {
-        //       '<%= appConfig.dist %>/scripts/scripts.js': [
-        //         '<%= appConfig.dist %>/scripts/scripts.js'
-        //       ]
-        //     }
-        //   }
-        // },
-        // concat: {
-        //   dist: {}
-        // },
 
         imagemin: {
             dist: {
@@ -346,7 +309,7 @@ module.exports = function (grunt) {
                 files: [{
                     expand: true,
                     cwd: '<%= appConfig.dist %>',
-                    src: ['*.html', 'views/{,*/}*.html'],
+                    src: ['*.html'],
                     dest: '<%= appConfig.dist %>'
                 }]
             }
@@ -375,10 +338,7 @@ module.exports = function (grunt) {
                     dest: '<%= appConfig.dist %>',
                     src: [
                         '*.{ico,png,txt}',
-                        '*.html',
-                        //'views/{,*/}*.html',
-                        'images/{,*/}*.{webp}',
-                        'fonts/{,*/}*.*'
+                        '404.html'
                     ]
                 }, {
                     expand: true,
@@ -400,6 +360,15 @@ module.exports = function (grunt) {
                     src: 'index.html',
                     dest: '<%= appConfig.temp %>'
                 }]
+            },
+
+            indexfinal: {
+                files: [{
+                    expand: true,
+                    cwd: '<%= appConfig.temp %>',
+                    src: 'index.html',
+                    dest: '<%= appConfig.dist %>'
+                }]
             }
         },
 
@@ -409,7 +378,6 @@ module.exports = function (grunt) {
                 'less',
                 'html2js',
                 'ngconstant:development',
-                'bower_concat',
                 'concat_sourcemap'
             ],
             dist: [
@@ -418,7 +386,6 @@ module.exports = function (grunt) {
                 'html2js',
                 'imagemin',
                 'svgmin',
-                'bower_concat',
                 'concat_sourcemap'
             ]
         },
@@ -506,6 +473,8 @@ module.exports = function (grunt) {
 
         grunt.task.run([
             'clean',
+            'copy:index',
+            'wiredep',
             'concurrent:server',
             'autoprefixer',
             'connect:livereload',
@@ -552,17 +521,20 @@ module.exports = function (grunt) {
 
     grunt.registerTask('build', [
         'clean',
+        'copy:index',
+        'wiredep',
         'useminPrepare',
         'concurrent:dist',
         'autoprefixer',
         'ngAnnotate',
         'concat',
-        'copy',
+        'copy:dist',
         'cssmin',
         'uglify',
         'filerev',
         'usemin',
-        'htmlmin'
+        'copy:indexfinal'
+        //'htmlmin'
     ]);
 
     grunt.registerTask('default', [
