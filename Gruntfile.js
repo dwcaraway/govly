@@ -72,7 +72,8 @@ module.exports = function (grunt) {
         watch: {
             bower: {
                 files: ['bower.json'],
-                tasks: ['wiredep']
+                //tasks: ['wiredep']
+                tasks: ['bower_concat']
             },
             templates: {
                 files: ['<%= appConfig.app %>/**/*.tpl.html'],
@@ -225,7 +226,17 @@ module.exports = function (grunt) {
                     }
                 }
             }
+        },
 
+        bower_concat: {
+            all: {
+                dest: '<%= appConfig.dist %>/scripts/_bower.js',
+                cssDest: '<%= appConfig.dist %>/styles/_bower.css',
+                exclude: ['es5-shim', 'json3'],
+                mainFiles: {
+                    'angulartics': 'dist/angulartics-ga.min.js'
+                }
+            }
         },
 
         replace: {
@@ -370,9 +381,8 @@ module.exports = function (grunt) {
                     dest: '<%= appConfig.dist %>',
                     src: [
                         '*.{ico,png,txt}',
-                        '.htaccess',
                         '*.html',
-                        'views/{,*/}*.html',
+                        //'views/{,*/}*.html',
                         'images/{,*/}*.{webp}',
                         'fonts/{,*/}*.*'
                     ]
@@ -381,11 +391,6 @@ module.exports = function (grunt) {
                     cwd: '.tmp/images',
                     dest: '<%= appConfig.dist %>/images',
                     src: ['generated/*']
-                }, {
-                    expand: true,
-                    cwd: '.',
-                    src: 'bower_components/bootstrap-sass-official/assets/fonts/bootstrap/*',
-                    dest: '<%= appConfig.dist %>'
                 },
                     {
                         expand: true,
@@ -393,12 +398,6 @@ module.exports = function (grunt) {
                         src: 'fonts/*',
                         dest: '<%= appConfig.dist %>'
                     }]
-            },
-            styles: {
-                expand: true,
-                cwd: '<%= appConfig.app %>/styles',
-                dest: '.tmp/styles/',
-                src: '{,*/}*.css'
             }
         },
 
@@ -407,13 +406,15 @@ module.exports = function (grunt) {
             server:[
                 'less',
                 'html2js',
-                'ngconstant:development'
+                'ngconstant:development',
+                'bower_concat'
             ],
             dist: [
                 'ngconstant:production',
                 'less',
                 'imagemin',
-                'svgmin'
+                'svgmin',
+                'bower_concat'
             ]
         },
 
@@ -500,40 +501,35 @@ module.exports = function (grunt) {
 
         grunt.task.run([
             'clean',
-            'wiredep:app',
             'concurrent:server',
+            'copy',
             'autoprefixer',
             'connect:livereload',
             'watch'
         ]);
     });
 
-    grunt.registerTask('server', 'DEPRECATED TASK. Use the "serve" task instead', function (target) {
-        grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
-        grunt.task.run(['serve:' + target]);
-    });
-
     grunt.registerTask('test', 'Run unit or end-to-end tests', function (target) {
         if (target === 'pre') {
             return grunt.task.run([
                 'clean',
-                'ngconstant:development',
-                'autoprefixer',
-                'connect:test'
+                'ngconstant:development'
             ]);
         }
         if (target === 'e2e') {
             return grunt.task.run([
                 'test:pre',
+                'autoprefixer',
                 'protractor_webdriver:e2eStart',
                 'protractor:run'
             ]);
         } else if (target === 'all') {
-            return grunt.task.run(['test:e2e', 'karma']);
+            return grunt.task.run(['test:e2e', 'connect:test', 'karma']);
         }
 
         grunt.task.run([
-            'test:e2e',
+            'test:pre',
+            'connect:test',
             'karma'
         ]);
 
@@ -552,13 +548,12 @@ module.exports = function (grunt) {
 
     grunt.registerTask('build', [
         'clean',
-        'wiredep:app',
         'useminPrepare',
         'concurrent:dist',
         'autoprefixer',
         'concat',
         'ngAnnotate',
-        'copy:dist',
+        'copy',
         'cssmin',
         'uglify',
         'filerev',
