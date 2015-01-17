@@ -35,17 +35,14 @@ module.exports = function (grunt) {
                     base: '<%= appConfig.app %>'
                 },
                 src: ['**/*.tpl.html'],
-                dest: '<%= appConfig.dist %>/templates-app.js'
+                dest: '<%= appConfig.temp %>/scripts/_templates.js'
             }
         },
 
         less: {
             all: {
                 src: '<%= appConfig.app %>/styles/style.less',
-                dest: '<%= appConfig.dist %>/styles/style.css',
-                options: {
-                    report: 'gzip'
-                }
+                dest: '<%= appConfig.temp %>/styles/_style.css'
             }
         },
 
@@ -54,17 +51,8 @@ module.exports = function (grunt) {
                 sourcesContent: true
             },
             app: {
-                src: ['src/**/*.js', 'src/*.js'],
-                dest: 'build/app.js'
-            },
-            libs: {
-                src: [
-                    'libs/angular/angular.js',
-                    'libs/angular-animate/angular-animate.js',
-                    'libs/angular-mocks/angular-mocks.js',
-                    'libs/angular-ui-router/release/angular-ui-router.js'
-                ],
-                dest: 'build/libs.js'
+                src: ['<%= appConfig.app %>/**/*.js', 'src/*.js'],
+                dest: '<%= appConfig.temp %>/scripts/_app.js'
             }
         },
 
@@ -182,7 +170,7 @@ module.exports = function (grunt) {
                 files: [{
                     dot: true,
                     src: [
-                        '.tmp',
+                        '<%= appConfig.temp %>',
                         '<%= appConfig.dist %>/{,*/}*',
                         '!<%= appConfig.dist %>/.git{,*/}*'
                     ]
@@ -198,9 +186,9 @@ module.exports = function (grunt) {
             dist: {
                 files: [{
                     expand: true,
-                    cwd: '.tmp/styles/',
-                    src: '{,*/}*.css',
-                    dest: '.tmp/styles/'
+                    cwd: '<%= appConfig.temp %>/styles/',
+                    src: '_style.css',
+                    dest: '<%= appConfig.temp %>/styles/'
                 }]
             }
         },
@@ -230,9 +218,8 @@ module.exports = function (grunt) {
 
         bower_concat: {
             all: {
-                dest: '<%= appConfig.dist %>/scripts/_bower.js',
-                cssDest: '<%= appConfig.dist %>/styles/_bower.css',
-                exclude: ['es5-shim', 'json3'],
+                dest: '<%= appConfig.temp %>/scripts/_bower.js',
+                cssDest: '<%= appConfig.temp %>/styles/_bower.css',
                 mainFiles: {
                     'angulartics': 'dist/angulartics-ga.min.js'
                 }
@@ -364,9 +351,9 @@ module.exports = function (grunt) {
             dist: {
                 files: [{
                     expand: true,
-                    cwd: '.tmp/concat/scripts',
-                    src: ['*.js', '!oldieshim.js'],
-                    dest: '.tmp/concat/scripts'
+                    cwd: '<%= appConfig.temp %>/scripts',
+                    src: ['_app.js', '_bower.js'],
+                    dest: '<%= appConfig.temp %>/scripts'
                 }]
             }
         },
@@ -412,9 +399,11 @@ module.exports = function (grunt) {
             dist: [
                 'ngconstant:production',
                 'less',
+                'html2js',
                 'imagemin',
                 'svgmin',
-                'bower_concat'
+                'bower_concat',
+                'concat_sourcemap'
             ]
         },
 
@@ -551,8 +540,8 @@ module.exports = function (grunt) {
         'useminPrepare',
         'concurrent:dist',
         'autoprefixer',
-        'concat',
         'ngAnnotate',
+        'concat',
         'copy',
         'cssmin',
         'uglify',

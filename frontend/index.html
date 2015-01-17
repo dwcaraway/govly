@@ -5,25 +5,18 @@
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
-    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <!-- build:css(.) styles/vendor.css -->
-    <!-- bower:css -->
-    <link rel="stylesheet" href="styles/style.css" />
-      <link rel="stylesheet" href="styles/_bower.css" />
-    <!-- endbower -->
+    <!-- build:css(.tmp/styles) styles/main.css -->
+      <link rel="stylesheet" href="_style.css" />
+      <link rel="stylesheet" href="_bower.css" />
     <!-- endbuild -->
-    <!-- build:css(.tmp) styles/styles.css -->
-    <!-- endbuild -->
-
   </head>
   <!-- <body ng-app="vitalsApp">-->
 
   <body ng-controller="BodyController">
-    <!--[if lt IE 7]>
+    <!--[if lt IE 9]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-    <!-- Add your site or application content here -->
     <div class="container">
      <div class="navbar navbar-default" role="navigation">
         <div class="navbar-collapse">
@@ -79,7 +72,7 @@
 
     </div>
 
-    <script>
+<!--    <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -87,18 +80,12 @@
 
       ga('create', 'UA-XXXXXXXX-X', 'auto');
 
-    </script>
+    </script> -->
 
-    <!-- build:js(.) scripts/oldieshim.js -->
-    <!--[if lt IE 9]>
-    <script src="bower_components/es5-shim/es5-shim.js"></script>
-    <script src="bower_components/json3/lib/json3.js"></script>
-    <![endif]-->
+    <!-- build:js(.tmp/scripts) scripts/main.js -->
+    <script src="_bower.js"></script>
+    <script src="_templates.js"></script>
+    <script src="_app.js"></script>
     <!-- endbuild -->
-
-    <!-- build:js(.) scripts/vendor.js -->
-    <script src="scripts/_bower.js"></script>
-    <!-- endbuild -->
-
 </body>
 </html>

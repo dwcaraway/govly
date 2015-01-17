@@ -22,7 +22,8 @@ angular
         'ui.bootstrap',
         'LocalForageModule',
         'CommonService',
-        'ngAnimate'
+        'ngAnimate',
+        'templates-app'
     ])
     .config(function ($stateProvider, $urlRouterProvider, $httpProvider, jwtInterceptorProvider) {
 
