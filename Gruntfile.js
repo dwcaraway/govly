@@ -20,16 +20,13 @@ module.exports = function (grunt) {
 
         // Project settings
         appConfig: {
-        app: require('./bower.json').appPath || 'frontend',
-        dist: 'dist',
-        temp: '.tmp',
-        test: './tests/client'
+            app: require('./bower.json').appPath || 'frontend',
+            dist: 'dist',
+            temp: '.tmp',
+            test: './tests/client'
         },
 
         html2js: {
-            /**
-             * These are the templates from `src/app`.
-             */
             app: {
                 options: {
                     base: '<%= appConfig.app %>'
@@ -71,6 +68,14 @@ module.exports = function (grunt) {
                 files: ['<%= appConfig.app=>/styles/style.less', '<%= appConfig.app =>/**/*.less'],
                 tasks: ['less']
             },
+            sources: {
+                files: ['<%= appConfig.app %>/**/*.js', '<%= appConfig.app %>/*.js'],
+                tasks: ['concat_sourcemap']
+            },
+            index: {
+                files: 'index.html',
+                tasks: ['copy']
+            },
             js: {
                 files: ['<%= appConfig.app %>/scripts/{,*/}*.js'],
                 tasks: ['newer:jshint:all'],
@@ -91,7 +96,7 @@ module.exports = function (grunt) {
                 },
                 files: [
                     '<%= appConfig.app %>/{,*/}*.html',
-                    '<%= appConfig.dist %>/templates-app.js',
+                    '<%= appConfig.temp %>/scripts/_templates.js',
                     '<%= appConfig.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
                 ]
             }
@@ -101,21 +106,23 @@ module.exports = function (grunt) {
         connect: {
             options: {
                 port: 9000,
-                // Change this to '0.0.0.0' to access the server from outside.
                 hostname: 'localhost',
                 livereload: 35729
             },
             livereload: {
                 options: {
                     open: true,
+                    debug: true,
                     middleware: function (connect) {
                         return [
-                            connect.static('.tmp'),
+                            connect.static(require('path').resolve('frontend')),
+
+                            //connect the font-awesome fonts
                             connect().use(
-                                '/bower_components',
-                                connect.static('./bower_components')
+                                '/fonts',
+                            connect.static(require('path').resolve('bower_components/font-awesome/fonts'))
                             ),
-                            connect.static('<%= appConfig.app %>')
+                            connect.static(require('path').resolve('.tmp'))
                         ];
                     }
                 }
@@ -394,7 +401,8 @@ module.exports = function (grunt) {
                 'less',
                 'html2js',
                 'ngconstant:development',
-                'bower_concat'
+                'bower_concat',
+                'concat_sourcemap'
             ],
             dist: [
                 'ngconstant:production',
@@ -491,7 +499,6 @@ module.exports = function (grunt) {
         grunt.task.run([
             'clean',
             'concurrent:server',
-            'copy',
             'autoprefixer',
             'connect:livereload',
             'watch'
