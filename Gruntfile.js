@@ -74,7 +74,7 @@ module.exports = function (grunt) {
             },
             index: {
                 files: 'index.html',
-                tasks: ['copy']
+                tasks: ['copy:index']
             },
             js: {
                 files: ['<%= appConfig.app %>/scripts/{,*/}*.js'],
@@ -392,6 +392,14 @@ module.exports = function (grunt) {
                         src: 'fonts/*',
                         dest: '<%= appConfig.dist %>'
                     }]
+            },
+            index: {
+                files: [{
+                    expand: true,
+                    cwd: '<%= appConfig.app %>',
+                    src: 'index.html',
+                    dest: '<%= appConfig.temp %>'
+                }]
             }
         },
 
