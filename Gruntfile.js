@@ -118,7 +118,6 @@ module.exports = function (grunt) {
                                 '/bower_components',
                                 connect.static('./bower_components')
                             ),
-                            //connect the font-awesome fonts
                             connect().use(
                                 '/fonts',
                             connect.static(require('path').resolve('bower_components/font-awesome/fonts'))
@@ -533,8 +532,8 @@ module.exports = function (grunt) {
         'uglify',
         'filerev',
         'usemin',
-        'copy:indexfinal'
-        //'htmlmin'
+        'copy:indexfinal',
+        'htmlmin'
     ]);
 
     grunt.registerTask('default', [
