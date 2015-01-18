@@ -532,6 +532,7 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('pre-deploy', [
+        'build',
         'ngconstant:production',
         'replace:production'
     ]);
