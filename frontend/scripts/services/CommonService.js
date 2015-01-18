@@ -3,16 +3,9 @@
 angular.module('CommonService', ['config'])
     .factory('LinkRelation', ['$log', '$http', 'ENV', function ($log, $http, ENV) {
         var SCHEMA_URL = ENV.apiEndpoint+'/rels';
-        var schemas = {};
-
-        $http.get(SCHEMA_URL).success(function (data) {
-            schemas = data;
-        }).error(function () {
-            $log.warn('could not reach server');
-        });
 
         var getSchemas = function() {
-          return schemas;
+          return $http.get(SCHEMA_URL);
         };
 
         return {'getSchemas':getSchemas};
