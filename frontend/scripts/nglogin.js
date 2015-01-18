@@ -32,6 +32,7 @@ angular.module('angular-login', [
   $rootScope.$on('$statePermissionError', resolveDone);
 })
 .controller('BodyController', function ($scope, $state, $stateParams, loginService, $http, $timeout) {
+            'use strict';
   // Expose $state and $stateParams to the <body> tag
   $scope.$state = $state;
   $scope.$stateParams = $stateParams;

@@ -12,7 +12,7 @@ angular.module('vitalsApp')
         var token = $stateParams.token;
 
         if (token) {
-            $log.debug('Contacting server')
+            $log.debug('Contacting server');
 
             Security.confirm($stateParams.token).
                 success(
@@ -29,7 +29,7 @@ angular.module('vitalsApp')
 
                     if (status === 0) {
                         $scope.alerts = [
-                            {type: 'danger', msg: "Unable to connect"}
+                            {type: 'danger', msg: 'Unable to connect'}
                         ];
                     } else {
                         $scope.alerts = [

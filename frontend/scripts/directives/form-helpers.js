@@ -7,6 +7,7 @@ angular.module('angular-login.directives', [])
  * <input type="password" ng-model="password2">
  */
 .directive('passwordMatch', function () {
+                'use strict';
   return {
     restrict: 'A',
     scope: false,
@@ -37,6 +38,7 @@ angular.module('angular-login.directives', [])
  * NOTE: Your controllers have to make the field invalid in case *your* server says so.
  */
 .directive('remoteValidated', function () {
+                'use strict';
   return {
     restrict: 'A',
     scope: false,

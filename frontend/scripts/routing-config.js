@@ -37,8 +37,7 @@
      roles array parameter
      */
     function buildRoles(roles) {
-
-        var bitMask = "01";
+        var bitMask = '01';
         var userRoles = {};
 
         for (var role in roles) {
@@ -70,7 +69,7 @@
                     resultBitMask = '';
 
                     for (role in userRoles) {
-                        resultBitMask += "1";
+                        resultBitMask += '1';
                     }
                     //accessLevels[level] = parseInt(resultBitMask, 2);
                     accessLevels[level] = {
@@ -79,7 +78,7 @@
                     };
                 }
                 else {
-                    console.log("Access Control Error: Could not parse '" + accessLevelDeclarations[level] + "' as access definition for level '" + level + "'");
+                    console.log('Access Control Error: Could not parse [' + accessLevelDeclarations[level] + '] as access definition for level [' + level + ']');
                 }
             }
             else {
@@ -90,7 +89,7 @@
                         resultBitMask = resultBitMask | userRoles[accessLevelDeclarations[level][role]].bitMask;
                     }
                     else {
-                        console.log("Access Control Error: Could not find role '" + accessLevelDeclarations[level][role] + "' in registered roles while building access for '" + level + "'");
+                        console.log('Access Control Error: Could not find role [' + accessLevelDeclarations[level][role] + '] in registered roles while building access for [' + level + ']');
                     }
                 }
                 accessLevels[level] = {

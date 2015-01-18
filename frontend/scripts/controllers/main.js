@@ -33,7 +33,7 @@ angular.module('vitalsApp')
             $scope.getOpps($scope.filter);
         };
 
-        $scope.filterChanged = function (filter) {
+        $scope.filterChanged = function () {
             console.log('page: ' + $scope.currentPage);
             $scope.currentPage = 1;
             $scope.filter = $scope.filter || {};

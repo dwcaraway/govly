@@ -31,12 +31,14 @@ angular.module('angular-login.mock', ['ngMockE2E'])
     })
 // delay HTTP
     .config(['$httpProvider', function ($httpProvider) {
+        'use strict';
         $httpProvider.interceptors.push('delayHTTP');
     }])
     .constant('loginExampleData', {
         version: '0.2.0'
     })
     .run(function ($httpBackend, $log, loginExampleData) {
+            'use strict';
         var userStorage = angular.fromJson(localStorage.getItem('userStorage')),
             emailStorage = angular.fromJson(localStorage.getItem('emailStorage')),
             tokenStorage = angular.fromJson(localStorage.getItem('tokenStorage')) || {},
@@ -94,11 +96,10 @@ angular.module('angular-login.mock', ['ngMockE2E'])
         };
 
         // fakeLogin
-        $httpBackend.when('POST', '/login').respond(function (method, url, data, headers) {
+        $httpBackend.when('POST', '/login').respond(function (method, url, data) {
             var postData = angular.fromJson(data),
                 user = userStorage[postData.username],
-                newToken,
-                tokenObj;
+                newToken;
             $log.info(method, '->', url);
 
             if (angular.isDefined(user) && user.password === postData.password) {
@@ -154,7 +155,7 @@ angular.module('angular-login.mock', ['ngMockE2E'])
         });
 
         // fakeRegister
-        $httpBackend.when('POST', '/user').respond(function (method, url, data, headers) {
+        $httpBackend.when('POST', '/user').respond(function (method, url, data) {
             var postData = angular.fromJson(data),
                 newUser,
                 errors = [];

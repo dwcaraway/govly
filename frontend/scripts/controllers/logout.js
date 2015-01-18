@@ -7,7 +7,7 @@
  * Controller of vitalsApp controlling logout
  */
 angular.module('vitalsApp')
-    .controller('LogoutCtrl', ['Security', '$scope','$state', function (Security, $scope, $state) {
+    .controller('LogoutCtrl', ['Security', '$scope','$state', function (Security, $scope) {
         Security.logout();
 
         $scope.alerts = [

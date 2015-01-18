@@ -1,5 +1,6 @@
 angular.module('angular-login.home', ['angular-login.grandfather'])
 .config(function ($stateProvider) {
+        'use strict';
   $stateProvider
     .state('app.home', {
       url: '/',
@@ -8,5 +9,6 @@ angular.module('angular-login.home', ['angular-login.grandfather'])
     });
 })
 .controller('HomeController', function ($scope) {
+        'use strict';
   $scope.users = angular.fromJson(localStorage.getItem('userStorage'));
 });
