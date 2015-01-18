@@ -29,7 +29,7 @@ module.exports = function (grunt) {
         html2js: {
             app: {
                 options: {
-                    base: '<%= appConfig.app %>'
+                    base: '<%= appConfig.app %>/scripts/'
                 },
                 src: ['**/*.tpl.html'],
                 dest: '<%= appConfig.temp %>/scripts/_templates.js'
