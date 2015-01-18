@@ -43,16 +43,6 @@ module.exports = function (grunt) {
             }
         },
 
-        concat_sourcemap: {
-            options: {
-                sourcesContent: true
-            },
-            app: {
-                src: ['<%= appConfig.app %>/**/*.js', 'src/*.js'],
-                dest: '<%= appConfig.temp %>/scripts/_app.js'
-            }
-        },
-
         // Watches files for changes and runs tasks based on the changed files
         watch: {
             bower: {
@@ -68,8 +58,8 @@ module.exports = function (grunt) {
                 tasks: ['less']
             },
             sources: {
-                files: ['<%= appConfig.app %>/**/*.js', '<%= appConfig.app %>/*.js'],
-                tasks: ['concat_sourcemap']
+                files: ['<%= appConfig.app %>/scripts/*.js'],
+                tasks: ['injector']
             },
             index: {
                 files: 'index.html',
@@ -121,6 +111,10 @@ module.exports = function (grunt) {
                             connect().use(
                                 '/fonts',
                             connect.static(require('path').resolve('bower_components/font-awesome/fonts'))
+                            ),
+                            connect().use(
+                                '/frontend/scripts',
+                                connect.static('./frontend/scripts')
                             ),
                             connect.static(require('path').resolve('.tmp'))
                         ];
@@ -200,6 +194,17 @@ module.exports = function (grunt) {
             }
         },
 
+        // Automatically inject application javascript into the index.html
+        injector: {
+            options: {
+            },
+            local_dependencies: {
+                files: {
+                    '<%= appConfig.temp %>/index.html': ['<%= appConfig.app %>/scripts/**/*.js']
+                }
+            }
+        },
+
         // Automatically inject Bower components into the app
         wiredep: {
             app: {
@@ -230,6 +235,16 @@ module.exports = function (grunt) {
                     {
                         from: 'UA-XXXXXXXX-X',
                         to: 'UA-37455300-1'
+                    }
+                ]
+            },
+            injection: {
+                src: ['<%= appConfig.temp %>/index.html'],   // source files array (supports minimatch)
+                dest: '<%= appConfig.temp %>/',             // destination directory or file
+                replacements: [
+                    {
+                        from: '/frontend/scripts',
+                        to: '../frontend/scripts'
                     }
                 ]
             }
@@ -320,9 +335,9 @@ module.exports = function (grunt) {
             dist: {
                 files: [{
                     expand: true,
-                    cwd: '<%= appConfig.temp %>/scripts',
-                    src: ['_app.js', '_bower.js'],
-                    dest: '<%= appConfig.temp %>/scripts'
+                    cwd: '<%= appConfig.temp %>/concat/scripts',
+                    src: ['*.js'],
+                    dest: '<%= appConfig.temp %>/concat/scripts'
                 }]
             }
         },
@@ -376,16 +391,16 @@ module.exports = function (grunt) {
             server:[
                 'less',
                 'html2js',
-                'ngconstant:development',
-                'concat_sourcemap'
+                'ngconstant:development'
+                //'concat_sourcemap'
             ],
             dist: [
                 'ngconstant:production',
                 'less',
                 'html2js',
                 'imagemin',
-                'svgmin',
-                'concat_sourcemap'
+                'svgmin'
+                //'concat_sourcemap'
             ]
         },
 
@@ -474,6 +489,7 @@ module.exports = function (grunt) {
             'clean',
             'copy:index',
             'wiredep',
+            'injector',
             'concurrent:server',
             'autoprefixer',
             'connect:livereload',
@@ -522,11 +538,13 @@ module.exports = function (grunt) {
         'clean',
         'copy:index',
         'wiredep',
+        'injector',
+        'replace:injection',
         'useminPrepare',
         'concurrent:dist',
         'autoprefixer',
-        'ngAnnotate',
         'concat',
+        'ngAnnotate',
         'copy:dist',
         'cssmin',
         'uglify',
@@ -541,6 +559,4 @@ module.exports = function (grunt) {
         'test',
         'build'
     ]);
-
-    grunt.registerTask('foo', ['clean', 'concat_sourcemap:libs', 'connect', 'watch']);
 };
