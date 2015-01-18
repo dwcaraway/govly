@@ -29,7 +29,7 @@
   },
   "overrides": {
     "angulartics": {
-      "main": "dist/angulartics-ga.min.js"
+      "main": [ "dist/angulartics.min.js", "dist/angulartics-ga.min.js"]
     }
   }
 }

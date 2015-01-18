@@ -501,7 +501,9 @@ module.exports = function (grunt) {
         if (target === 'pre') {
             return grunt.task.run([
                 'clean',
-                'ngconstant:development'
+                'ngconstant:development',
+                'html2js',
+                'wiredep:test'
             ]);
         }
         if (target === 'e2e') {
