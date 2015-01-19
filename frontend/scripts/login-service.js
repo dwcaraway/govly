@@ -1,4 +1,4 @@
-angular.module('loginService', [])
+angular.module('loginService', ['ui.router'])
     .provider('loginService', function () {
         'use strict';
 
