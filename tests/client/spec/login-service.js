@@ -46,21 +46,29 @@ describe('Provider: login-service', function () {
         });
 
         it('should set the user role when called', function () {
-            var user  = {userRole: {bitMask: 2, title: 'admin'}};
+            var user  = {userRole: userRoles.admin};
 
-            expect(loginService.userRole).toEqual({bitMask: 1, title: 'public'});
+            expect(loginService.userRole).toEqual(userRoles.public);
             loginService.loginHandler(user);
             expect(loginService.userRole).toBe(user.userRole);
 
         });
 
-        it('should set userRole to default if not in user object', function () {
+        it('should set userRole to public if not in user object', function () {
             var user  = {foo: 'bar'};
-            var defaultRole = {bitMask: 1, title: 'public'};
 
-            expect(loginService.userRole).toEqual(defaultRole);
+            expect(loginService.userRole).toEqual(userRoles.public);
             loginService.loginHandler(user);
-            expect(loginService.userRole).toBe(defaultRole);
+            expect(loginService.userRole).toEqual(userRoles.public);
+
+        });
+
+        it('should set a token', function () {
+            var user  = {token: 'supersecret'};
+
+            expect(localStorage.getItem('userToken')).toEqual(null);
+            loginService.loginHandler(user);
+            expect(localStorage.getItem('userToken')).toEqual(user.token);
 
         });
     });

@@ -28,6 +28,15 @@ angular.module('loginService', ['ui.router'])
                 setHeaders(token);
             };
 
+            var setUserRole = function (role) {
+                if(!role){
+                    //if role not in userRoles, then we're done here
+                    wrappedService.userRole = userRoles.public;
+                }else{
+                    wrappedService.userRole = role;
+                }
+            };
+
             var getLoginData = function () {
                 if (userToken) {
                     setHeaders(userToken);
@@ -146,7 +155,7 @@ angular.module('loginService', ['ui.router'])
                     // flag true on isLogged
                     wrappedService.isLogged = true;
                     // update userRole
-                    wrappedService.userRole = user.userRole;
+                    setUserRole(user.userRole);
                     return user;
                 },
                 loginUser: function (httpPromise) {
