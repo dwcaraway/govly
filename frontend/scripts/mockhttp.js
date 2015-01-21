@@ -37,12 +37,13 @@ angular.module('angular-login.mock', ['ngMockE2E'])
     .constant('loginExampleData', {
         version: '0.2.0'
     })
-    .run(function ($httpBackend, $log) {
+    .run(function ($httpBackend, $log, $http) {
             'use strict';
         var userStorage = angular.fromJson(localStorage.getItem('userStorage')),
             emailStorage = angular.fromJson(localStorage.getItem('emailStorage')),
             tokenStorage = angular.fromJson(localStorage.getItem('tokenStorage')) || {},
-            loginExample = angular.fromJson(localStorage.getItem('loginExample'));
+            loginExample = angular.fromJson(localStorage.getItem('loginExample')),
+            oppsExample = angular.fromJson(localStorage.getItem('oppsExample'));
 
         if (userStorage === null || emailStorage === null) {
             userStorage = {
@@ -69,6 +70,16 @@ angular.module('angular-login.mock', ['ngMockE2E'])
             };
             localStorage.setItem('userStorage', angular.toJson(userStorage));
             localStorage.setItem('emailStorage', angular.toJson(emailStorage));
+        }
+
+        if (oppsExample === null){
+            $http.get('/data/oppsExample.json').success(function (data){
+                $log.debug('loading example opps data into local storage');
+                oppsExample = data;
+                localStorage.setItem('oppsExample', angular.toJson(data));
+            }).error(function (){
+                $log.warn('could not resolve example opps data');
+            });
         }
 
         /**
@@ -177,6 +188,14 @@ angular.module('angular-login.mock', ['ngMockE2E'])
                 localStorage.setItem('emailStorage', angular.toJson(emailStorage));
                 return [201, {valid: true, creationDate: Date.now()}, {}];
             }
+        });
+
+        //passthrough to api.data.gov
+        $httpBackend.when('GET', /data\/.*\.json/).passThrough();
+
+        $httpBackend.when('GET', /http:\/\/api\.data\.gov\/.*/).respond(function (method, url, data) {
+            $log.info(method, '->', url);
+            return [200, {}, oppsExample];
         });
 
     });

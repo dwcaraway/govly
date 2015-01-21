@@ -1,14 +1,15 @@
-'use strict';
-
-/**
- * @ngdoc function
- * @name vitalsApp.controller:MainCtrl
- * @description
- * # MainCtrl
- * Controller of the vitalsApp
- */
-angular.module('vitalsApp')
+angular.module('angular-login.opps', ['angular-login.grandfather', 'ngResource'])
+    .config(function ($stateProvider) {
+        'use strict';
+        $stateProvider
+            .state('app.opps', {
+                url: '/opps',
+                templateUrl: 'opps/opps.tpl.html',
+                accessLevel: accessLevels.user
+            });
+    })
     .controller('MainCtrl', function ($scope, $http, $resource, $timeout) {
+        'use strict';
         $http.defaults.useXDomain = true;
         var Opp = $resource('http://api.data.gov/gsa/fbopen/v0/opps', {'api_key': '8l3xbEmsQMq7AG7mXoSy3IuJAqehmWGRC754Otx7'});
         $scope.currentPage = 1;

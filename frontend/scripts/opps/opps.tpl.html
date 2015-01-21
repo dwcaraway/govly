@@ -1,11 +1,9 @@
 <div class="container" id="find" name="find" ng-controller="MainCtrl">
-    <h1 class="centered">Find Opportunities</h1>
-    <hr>
     <div id="sidebar" class="col-sm-3 col-md-3" >
         <form id="opps-form" novalidate role="form" class="form-inline">
             <div id="form-search-grp">
                 <label class="sr-only" for="q">Search</label>
-                <input name="q" id="q" type="text" class="search-query" ng-model="filter.q" placeholder="Search..." autocomplete="off" >
+                <input name="q" id="q" type="text" class="search-query" ng-model="filter.q" placeholder="Search Opps..." autocomplete="off" >
                 <button class="btn-primary" ng-click="filterChanged(filter)"><span class="glyphicon glyphicon-search"></span></button>
             </div>
 

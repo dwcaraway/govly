@@ -8,6 +8,7 @@ angular.module('angular-login', [
     'angular-login.pages',
     'angular-login.register',
     'angular-login.error',
+    'angular-login.opps',
     // components
     'ngAnimate'
 ])

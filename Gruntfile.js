@@ -116,6 +116,9 @@ module.exports = function (grunt) {
                                 '/frontend/scripts',
                                 connect.static('./frontend/scripts')
                             ),
+                            connect().use(
+                              '/data/oppsExample.json', connect.static('./frontend/scripts/opps/oppsExample.json')
+                            ),
                             connect.static(require('path').resolve('.tmp'))
                         ];
                     }
