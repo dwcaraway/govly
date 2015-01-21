@@ -37,23 +37,16 @@ angular.module('angular-login.mock', ['ngMockE2E'])
     .constant('loginExampleData', {
         version: '0.2.0'
     })
-    .run(function ($httpBackend, $log, loginExampleData) {
+    .run(function ($httpBackend, $log) {
             'use strict';
         var userStorage = angular.fromJson(localStorage.getItem('userStorage')),
             emailStorage = angular.fromJson(localStorage.getItem('emailStorage')),
             tokenStorage = angular.fromJson(localStorage.getItem('tokenStorage')) || {},
             loginExample = angular.fromJson(localStorage.getItem('loginExample'));
 
-        // Check and corrects old localStorage values, backward-compatibility!
-        if (!loginExample || loginExample.version !== loginExampleData.version) {
-            userStorage = null;
-            tokenStorage = {};
-            localStorage.setItem('loginExample', angular.toJson(loginExampleData));
-        }
-
         if (userStorage === null || emailStorage === null) {
             userStorage = {
-                'johnm': {
+                'john.dott@myemail.com': {
                     name: 'John',
                     username: 'johnm',
                     password: 'hello',
@@ -61,7 +54,7 @@ angular.module('angular-login.mock', ['ngMockE2E'])
                     userRole: userRoles.user,
                     tokens: []
                 },
-                'sandrab': {
+                'bitter.s@provider.com': {
                     name: 'Sandra',
                     username: 'sandrab',
                     password: 'world',
@@ -98,19 +91,19 @@ angular.module('angular-login.mock', ['ngMockE2E'])
         // fakeLogin
         $httpBackend.when('POST', '/login').respond(function (method, url, data) {
             var postData = angular.fromJson(data),
-                user = userStorage[postData.username],
+                user = userStorage[postData.email],
                 newToken;
-            $log.info(method, '->', url);
+            $log.info(method, '->', url, 'user defined? '+angular.isDefined(user));
 
             if (angular.isDefined(user) && user.password === postData.password) {
                 newToken = randomUUID();
                 user.tokens.push(newToken);
-                tokenStorage[newToken] = postData.username;
+                tokenStorage[newToken] = postData.email;
                 localStorage.setItem('userStorage', angular.toJson(userStorage));
                 localStorage.setItem('tokenStorage', angular.toJson(tokenStorage));
                 return [200, {name: user.name, userRole: user.userRole, token: newToken}, {}];
             } else {
-                return [401, 'wrong combination username/password', {}];
+                return [401, 'wrong combination email/password', {}];
             }
         });
 
