@@ -12,7 +12,7 @@ Installation (Server)
 Install Python 2.7.x, pip, virtualenv
 ```
 $ sudo apt-get update
-$ sudo apt-get install python2.7 python-setuptools libxml2-dev libxslt-dev python-dev lib32z1-dev
+$ sudo apt-get install python2.7 python-setuptools libxml2-dev libxslt-dev python-dev postgresql-server-dev-9.3
 $ sudo easy_install pip
 $ sudo pip install virtualenv
 ```
@@ -35,6 +35,23 @@ Now in the /path/to/this directory, install the requirements
 cd /path/to/this
 $ pip install -r requirements.txt
 ```
+
+## Configure the Database
+Install Postgresql 9.3+
+
+    sudo apt-get install postgresql-9.3
+
+Configure the pg_hba.conf file on your system (location varies) to allow local connections without passwords. Your hba.conf should have lines like below
+
+
+local all all trust
+host all all 127.0.0.1/32 trust
+
+Create the database and role within your system user name
+
+    $ psql -c 'create user vitals password 'vitals';' -U postgres
+    $ psql -c 'CREATE DATABASE vitalsdev WITH OWNER vitals;' -U postgres
+
 
 To launch a development server, run the below. _NOTE: DO NOT USE BUILT-IN SERVER FOR PRODUCTION_
 ```
