@@ -1,7 +1,11 @@
 angular.module('angular-login', [
+    //Mock backend replaced by real servers in production
+    //Keep the mock login as first dependency! otherwise may leave
+    //mock backend attached in production!
+    'angular-login.mock',
+
     // login service
     'loginService',
-    'angular-login.mock',
     'angular-login.directives',
     // different app sections
     'angular-login.home',

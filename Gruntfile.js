@@ -241,6 +241,16 @@ module.exports = function (grunt) {
                     }
                 ]
             },
+            backend: {
+                src: ['<%= appConfig.dist %>/scripts/main.*'],  //replaces the ngMockE2E backend for watch server with real one in build
+                dest: '<%= appConfig.dist %>/scripts/',
+                replacements: [
+                    {
+                        from: '["angular-login.mock",',
+                        to: '['
+                    }
+                ]
+            },
             injection: {
                 src: ['<%= appConfig.temp %>/index.html'],   // source files array (supports minimatch)
                 dest: '<%= appConfig.temp %>/',             // destination directory or file
@@ -539,7 +549,8 @@ module.exports = function (grunt) {
     grunt.registerTask('pre-deploy', [
         'build',
         'ngconstant:production',
-        'replace:production'
+        'replace:production',
+        'replace:backend'
     ]);
 
     grunt.registerTask('build', [
