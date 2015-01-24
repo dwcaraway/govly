@@ -400,9 +400,11 @@ module.exports = function (grunt) {
             dist: [
                 'ngconstant:production',
                 'less',
-                'html2js',
-                'imagemin',
-                'svgmin'
+                'html2js'
+                //Disabling these image minimizations to get build working on 2 core 32-bit linux machine
+
+                //'imagemin',
+                //'svgmin'
                 //'concat_sourcemap'
             ]
         },
