@@ -8,7 +8,7 @@ angular.module('angular-login.opps', ['angular-login.grandfather', 'ngResource']
                 accessLevel: accessLevels.user
             });
     })
-    .controller('MainCtrl', function ($scope, $http, $resource, $timeout) {
+    .controller('MainCtrl', function ($scope, $http, $resource, $timeout, $log) {
         'use strict';
         $http.defaults.useXDomain = true;
         var Opp = $resource('http://api.data.gov/gsa/fbopen/v0/opps', {'api_key': '8l3xbEmsQMq7AG7mXoSy3IuJAqehmWGRC754Otx7'});

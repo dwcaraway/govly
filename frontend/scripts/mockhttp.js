@@ -195,7 +195,7 @@ angular.module('angular-login.mock', ['ngMockE2E'])
 
         $httpBackend.when('GET', /http:\/\/api\.data\.gov\/.*/).respond(function (method, url, data) {
             $log.info(method, '->', url);
-            return [200, {}, oppsExample];
+            return [200, oppsExample];
         });
 
     });
