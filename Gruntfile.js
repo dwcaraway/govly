@@ -403,12 +403,10 @@ module.exports = function (grunt) {
         concurrent: {
             server:[
                 'less',
-                'html2js',
-                'ngconstant:development'
+                'html2js'
                 //'concat_sourcemap'
             ],
             dist: [
-                'ngconstant:production',
                 'less',
                 'html2js'
                 //Disabling these image minimizations to get build working on 2 core 32-bit linux machine
@@ -457,6 +455,17 @@ module.exports = function (grunt) {
                     }
                 }
             },
+            staging: {
+                options: {
+                    dest: '<%= appConfig.app %>/scripts/config.js'
+                },
+                constants: {
+                    ENV: {
+                        name: 'staging',
+                        apiEndpoint: 'https://staging-api.fogmine.com'
+                    }
+                }
+            },
             production: {
                 options: {
                     dest: '<%= appConfig.app %>/scripts/config.js'
@@ -495,9 +504,14 @@ module.exports = function (grunt) {
     });
 
 
-    grunt.registerTask('serve', 'Compile then start a connect web server', function (target) {
+    grunt.registerTask('serve', 'Compile then start a web server. dist target will load compiled files from dist' +
+    ' folder and use localhost:5000 api, no live reload / watch. all other targets or no target results watch ' +
+    'the source files and use a mock backend', function (target) {
         if (target === 'dist') {
-            return grunt.task.run(['build', 'connect:dist:keepalive']);
+            //Serves the dist folder. If you forget to run a build first, garbage in, garbage out...
+            return grunt.task.run(['connect:dist:keepalive']);
+        }else if (target === 'local'){
+
         }
 
         grunt.task.run([
@@ -546,32 +560,44 @@ module.exports = function (grunt) {
         'sauce-connect-close'
     ]);
 
-    grunt.registerTask('pre-deploy', [
-        'build',
-        'ngconstant:production',
-        'replace:production'
-    ]);
+    grunt.registerTask('build', 'Processes all files and stores in dist folder ready for serving. default (no target) or local target preps files' +
+        'assuming api is localhost:5000. staging target assumes api is https://staging-api.fogmine.com. production target assumes api is https://api.fogmine.com',
+        function (target) {
+            var tasks = [
+                'clean',
+                'copy:index',
+                'wiredep',
+                'injector',
+                'replace:injection',
+                'useminPrepare',
+                'concurrent:dist',
+                'autoprefixer',
+                'concat',
+                'ngAnnotate',
+                'copy:dist',
+                'cssmin',
+                'uglify',
+                'filerev',
+                'usemin',
+                'copy:indexfinal',
+                'htmlmin',
+                'replace:backend'
+            ];
 
-    grunt.registerTask('build', [
-        'clean',
-        'copy:index',
-        'wiredep',
-        'injector',
-        'replace:injection',
-        'useminPrepare',
-        'concurrent:dist',
-        'autoprefixer',
-        'concat',
-        'ngAnnotate',
-        'copy:dist',
-        'cssmin',
-        'uglify',
-        'filerev',
-        'usemin',
-        'copy:indexfinal',
-        'htmlmin',
-        'replace:backend'
-    ]);
+            if (target === 'staging') {
+                //Build files to dist folder ready for staging deployment on CDN. Built files will assume the api is at https://staging-api.fogmine.com
+                tasks.unshift('ngconstant:staging');
+            } else if (target === 'production') {
+                //Build files to dist folder ready for production deployment on CDN. Built files will assume the api is at https://api.fogmine.com
+                tasks.unshift('ngconstant:production', 'replace:production');
+            } else if (target == 'local' || !target){
+                tasks.unshift('ngconstant:development');
+            } else{
+               grunt.fail.warn("Undefined target: "+target);
+            }
+
+            return grunt.task.run(tasks);
+        });
 
     grunt.registerTask('default', [
         'newer:jshint',
