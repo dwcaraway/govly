@@ -37,7 +37,7 @@ angular.module('angular-login', [
         $rootScope.$on('$stateChangeError', resolveDone);
         $rootScope.$on('$statePermissionError', resolveDone);
     })
-    .controller('BodyController', function ($scope, $state, $stateParams, loginService, $http, $timeout) {
+    .controller('BodyController', function ($scope, $state, $stateParams, loginService, $timeout) {
         'use strict';
         // Expose $state and $stateParams to the <body> tag
         $scope.$state = $state;
@@ -49,24 +49,25 @@ angular.module('angular-login', [
             working: false,
             wrong: false
         };
+
         $scope.loginMe = function () {
             // setup promise, and 'working' flag
-            var loginPromise = $http.post('/login', $scope.login);
             $scope.login.working = true;
             $scope.login.wrong = false;
 
-            loginService.loginUser(loginPromise);
-            loginPromise.error(function () {
-                $scope.login.wrong = true;
-                $timeout(function () {
-                    $scope.login.wrong = false;
-                }, 8000);
-            });
-            loginPromise.finally(function () {
-                $scope.login.working = false;
-            });
+            loginService.loginUser($scope.login)
+                .error(function () {
+                    $scope.login.wrong = true;
+                    $timeout(function () {
+                        $scope.login.wrong = false;
+                    }, 8000);
+                }).finally(function () {
+                    $scope.login.working = false;
+                });
         };
-        $scope.logoutMe = function () {
-            loginService.logoutUser($http.get('/logout'));
+
+        $scope.logoutMe = function (){
+            loginService.logoutUser();
         };
+
     });

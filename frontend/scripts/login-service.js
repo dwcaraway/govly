@@ -1,12 +1,14 @@
-angular.module('loginService', ['ui.router'])
-    .provider('loginService', function () {
+angular.module('loginService', ['ui.router', 'config'])
+    .provider('loginService', function (ENV) {
         'use strict';
 
         var userToken = localStorage.getItem('userToken'),
             errorState = 'app.error',
             logoutState = 'app.home';
 
-        this.$get = function ($rootScope, $http, $q, $state) {
+        var AUTH_BASE_URL = ENV.apiEndpoint + '/auth';
+
+        this.$get = function ($rootScope, $http, $q, $state, $timeout) {
 
             /**
              * Low-level, private functions.
@@ -158,14 +160,18 @@ angular.module('loginService', ['ui.router'])
                     setUserRole(user.userRole);
                     return user;
                 },
-                loginUser: function (httpPromise) {
-                    httpPromise.success(this.loginHandler);
+                loginUser: function (user) {
+                    return $http.post(AUTH_BASE_URL + '/login', {
+                        'username': user.email,
+                        'password': user.password
+                    }).success(this.loginHandler);
                 },
                 logoutUser: function () {
                     /**
                      * De-registers the userToken remotely
                      * then clears the loginService as it was on startup
                      */
+                    $http.get(AUTH_BASE_URL + '/logout');
                     setToken(null);
                     this.userRole = userRoles.public;
                     this.user = {};

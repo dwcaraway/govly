@@ -1,5 +1,5 @@
 /* jshint -W084 */
-angular.module('angular-login.mock', ['ngMockE2E'])
+angular.module('angular-login.mock', ['ngMockE2E', 'config'])
     .factory('delayHTTP', function ($q, $timeout) {
         'use strict';
 
@@ -37,13 +37,15 @@ angular.module('angular-login.mock', ['ngMockE2E'])
     .constant('loginExampleData', {
         version: '0.2.0'
     })
-    .run(function ($httpBackend, $log, $http) {
+    .run(function ($httpBackend, $log, $http, ENV) {
             'use strict';
         var userStorage = angular.fromJson(localStorage.getItem('userStorage')),
             emailStorage = angular.fromJson(localStorage.getItem('emailStorage')),
             tokenStorage = angular.fromJson(localStorage.getItem('tokenStorage')) || {},
             loginExample = angular.fromJson(localStorage.getItem('loginExample')),
             oppsExample = angular.fromJson(localStorage.getItem('oppsExample'));
+
+        var AUTH_BASE_URL = ENV.apiEndpoint + '/auth';
 
         if (userStorage === null || emailStorage === null) {
             userStorage = {
@@ -100,9 +102,9 @@ angular.module('angular-login.mock', ['ngMockE2E'])
         };
 
         // fakeLogin
-        $httpBackend.when('POST', '/login').respond(function (method, url, data) {
+        $httpBackend.when('POST', AUTH_BASE_URL+'/login').respond(function (method, url, data) {
             var postData = angular.fromJson(data),
-                user = userStorage[postData.email],
+                user = userStorage[postData.username],
                 newToken;
             $log.info(method, '->', url, 'user defined? '+angular.isDefined(user));
 
@@ -119,7 +121,7 @@ angular.module('angular-login.mock', ['ngMockE2E'])
         });
 
         // fakeLogout
-        $httpBackend.when('GET', '/logout').respond(function (method, url, data, headers) {
+        $httpBackend.when('GET', AUTH_BASE_URL+'/logout').respond(function (method, url, data, headers) {
             var queryToken, userTokens;
             $log.info(method, '->', url);
 

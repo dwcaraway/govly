@@ -549,8 +549,7 @@ module.exports = function (grunt) {
     grunt.registerTask('pre-deploy', [
         'build',
         'ngconstant:production',
-        'replace:production',
-        'replace:backend'
+        'replace:production'
     ]);
 
     grunt.registerTask('build', [
@@ -570,7 +569,8 @@ module.exports = function (grunt) {
         'filerev',
         'usemin',
         'copy:indexfinal',
-        'htmlmin'
+        'htmlmin',
+        'replace:backend'
     ]);
 
     grunt.registerTask('default', [
