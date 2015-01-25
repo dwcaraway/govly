@@ -65,6 +65,10 @@ module.exports = function (grunt) {
                 files: 'index.html',
                 tasks: ['copy:index']
             },
+            applocal:{
+                files: 'nglogin.js',
+                tasks: ['replace:ngbootstrap']
+            },
             js: {
                 files: ['<%= appConfig.app %>/scripts/{,*/}*.js'],
                 tasks: ['newer:jshint:all'],
@@ -118,6 +122,11 @@ module.exports = function (grunt) {
                             ),
                             connect().use(
                               '/data/oppsExample.json', connect.static('./frontend/scripts/opps/oppsExample.json')
+                            ),
+
+                            //nglogin-local.js only exists/is built when we want to connect to an api running on local host rather than the mock backend
+                            connect().use(
+                              '/frontend/scripts/nglogin-local.js', connect.static('.tmp/not-for-build/nglogin-local.js')
                             ),
                             connect.static(require('path').resolve('.tmp'))
                         ];
@@ -248,6 +257,26 @@ module.exports = function (grunt) {
                     {
                         from: '["angular-login.mock",',
                         to: '['
+                    }
+                ]
+            },
+            ngbootstrap: {
+                src: ['<%= appConfig.app %>/scripts/nglogin.js'],  //replaces the ngMockE2E backend for watch server with real one in build
+                dest: '<%= appConfig.temp %>/not-for-build/nglogin-local.js',
+                replacements: [
+                    {
+                        from: "'angular-login.mock',",
+                        to: ''
+                    }
+                ]
+            },
+            ngboostrapindex: {
+                src: ['<%= appConfig.temp %>/index.html'],  //replaces the main nglogin.js angular app with the modified nglogin-local.js angular app
+                dest: '<%= appConfig.temp %>/',
+                replacements: [
+                    {
+                        from: 'nglogin.js',
+                        to: 'nglogin-local.js'
                     }
                 ]
             },
@@ -389,6 +418,14 @@ module.exports = function (grunt) {
                 }]
             },
 
+            ngbootstrap: {
+                files: [{
+                    expand: true,
+                    cwd: '<%= appConfig.app %>/scripts',
+                    src: 'nglogin.js',
+                    dest: '<%= appConfig.temp %>/not-for-build'
+                }]
+            },
             indexfinal: {
                 files: [{
                     expand: true,
@@ -507,23 +544,34 @@ module.exports = function (grunt) {
     grunt.registerTask('serve', 'Compile then start a web server. dist target will load compiled files from dist' +
     ' folder and use localhost:5000 api, no live reload / watch. all other targets or no target results watch ' +
     'the source files and use a mock backend', function (target) {
+        var tasks = [
+            'clean',
+            'ngconstant:development',
+            'copy:index',
+            'wiredep',
+            'injector'
+        ];
+
         if (target === 'dist') {
             //Serves the dist folder. If you forget to run a build first, garbage in, garbage out...
             return grunt.task.run(['connect:dist:keepalive']);
-        }else if (target === 'local'){
-
         }
 
-        grunt.task.run([
-            'clean',
-            'copy:index',
-            'wiredep',
-            'injector',
-            'concurrent:server',
+        if (target === 'local') {
+            tasks.push(                //This copies the nglogin.js to .tmp, removing the mockbackend in the process
+                'replace:ngbootstrap',
+                //This replaces the nglogin.js with nglogin-local.js in index.html
+                'replace:ngboostrapindex');
+        } else if (target && target !== 'mock') {
+            grunt.fail.error('Invalid target: ' + target);
+        }
+
+        tasks.push('concurrent:server',
             'autoprefixer',
             'connect:livereload',
-            'watch'
-        ]);
+            'watch');
+
+        grunt.task.run(tasks);
     });
 
     grunt.registerTask('test', 'Run unit or end-to-end tests', function (target) {
