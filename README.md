@@ -108,3 +108,13 @@ Then create a directory for the phantomJS output
 $ sudo mkdir /var/log/phantomJS
 $ sudo chown yourusername /var/log/phantomJS
 ```
+
+Primary Grunt Tasks
+-------------------
+
+*  **serve:mock** or **serve (default)**: Starts a grunt server on localhost:9000 with live reload connected to angular source files.. mock backend is used.
+*  **serve:local**: Same as serve:mock except an api is expected on localhost:5000
+*  **serve:dist**: Serves whatever is in the dist folder (depends on which build task was run) on localhost:9000
+*  **build:local** or **build (default)**: Build files to dist folder ready for deployment on host which also contains the api (localhost:5000). Used for development only.
+*  **build:staging**: Build files to dist folder ready for staging deployment on CDN. Built files will assume the api is at https://staging-api.fogmine.com
+*  **build:production**: Build files to dist folder ready for production deployment on CDN. Built files will assume the api is at https://api.fogmine.com
