@@ -62,9 +62,10 @@ Installation (Client)
 ---------------------
 The client side is static and can be loaded directly into a server or deployed via a CDN.
 
-Install Bower and Grunt
+Install the latest NodeJS(you might needs to use a PPA or compile from source to get the latest nodejs)
+
+Install Grunt and Bower
 ```
-$ sudo apt-get install nodejs
 $ sudo npm install -g bower grunt
 ```
 
@@ -73,7 +74,7 @@ Now in the /path/to/this directory, install the client side (javascript) require
 $ bower install
 ```
 
-Now install the Grunt build dependencies
+Now install the build dependencies
 ```
 $ npm install
 ```
@@ -85,7 +86,7 @@ Running Tests
 
 First install the test requirements
 ```
-$ pip install -r test-requirements.txt
+$ pip install -r requirements/develop.txt
 ```
 
 To run tests
@@ -95,26 +96,29 @@ $ python manage.py test
 
 (Client Side)
 
-To run client-side functional tests, install
+To run client-side tests
 ```
-$ sudo apt-get update
-$ sudo apt-get install nodejs
-$ sudo ln -s /usr/bin/nodejs /usr/bin/node
-$ sudo npm install -g phantomjs
-```
-
-Then create a directory for the phantomJS output
-```
-$ sudo mkdir /var/log/phantomJS
-$ sudo chown yourusername /var/log/phantomJS
+$ grunt test
 ```
 
 Primary Grunt Tasks
 -------------------
-
-*  **serve:mock** or **serve (default)**: Starts a grunt server on localhost:9000 with live reload connected to angular source files.. mock backend is used.
-*  **serve:local**: Same as serve:mock except an api is expected on localhost:5000
-*  **serve:dist**: Serves whatever is in the dist folder (depends on which build task was run) on localhost:9000
+##Build
 *  **build:local** or **build (default)**: Build files to dist folder ready for deployment on host which also contains the api (localhost:5000). Used for development only.
 *  **build:staging**: Build files to dist folder ready for staging deployment on CDN. Built files will assume the api is at https://staging-api.fogmine.com
 *  **build:production**: Build files to dist folder ready for production deployment on CDN. Built files will assume the api is at https://api.fogmine.com
+
+##Serve
+*  **serve:mock** or **serve (default)**: Starts a grunt server on localhost:9000 with live reload connected to angular source files.. mock backend is used.
+*  **serve:local**: Same as serve:mock except an api is expected on localhost:5000
+*  **serve:dist**: Serves whatever is in the dist folder (depends on which build task was run) on localhost:9000
+
+Database Migrations
+-------------------
+Modifications to the database should be performed through migrations. The general process is
+
+1.  Update the SQLAlchemy models with any changes that you wish to make
+2.  Generate database migration revision file ```python manage.py db migrate```
+3.  Edit the generated migration file to ensure that downgrade and upgrade functions are properly defined. Upgrades move forward in time while downgrads are backwards in time.
+4.  Verify migration completes successfully by ```python manage.py db upgrade```.
+5.  Verify migration downgrade completes by ```python manage.py db downgrade```. Repeat step 4 to get back to upgraded state.

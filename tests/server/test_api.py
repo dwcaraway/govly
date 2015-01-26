@@ -77,8 +77,16 @@ class TestLoggingIn:
         data = dict(username=user.email, password='myprecious')
         resp = testapi.post_json(url_for('jwt'), data)
         assert resp.status_code == 200
-        assert 'token' in resp.json
+        resp.json.should.contain('token')
+        resp.json.should.contain('roles')
+        resp.json.should.contain('firstName')
         return resp.json['token']
+
+    def test_login_returns_id_in_token(self, user, testapi):
+        token = self.test_jwt_log_in_returns_200_with_token(user, testapi)
+        from flask_jwt import _default_decode_handler as d
+        payload = d(token)
+        user.id.should.equal(payload['user_id'])
 
     def test_secure_endpoint_fails_without_token(self, user, testapi):
         resp = testapi.get("/secure", expect_errors=True)

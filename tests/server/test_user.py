@@ -1,14 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-    tests.test_users
-    ~~~~~~~~~~~~~~~~
-
-    :author: 18F
-    :copyright: © 2014-2015, 18F
-    :license: CC0 Public Domain License, see LICENSE for more details.
-
-    templated from https://github.com/ryanolson/cookiecutter-webapp
-"""
 import datetime as dt
 import pytest
 
@@ -43,7 +33,7 @@ class TestUser:
         assert isinstance(user.secret, basestring)
 
     def test_password_is_nullable(self):
-        user = User(email='foo@bar.com')
+        user = User(email='foo@bar.com', first_name="foo", last_name="bar")
         user.save()
         assert user.password is None
 

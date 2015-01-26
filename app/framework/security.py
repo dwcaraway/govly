@@ -11,11 +11,10 @@
 """
 import logging
 
-from flask import current_app
-from flask.ext.jwt import JWTError
+from flask import current_app,jsonify, _request_ctx_stack
+from flask.ext.jwt import JWTError, current_user
 from flask.ext.security.utils import verify_and_update_password
 from werkzeug.local import LocalProxy
-
 
 _log = logging.getLogger(__name__)
 _security = LocalProxy(lambda: current_app.extensions['security'])
@@ -26,6 +25,7 @@ def authenticate(username, password):
 
     if user and user.confirmed_at and verify_and_update_password(password, user):
         _log.info("%s authenticated successfully", username)
+        _request_ctx_stack.top.current_user = user
         return user
 
     if not user:
@@ -51,3 +51,7 @@ def make_payload(user):
         "user_id": user.id,
         "secret": user.secret
     }
+
+def make_response(payload):
+    """Encodes the payload and returns a flask response"""
+    return jsonify(dict(token=payload, roles=current_user.roles, firstName=current_user.first_name))

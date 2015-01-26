@@ -68,7 +68,9 @@ class AuthView(BaseView):
                 return {'status': 409, 'message':'An account with that email already exists.'}, 409
 
             password = encrypt_password(data['password'])
-            user = User.create(email=data['email'], password=password)
+
+            #TODO need to accept first and last name on register
+            user = User.create(email=data['email'], password=password, first_name='samplefirstname', last_name="samplelastname")
             confirmation_link = self.generate_confirmation_link(user)
 
             send_message(

@@ -35,6 +35,8 @@ class RoleFactory(BaseFactory):
 class UserFactory(BaseFactory):
     FACTORY_FOR = User
     email = Sequence(lambda n: 'user{0}@foobar.com'.format(n))
+    first_name = Sequence(lambda n: 'firstname{0}'.format(n))
+    last_name = Sequence(lambda n: 'lastname{0}'.format(n))
     confirmed_at = datetime.utcnow()
     last_login_at = datetime.utcnow()
     current_login_at = datetime.utcnow()

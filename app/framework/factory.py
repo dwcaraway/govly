@@ -18,7 +18,7 @@ from raven.contrib.flask import Sentry
 
 from .extensions import *
 from .middleware import HTTPMethodOverrideMiddleware
-from .security import authenticate, load_user, make_payload
+from .security import authenticate, load_user, make_payload, make_response
 from ..models.users import User, Role
 
 _log = logging.getLogger(__name__)
@@ -66,6 +66,7 @@ def create_app(package_name, package_path, settings_override=None,
     jwt.authentication_handler(authenticate)
     jwt.payload_handler(make_payload)
     jwt.user_handler(load_user)
+    jwt.response_handler(make_response)
 
     # Flask-CORS
     cors.init_app(app)

@@ -59,6 +59,8 @@ class User(UserMixin, Model):
 
     email = db.Column(db.String(128), unique=True, nullable=False)
     password = db.Column(db.String(120))
+    first_name = db.Column(db.String(120), nullable=False)
+    last_name = db.Column(db.String(120), nullable=False)
     active = db.Column(db.Boolean())
     secret = db.Column(db.String(64), default=generate_secret)
     confirmed_at = db.Column(db.DateTime())
