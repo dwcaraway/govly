@@ -11,9 +11,8 @@
 """
 from flask import request, render_template, Flask
 from flask.ext.classy import route
-from flask.ext.jwt import generate_token, SignatureExpired, BadSignature
+from flask.ext.jwt import generate_token, SignatureExpired, BadSignature, current_user
 from flask.ext.restful.reqparse import RequestParser
-from flask.ext.security import current_user
 from flask_security.registerable import encrypt_password
 from ..base import BaseView, secure_endpoint
 from .rel import RELS
@@ -145,8 +144,8 @@ class AuthView(BaseView):
     @route('/logout', methods=['GET'])
     @secure_endpoint()
     def logout(self):
-        #TODO see 85848860
-        return {'TO': 'DO'}, 501
+        current_user.reset_secret()
+        return 200
 
     def generate_confirmation_link(self, user):
         """Generates a random link for confirming emails with timestamp for expiry"""

@@ -140,7 +140,12 @@ class TestLoggingOut:
         resp = testapi.get(url_for('v1.AuthView:logout'), headers={
             "Authorization": "Bearer {token}".format(token=token),
         }, expect_errors=True)
-        assert resp.status_code == 501
+        resp.status_code.should.equal(200)
+
+    def test_logout_resets_secret(self, user, token, testapi):
+        original_secret = user.secret
+        self.test_logout_succeeds_with_valid_token(user, token, testapi)
+        user.secret.should_not.equal(original_secret)
 
 class TestRegistration:
     """Test user registration via the API"""

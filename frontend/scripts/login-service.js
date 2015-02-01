@@ -23,6 +23,8 @@ angular.module('loginService', ['ui.router', 'config'])
 
             var setToken = function (token) {
                 if (!token) {
+                    //TODO remove the debug console below
+                    console.log('setToken called without token, removing any userToken entries');
                     localStorage.removeItem('userToken');
                 } else {
                     localStorage.setItem('userToken', token);
