@@ -146,8 +146,6 @@ class AuthView(BaseView):
     @secure_endpoint()
     def logout(self):
         #TODO see 85848860
-        print request.headers
-
         return {'TO': 'DO'}, 501
 
     def generate_confirmation_link(self, user):

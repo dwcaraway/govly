@@ -1,4 +1,4 @@
-angular.module('angular-login.opps', ['angular-login.grandfather', 'ngResource'])
+angular.module('angular-login.opps', ['angular-login.grandfather', 'ngResource', 'config'])
     .config(function ($stateProvider) {
         'use strict';
         $stateProvider
@@ -8,11 +8,11 @@ angular.module('angular-login.opps', ['angular-login.grandfather', 'ngResource']
                 accessLevel: accessLevels.user
             });
     })
-    .controller('MainCtrl', function ($scope, $http, $resource, $timeout, $log) {
+    .controller('MainCtrl', function ($scope, $http, $resource, $timeout, $log, ENV) {
         'use strict';
 
 
-        var Opp = $resource('http://localhost:5000/opps');
+        var Opp = $resource(ENV.apiEndpoint+'/opps');
         $scope.currentPage = 1;
 
         $scope.getOpps = function (filter) {
