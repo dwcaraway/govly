@@ -46,11 +46,11 @@ describe('Provider: login-service', function () {
         });
 
         it('should set the user role when called', function () {
-            var user  = {userRole: userRoles.admin};
+            var user  = {roles: [userRoles.admin]};
 
             expect(loginService.userRole).toEqual(userRoles.public);
             loginService.loginHandler(user);
-            expect(loginService.userRole).toBe(user.userRole);
+            expect(loginService.userRole).toBe(user.roles[0]);
 
         });
 
@@ -69,6 +69,10 @@ describe('Provider: login-service', function () {
             expect(localStorage.getItem('userToken')).toEqual(null);
             loginService.loginHandler(user);
             expect(localStorage.getItem('userToken')).toEqual(user.token);
+
+        });
+
+        it('should set Authorization header when token is set', function(){
 
         });
     });

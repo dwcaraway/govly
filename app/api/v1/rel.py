@@ -42,6 +42,10 @@ RELS = {
         {
             "to": "do"
         },
+     "opps":
+        {
+            "to": "do"
+        },
     "v1.AuthView:register": {
         "POST": {
             "properties": {

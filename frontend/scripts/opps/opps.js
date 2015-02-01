@@ -10,8 +10,9 @@ angular.module('angular-login.opps', ['angular-login.grandfather', 'ngResource']
     })
     .controller('MainCtrl', function ($scope, $http, $resource, $timeout, $log) {
         'use strict';
-        $http.defaults.useXDomain = true;
-        var Opp = $resource('http://api.data.gov/gsa/fbopen/v0/opps', {'api_key': '8l3xbEmsQMq7AG7mXoSy3IuJAqehmWGRC754Otx7'});
+
+
+        var Opp = $resource('http://localhost:5000/opps');
         $scope.currentPage = 1;
 
         $scope.getOpps = function (filter) {
@@ -27,15 +28,15 @@ angular.module('angular-login.opps', ['angular-login.grandfather', 'ngResource']
         };
 
         $scope.pageChanged = function () {
-            console.log('page: ' + $scope.currentPage);
+            $log.debug('page: ' + $scope.currentPage);
             $scope.filter = $scope.filter || {};
             $scope.filter.start = 10 * ($scope.currentPage - 1);
-            console.log('start: ' + $scope.filter.start);
+            $log.debug('start: ' + $scope.filter.start);
             $scope.getOpps($scope.filter);
         };
 
         $scope.filterChanged = function () {
-            console.log('page: ' + $scope.currentPage);
+            $log.debug('page: ' + $scope.currentPage);
             $scope.currentPage = 1;
             $scope.filter = $scope.filter || {};
             $scope.filter.start = 0;

@@ -54,4 +54,6 @@ def make_payload(user):
 
 def make_response(payload):
     """Encodes the payload and returns a flask response"""
-    return jsonify(dict(token=payload, roles=current_user.roles, firstName=current_user.first_name))
+    #TODO all bitmasks should NOT be the same and should be saved as an attribute of the role
+    masked_roles = [dict(bitMask=2, title=role.name) for role in current_user.roles]
+    return jsonify(dict(token=payload, roles=masked_roles, name=current_user.first_name))

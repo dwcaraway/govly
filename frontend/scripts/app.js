@@ -25,13 +25,7 @@ angular
         'ngAnimate',
         'templates-app'
     ])
-    .config(function ($stateProvider, $urlRouterProvider, $httpProvider, jwtInterceptorProvider) {
-
-        //Configure Jason Web Token support
-        jwtInterceptorProvider.tokenGetter = function () {
-            return localStorage.getItem('fogmine_token');
-        };
-        $httpProvider.interceptors.push('jwtInterceptor');
+    .config(function ($stateProvider, $urlRouterProvider, $httpProvider) {
 
         // For any unmatched url, send to /
         $urlRouterProvider.otherwise('/');

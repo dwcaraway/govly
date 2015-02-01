@@ -108,7 +108,7 @@ class AuthView(BaseView):
                 raise BadSignature
 
             s = TimestampSigner(secret_key=user.secret)
-            payload = s.unsign(email_signed, max_age=SECONDS_IN_A_DAY*3)
+            s.unsign(email_signed, max_age=SECONDS_IN_A_DAY*3)
 
             if user.confirmed_at:
                 return {
@@ -118,29 +118,37 @@ class AuthView(BaseView):
 
             user.confirmed_at = datetime.now()
             user.save()
-        except BadSignature as e:
+        except BadSignature:
             return {
                 'status': 409,
                 'message': "Invalid confirmation token"
             }, 409
-        except SignatureExpired as e:
+        except SignatureExpired:
             return {
                 'status': 409,
                 'message': "Confirmation token has expired."
             }, 409
 
-        return {'status':200, 'message': 'Account confirmed.', 'token':generate_token(user)}
+        return {'status': 200, 'message': 'Account confirmed.', 'token': generate_token(user)}
 
     @route('/change', methods=['POST'])
     @secure_endpoint()
     def change_password(self):
         #TODO
-        return {'TO':'DO'}, 501
+        return {'TO': 'DO'}, 501
 
     @route('/reset', methods=['POST'])
     def reset_password(self):
         #TODO
-        return {'TO':'DO'}, 501
+        return {'TO': 'DO'}, 501
+
+    @route('/logout', methods=['GET'])
+    @secure_endpoint()
+    def logout(self):
+        #TODO see 85848860
+        print request.headers
+
+        return {'TO': 'DO'}, 501
 
     def generate_confirmation_link(self, user):
         """Generates a random link for confirming emails with timestamp for expiry"""

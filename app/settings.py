@@ -17,7 +17,7 @@ class Config(object):
     # Flask
     DEBUG = True
     TESTING = False
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'super secret key - override with instance configuration')
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'superdupersecret')
     EMAIL_CONFIRM_SALT = os.environ.get('EMAIL_CONFIRM_SALT', 'email-confirm-key')
 
     CLIENT_DOMAIN = 'http://localhost:9000'
@@ -90,6 +90,7 @@ class Config(object):
 
     #Flask-JWT
     JWT_AUTH_URL_RULE = '/auth/login'
+    JWT_AUTH_HEADER_PREFIX = 'Bearer'
 
 class ProductionConfig(Config):
     DEBUG = False

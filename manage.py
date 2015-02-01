@@ -10,8 +10,8 @@
 
     templated from https://github.com/ryanolson/cookiecutter-webapp
 """
-from flask.ext.script import Command, Manager, Option, Shell, Server
-from flask.ext.migrate import MigrateCommand
+from flask.ext.script import Command, Manager, Option, Shell, Server, prompt_bool
+from flask.ext.migrate import MigrateCommand, upgrade
 from werkzeug.serving import run_simple
 
 from app import create_app
@@ -79,7 +79,35 @@ def test():
     exit_code = pytest.main(['tests', '--verbose'])
     return exit_code
 
-manager.add_command('runserver', WSGI(host='0.0.0.0'), )
+#Modifications to the migrate command
+@MigrateCommand.command
+def drop():
+    """Drops all database tables"""
+    if prompt_bool("Are you sure you want to lose all your data"):
+        db.drop_all()
+        db.engine.execute("drop table alembic_version")
+
+@MigrateCommand.command
+def create():
+    """Creates database tables from sqlalchemy models"""
+    upgrade()
+    populate()
+
+@MigrateCommand.command
+def recreate():
+    """Recreates database tables (same as issuing 'drop' and then 'create')"""
+    drop()
+    create()
+
+
+@MigrateCommand.command
+def populate():
+    "Populate database with default data"
+    from tests.fixtures import setup, mixer
+    mixer.init_app(application)
+    setup()
+
+manager.add_command('runserver', WSGI(host='0.0.0.0'))
 manager.add_command('worker', Worker())
 manager.add_command('shell', Shell(make_context=_make_context))
 manager.add_command('db', MigrateCommand)

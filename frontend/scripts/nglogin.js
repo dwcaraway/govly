@@ -18,6 +18,7 @@ angular.module('angular-login', [
     .config(function ($urlRouterProvider) {
         'use strict';
         $urlRouterProvider.otherwise('/');
+
     })
     .run(function ($rootScope) {
         /**

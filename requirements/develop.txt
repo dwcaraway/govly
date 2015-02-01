@@ -2,6 +2,7 @@
 -r scraper.txt
 
 #Libraries for testing
+mixer == 5.0.7
 sure == 1.2.7
 selenium == 2.42.1
 mock == 1.0.1

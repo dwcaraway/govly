@@ -62,7 +62,7 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
                     username: 'sandrab',
                     password: 'world',
                     email: 'bitter.s@provider.com',
-                    userRole: userRoles.admin,
+                    userRoles: userRoles.admin,
                     tokens: []
                 }
             };
@@ -110,11 +110,11 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
 
             if (angular.isDefined(user) && user.password === postData.password) {
                 newToken = randomUUID();
-                user.tokens.push(newToken);
+                user.tokens = [newToken];
                 tokenStorage[newToken] = postData.email;
                 localStorage.setItem('userStorage', angular.toJson(userStorage));
                 localStorage.setItem('tokenStorage', angular.toJson(tokenStorage));
-                return [200, {name: user.name, userRole: user.userRole, token: newToken}, {}];
+                return [200, {name: user.name, roles: [user.userRole], token: newToken}, {}];
             } else {
                 return [401, 'wrong combination email/password', {}];
             }
@@ -195,7 +195,7 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
         //passthrough to api.data.gov
         $httpBackend.when('GET', /data\/.*\.json/).passThrough();
 
-        $httpBackend.when('GET', /http:\/\/api\.data\.gov\/.*/).respond(function (method, url, data) {
+        $httpBackend.when('GET', /http:\/\/localhost:5000\/opps.*/).respond(function (method, url, data) {
             $log.info(method, '->', url);
             return [200, oppsExample];
         });

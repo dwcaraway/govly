@@ -76,10 +76,10 @@ class TestLoggingIn:
     def test_jwt_log_in_returns_200_with_token(self, user, testapi):
         data = dict(username=user.email, password='myprecious')
         resp = testapi.post_json(url_for('jwt'), data)
-        assert resp.status_code == 200
+        resp.status_code.should.equal(200)
         resp.json.should.contain('token')
         resp.json.should.contain('roles')
-        resp.json.should.contain('firstName')
+        resp.json.should.contain('name')
         return resp.json['token']
 
     def test_login_returns_id_in_token(self, user, testapi):
@@ -123,6 +123,24 @@ class TestLoggingIn:
         resp.headers.get('Access-Control-Allow-Origin').should.equal('*')
         resp.headers.get('Access-Control-Allow-Headers').should.contain('Content-Type')
         resp.headers.get('Access-Control-Allow-Headers').should.contain('Authorization')
+
+class TestLoggingOut:
+
+    def test_logout_requires_jwt_header(self, testapi):
+        resp = testapi.get(url_for('v1.AuthView:logout'), expect_errors=True)
+        assert resp.status_code == 401
+
+    def test_logout_requires_valid_jwt(self, testapi):
+        resp = testapi.get(url_for('v1.AuthView:logout'), headers={
+            "Authorization": "Bearer {token}".format(token='nota.real.token'),
+        }, expect_errors=True)
+        assert resp.status_code == 400
+
+    def test_logout_succeeds_with_valid_token(self, user, token, testapi):
+        resp = testapi.get(url_for('v1.AuthView:logout'), headers={
+            "Authorization": "Bearer {token}".format(token=token),
+        }, expect_errors=True)
+        assert resp.status_code == 501
 
 class TestRegistration:
     """Test user registration via the API"""
@@ -310,3 +328,16 @@ class TestOrganizations:
 
         doc = resp.hal
         doc.links['r:organizations'].url().should.equal(url_for('v1.OrganizationsView:index', page=1))
+
+class TestOpportunities:
+    """Test of 'Opportunity' Resource"""
+
+    def test_get(self, testapi, token):
+        """
+        Get a collection with default parameters
+        """
+        resp = testapi.get(url_for('v1.OpportunitiesView:index'), headers={
+            "Authorization": "Bearer {token}".format(token=token),
+        })
+
+        resp.should_not.equal(None)

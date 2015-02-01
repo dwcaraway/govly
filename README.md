@@ -89,6 +89,10 @@ First install the test requirements
 $ pip install -r requirements/develop.txt
 ```
 
+On Mac, if you receive a message that 'ffi.h' not found, follow [stackoverflow directions](http://stackoverflow.com/questions/22875270/error-installing-bcrypt-with-pip-on-os-x-cant-find-ffi-h-libffi-is-installed)
+On Mac, if you receive a message that 'libxml/xmlversion.h' is missing, install lxml alone with static library ```STATIC_DEPS=true pip install lxml```
+I also read that you may want to install ```xcode-select --install```
+
 To run tests
 ```
 $ python manage.py test

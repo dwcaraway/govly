@@ -8,17 +8,17 @@ angular.module('loginService', ['ui.router', 'config'])
 
         var AUTH_BASE_URL = ENV.apiEndpoint + '/auth';
 
-        this.$get = function ($rootScope, $http, $q, $state, $timeout) {
+        this.$get = function ($rootScope, $http, $q, $state) {
 
             /**
              * Low-level, private functions.
              */
             var setHeaders = function (token) {
                 if (!token) {
-                    delete $http.defaults.headers.common['X-Token'];
+                    delete $http.defaults.headers.common['Authorization'];
                     return;
                 }
-                $http.defaults.headers.common['X-Token'] = token.toString();
+                $http.defaults.headers.common['Authorization'] = 'Bearer '+token.toString();
             };
 
             var setToken = function (token) {
@@ -35,7 +35,8 @@ angular.module('loginService', ['ui.router', 'config'])
                     //if role not in userRoles, then we're done here
                     wrappedService.userRole = userRoles.public;
                 }else{
-                    wrappedService.userRole = role;
+                    //TODO change this to process all roles, not just first one? dwc
+                    wrappedService.userRole = role[0];
                 }
             };
 
@@ -150,14 +151,15 @@ angular.module('loginService', ['ui.router', 'config'])
          *   $state.go('app.nagscreen');
          * }
                      */
-                        // setup token
+                    console.log(angular.toJson(user));
+                    // setup token
                     setToken(user.token);
                     // update user
                     angular.extend(wrappedService.user, user);
                     // flag true on isLogged
                     wrappedService.isLogged = true;
                     // update userRole
-                    setUserRole(user.userRole);
+                    setUserRole(user.roles);
                     return user;
                 },
                 loginUser: function (user) {
