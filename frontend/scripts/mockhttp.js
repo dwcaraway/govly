@@ -125,7 +125,7 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
             var queryToken, userTokens;
             $log.info(method, '->', url);
 
-            if (queryToken = headers['X-Token']) {
+            if (queryToken = headers['userToken']) {
                 if (angular.isDefined(tokenStorage[queryToken])) {
                     userTokens = userStorage[tokenStorage[queryToken]].tokens;
                     // Update userStorage AND tokenStorage
@@ -148,7 +148,7 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
             $log.info(method, '->', url);
 
             // if is present in a registered users array.
-            if (queryToken = headers['X-Token']) {
+            if (queryToken = headers['userToken']) {
                 if (angular.isDefined(tokenStorage[queryToken])) {
                     userObject = userStorage[tokenStorage[queryToken]];
                     return [200, {token: queryToken, name: userObject.name, userRole: userObject.userRole}, {}];
@@ -192,7 +192,6 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
             }
         });
 
-        //passthrough to api.data.gov
         $httpBackend.when('GET', /data\/.*\.json/).passThrough();
 
         $httpBackend.when('GET', /http:\/\/localhost:5000\/opps.*/).respond(function (method, url, data) {

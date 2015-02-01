@@ -15,10 +15,10 @@ angular.module('loginService', ['ui.router', 'config'])
              */
             var setHeaders = function (token) {
                 if (!token) {
-                    delete $http.defaults.headers.common['Authorization'];
+                    delete $http.defaults.headers.common.Authorization;
                     return;
                 }
-                $http.defaults.headers.common['Authorization'] = 'Bearer '+token.toString();
+                $http.defaults.headers.common.Authorization = 'Bearer '+token.toString();
             };
 
             var setToken = function (token) {
@@ -153,7 +153,7 @@ angular.module('loginService', ['ui.router', 'config'])
          *   $state.go('app.nagscreen');
          * }
                      */
-                    console.log(angular.toJson(user));
+                    console.log('loginHandler called: '+angular.toJson(user));
                     // setup token
                     setToken(user.token);
                     // update user

@@ -11,6 +11,7 @@ describe('Provider: login-service', function () {
     // Initialize the controller and a mock scope
     beforeEach(inject(function (_loginService_) {
         loginService = _loginService_;
+        localStorage.removeItem('userToken');
     }));
 
     describe('loginHandler', function () {
@@ -54,6 +55,15 @@ describe('Provider: login-service', function () {
 
         });
 
+        it('should set the user in the loginService', function () {
+            var user  = {roles: [userRoles.admin]};
+
+            expect(loginService.userRole).toEqual(userRoles.public);
+            loginService.loginHandler(user);
+            expect(loginService.user).toEqual(user);
+
+        });
+
         it('should set userRole to public if not in user object', function () {
             var user  = {foo: 'bar'};
 
@@ -72,8 +82,30 @@ describe('Provider: login-service', function () {
 
         });
 
-        it('should set Authorization header when token is set', function(){
+        it('should maintain token in localStorage over window refresh', inject(function($window){
+            var user = {token: 'supersecret'};
 
-        });
+            loginService.loginHandler(user);
+            expect(localStorage.getItem('userToken')).toEqual(user.token);
+
+            $window.location.reload();
+            expect(localStorage.getItem('userToken')).toEqual(user.token);
+        }));
+
+        it('should add jwt header to requests', inject(function($http, $httpBackend){
+            var user = {token: 'supersecret'};
+
+            $httpBackend.expectGET('/checkheaders').respond(200);
+
+            //login should set headers
+            loginService.loginHandler(user);
+
+            //Make request which httpBackend will intercept and set the expectation
+            $http.get('/checkheaders');
+
+            //Flush triggers the intercept and resolves the $http promise
+            $httpBackend.flush();
+            expect($http.defaults.headers.common['Authorization']).toEqual('Bearer '+user.token);
+        }));
     });
 });
