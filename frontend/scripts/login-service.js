@@ -1,4 +1,10 @@
 angular.module('loginService', ['ui.router', 'config'])
+    .config(function ($httpProvider) {
+        'use strict';
+        //Interceptor to put the Authorization header in requests if user is authenticated
+        $httpProvider.interceptors.push('authInterceptor');
+
+    })
     .provider('loginService', function (ENV) {
         'use strict';
 
@@ -13,14 +19,6 @@ angular.module('loginService', ['ui.router', 'config'])
             /**
              * Low-level, private functions.
              */
-            var setHeaders = function (token) {
-                if (!token) {
-                    delete $http.defaults.headers.common.Authorization;
-                    return;
-                }
-                $http.defaults.headers.common.Authorization = 'Bearer '+token.toString();
-            };
-
             var setToken = function (token) {
                 if (!token) {
                     //TODO remove the debug console below
@@ -29,7 +27,6 @@ angular.module('loginService', ['ui.router', 'config'])
                 } else {
                     localStorage.setItem('userToken', token);
                 }
-                setHeaders(token);
             };
 
             var setUserRole = function (role) {
@@ -43,9 +40,7 @@ angular.module('loginService', ['ui.router', 'config'])
             };
 
             var getLoginData = function () {
-                if (userToken) {
-                    setHeaders(userToken);
-                } else {
+                if (!userToken) {
                     wrappedService.userRole = userRoles.public;
                     wrappedService.isLogged = false;
                     wrappedService.doneLoading = true;
@@ -96,7 +91,7 @@ angular.module('loginService', ['ui.router', 'config'])
                  * to handle same status codes for different resolve(s).
                  * This is defined inside $state.redirectMap.
                  */
-                $rootScope.$on('$stateChangeError', function (event, to, toParams, from, fromParams, error) {
+                $rootScope.$on('$stateChangeError', function (event, to, toParams, from, fromParams, _error_) {
                     /**
                      * This is a very clever way to implement failure redirection.
                      * You can use the value of redirectMap, based on the value of the rejection
@@ -105,10 +100,14 @@ angular.module('loginService', ['ui.router', 'config'])
                     var redirectObj;
                     // in case the promise given to resolve function is an $http request
                     // the error is a object containing the error and additional informations
-                    error = (typeof error === 'object') ? error.status.toString() : error;
+                    var error = (typeof _error_ === 'object') ? _error_.status.toString() : _error_;
                     // in case of a random 4xx/5xx status code from server, user gets loggedout
                     // otherwise it *might* forever loop (look call diagram)
+                    console.log('to', to, 'error', error, '_error_', _error_);
                     if (/^[45]\d{2}$/.test(error)) {
+                        //TODO remove debug statement
+
+                        console.log('$stateChangeError matches 4xx/5xx status code, initiating logout');
                         wrappedService.logoutUser();
                     }
                     /**
@@ -175,6 +174,8 @@ angular.module('loginService', ['ui.router', 'config'])
                      * De-registers the userToken remotely
                      * then clears the loginService as it was on startup
                      */
+                    //TODO remove debug statement
+                    console.log('logout called');
                     $http.get(AUTH_BASE_URL + '/logout');
                     setToken(null);
                     this.userRole = userRoles.public;
@@ -225,5 +226,18 @@ angular.module('loginService', ['ui.router', 'config'])
             managePermissions();
 
             return wrappedService;
+        };
+    }).factory('authInterceptor', function ($q) {
+        'use strict';
+
+        return {
+            request: function (config) {
+                var token = localStorage.getItem('userToken');
+                if (token) {
+                    config.headers.Authorization = 'Bearer ' + token;
+                }
+                //TODO should check for expired token???
+                return config;
+            }
         };
     });

@@ -34,15 +34,11 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
         'use strict';
         $httpProvider.interceptors.push('delayHTTP');
     }])
-    .constant('loginExampleData', {
-        version: '0.2.0'
-    })
     .run(function ($httpBackend, $log, $http, ENV) {
             'use strict';
         var userStorage = angular.fromJson(localStorage.getItem('userStorage')),
             emailStorage = angular.fromJson(localStorage.getItem('emailStorage')),
             tokenStorage = angular.fromJson(localStorage.getItem('tokenStorage')) || {},
-            loginExample = angular.fromJson(localStorage.getItem('loginExample')),
             oppsExample = angular.fromJson(localStorage.getItem('oppsExample'));
 
         var AUTH_BASE_URL = ENV.apiEndpoint + '/auth';
@@ -98,6 +94,8 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
                 var randomPoz = Math.floor(Math.random() * charSet.length);
                 randomToken += charSet.substring(randomPoz, randomPoz + 1);
             }
+
+            console.log('generated new token: '+randomToken);
             return randomToken;
         };
 
@@ -112,8 +110,11 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
                 newToken = randomUUID();
                 user.tokens = [newToken];
                 tokenStorage[newToken] = postData.email;
-                localStorage.setItem('userStorage', angular.toJson(userStorage));
+                localStorage.setItem('userStorage', angular.toJson(userStorage));//Is the update to userStorage necessary?
                 localStorage.setItem('tokenStorage', angular.toJson(tokenStorage));
+
+                //TODO remove debug statement below
+                console.log('tokenStorage updated'+localStorage.getItem('tokenStorage')+'token='+newToken);
                 return [200, {name: user.name, roles: [user.userRole], token: newToken}, {}];
             } else {
                 return [401, 'wrong combination email/password', {}];
@@ -148,14 +149,16 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
             $log.info(method, '->', url);
 
             // if is present in a registered users array.
-            if (queryToken = headers['userToken']) {
+            if (queryToken = headers.Authorization) {
                 if (angular.isDefined(tokenStorage[queryToken])) {
                     userObject = userStorage[tokenStorage[queryToken]];
                     return [200, {token: queryToken, name: userObject.name, userRole: userObject.userRole}, {}];
                 } else {
+                    console.log('auth token not found in tokenStorage');
                     return [401, 'auth token invalid or expired', {}];
                 }
             } else {
+                console.log('auth token not found in request headers');
                 return [401, 'auth token invalid or expired', {}];
             }
         });
@@ -194,7 +197,7 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
 
         $httpBackend.when('GET', /data\/.*\.json/).passThrough();
 
-        $httpBackend.when('GET', /http:\/\/localhost:5000\/opps.*/).respond(function (method, url, data) {
+        $httpBackend.when('GET', /http:\/\/localhost:5000\/opps.*/).respond(function (method, url) {
             $log.info(method, '->', url);
             return [200, oppsExample];
         });
