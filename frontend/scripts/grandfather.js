@@ -1,5 +1,5 @@
-angular.module('angular-login.grandfather', ['ui.router', 'templates-app'])
-    .config(function ($stateProvider) {
+angular.module('angular-login.grandfather', ['ui.router', 'templates-app', 'config'])
+    .config(function ($stateProvider, ENV) {
         'use strict';
         $stateProvider
             .state('app', {
@@ -17,7 +17,7 @@ angular.module('angular-login.grandfather', ['ui.router', 'templates-app'])
                          */
                         if (loginService.pendingStateChange) {
                             console.log('pendingStateChange is true, so resolvePendingState');
-                            return loginService.resolvePendingState($http.get('/user'));
+                            return loginService.resolvePendingState($http.get(ENV.apiEndpoint+'/user'));
                         } else {
                             console.log('roleDefined called to resolve: '+angular.toJson(roleDefined));
                             roleDefined.resolve();

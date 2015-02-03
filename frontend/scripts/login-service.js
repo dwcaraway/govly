@@ -32,9 +32,11 @@ angular.module('loginService', ['ui.router', 'config'])
             var setUserRole = function (role) {
                 if(!role){
                     //if role not in userRoles, then we're done here
+                    console.log('setUserRole called with null: reset to public role');
                     wrappedService.userRole = userRoles.public;
                 }else{
                     //TODO change this to process all roles, not just first one? dwc
+                    console.log('setUserRole called, role is '+role[0]);
                     wrappedService.userRole = role[0];
                 }
             };
@@ -66,15 +68,13 @@ angular.module('loginService', ['ui.router', 'config'])
                             to: to,
                             toParams: toParams
                         };
-                        return;
                     }
 
                     // if the state has undefined accessLevel, anyone can access it.
                     // NOTE: if `wrappedService.userRole === undefined` means the service still doesn't know the user role,
                     // we need to rely on grandfather resolve, so we let the stateChange success, for now.
-                    if (to.accessLevel === undefined || to.accessLevel.bitMask & wrappedService.userRole.bitMask) {
-                        angular.noop(); // requested state can be transitioned to.
-                    } else {
+                    else if (to.accessLevel && !(to.accessLevel.bitMask & wrappedService.userRole.bitMask)) {
+                        console.log('Unauthorized: state permission error');
                         event.preventDefault();
                         $rootScope.$emit('$statePermissionError');
                         $state.go(errorState, {error: 'unauthorized'}, {location: false, inherit: false});
@@ -103,7 +103,7 @@ angular.module('loginService', ['ui.router', 'config'])
                     var error = (typeof _error_ === 'object') ? _error_.status.toString() : _error_;
                     // in case of a random 4xx/5xx status code from server, user gets loggedout
                     // otherwise it *might* forever loop (look call diagram)
-                    console.log('to', to, 'error', error, '_error_', _error_);
+                    console.log('event ', angular.toJson(event),'to ', to, 'error ',error);
                     if (/^[45]\d{2}$/.test(error)) {
                         //TODO remove debug statement
 
