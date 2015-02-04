@@ -206,7 +206,7 @@ angular.module('loginService', ['ui.router', 'config'])
                         }
                     );
                     /**
-                     * I setted up the state change inside the promises success/error,
+                     * I set up the state change inside the promises success/error,
                      * so i can safely assign pendingStateChange back to null.
                      */
                     self.pendingStateChange = null;
@@ -227,7 +227,7 @@ angular.module('loginService', ['ui.router', 'config'])
 
             return wrappedService;
         };
-    }).factory('authInterceptor', function ($q) {
+    }).factory('authInterceptor', function () {
         'use strict';
 
         return {
