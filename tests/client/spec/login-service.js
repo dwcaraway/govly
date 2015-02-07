@@ -313,5 +313,32 @@ describe('Provider: login-service', function () {
             expect(isResolved).toBeFalsy();
         }));
 
+        it('should define a user role if not defined due to server error', inject(function($http, $httpBackend){
+
+            loginService.userRole = null;
+            loginService.pendingStateChange={to: {accessLevel : {bitMask : 1}}};
+
+            //Simulate the backend responding with user
+            $httpBackend.expectGET('/notfound').respond(404);
+
+            //Simulate the call made by grandfather
+            var checkUserPromise = loginService.resolvePendingState($http.get('/notfound'));
+
+            //Add a check to make sure the resolve happens
+            var isResolved = false;
+
+            checkUserPromise.then(function resolvedSuccessfully(){
+                isResolved = true;
+            });
+
+            $httpBackend.flush();
+
+            expect(loginService.doneLoading).toBeTruthy();
+            expect(loginService.userRole).not.toBeNull();
+            expect(isResolved).toBeFalsy();
+        }));
+
+
+
     });
 });

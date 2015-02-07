@@ -104,10 +104,11 @@ angular.module('loginService', ['ui.router', 'config'])
                     // in case of a random 4xx/5xx status code from server, user gets loggedout
                     // otherwise it *might* forever loop (look call diagram)
                     console.log('event ', angular.toJson(event),'to ', to, 'error ',error);
-                    if (/^[45]\d{2}$/.test(error)) {
+                    if (/^[45]\d{2}$/.test(error) || error === 0) {
                         //TODO remove debug statement
 
                         console.log('$stateChangeError matches 4xx/5xx status code, initiating logout');
+                        wrappedService.doneLoading = true;
                         wrappedService.logoutUser();
                     }
                     /**
@@ -189,22 +190,21 @@ angular.module('loginService', ['ui.router', 'config'])
                         pendingState = self.pendingStateChange;
 
                     // When the $http is done, we register the http result into loginHandler, `data` parameter goes into loginService.loginHandler
-                    httpPromise.success(self.loginHandler);
-
-                    httpPromise.then(
-                        function success() {
-                            self.doneLoading = true;
-                            // duplicated logic from $stateChangeStart, slightly different, now we surely have the userRole informations.
-                            if (pendingState.to.accessLevel === undefined || pendingState.to.accessLevel.bitMask & self.userRole.bitMask) {
-                                checkUser.resolve();
-                            } else {
-                                checkUser.reject('unauthorized');
-                            }
-                        },
-                        function reject(httpObj) {
-                            checkUser.reject(httpObj.status.toString());
+                    httpPromise.success(function (data,  head) {
+                        self.loginHandler(data);
+                        self.doneLoading = true;
+                        // duplicated logic from $stateChangeStart, slightly different, now we surely have the userRole informations.
+                        if (pendingState.to.accessLevel === undefined || pendingState.to.accessLevel.bitMask & self.userRole.bitMask) {
+                            checkUser.resolve();
+                        } else {
+                            checkUser.reject('unauthorized');
                         }
-                    );
+                    });
+
+                    httpPromise.error(function (data, status, headers, config) {
+                        checkUser.reject(status);
+                    });
+
                     /**
                      * I set up the state change inside the promises success/error,
                      * so i can safely assign pendingStateChange back to null.
