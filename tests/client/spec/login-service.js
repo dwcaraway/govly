@@ -55,6 +55,15 @@ describe('Provider: login-service', function () {
 
         });
 
+        it('should save the user role to localStorage when called', function () {
+            var user = {roles: [userRoles.admin]};
+
+            expect(loginService.userRole).toEqual(userRoles.public);
+            loginService.loginHandler(user);
+            expect(localStorage.getItem('userRole')).toEqual(angular.toJson(user.roles[0]));
+
+        });
+
         it('should set the user in the loginService', function () {
             var user = {roles: [userRoles.admin]};
 
@@ -337,8 +346,27 @@ describe('Provider: login-service', function () {
             expect(loginService.userRole).not.toBeNull();
             expect(isResolved).toBeFalsy();
         }));
+    });
 
+    describe('logoutUser', function(){
+       it('should remove the usertoken from local storage', function(){
+           var user = {token: 'sometoken', roles: [userRoles.admin]};
 
+           loginService.loginHandler(user);
 
+           loginService.logoutUser();
+           expect(localStorage.getItem('userToken')).toBeNull();
+        });
+
+        it('should set the user role to public in local storage', function(){
+           var user = {token: 'sometoken', roles: [userRoles.admin]};
+
+           loginService.loginHandler(user);
+
+           loginService.logoutUser();
+            expect(localStorage.getItem('userRole')).toBe(angular.toJson(userRoles.public));
+            expect(loginService.userRole).toEqual(userRoles.public);
+
+        });
     });
 });

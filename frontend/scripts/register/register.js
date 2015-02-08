@@ -9,7 +9,7 @@ angular.module('angular-login.register', ['angular-login.grandfather'])
                 accessLevel: accessLevels.anon
             });
     })
-    .controller('RegisterController', function ($scope, $http, $timeout, $state) {
+    .controller('RegisterController', function ($scope, $http, $timeout, $state, $log) {
         'use strict';
         $scope.xhr = false;
         $scope.redirect = false;
@@ -23,7 +23,7 @@ angular.module('angular-login.register', ['angular-login.grandfather'])
             $scope.xhr = true;
             $http.post('/user', $scope.registerObj)
                 .success(function (data) {
-                    console.info('post success - ', data);
+                    $log.info('post success - ', data);
                     $scope.xhr = false;
                     $scope.redirect = true;
                     $timeout(function () {
@@ -35,7 +35,7 @@ angular.module('angular-login.register', ['angular-login.grandfather'])
                         formInstance[error.field].$error[error.name] = true;
                     });
                     formInstance.$setPristine();
-                    console.info('post error - ', data);
+                    $log.info('post error - ', data);
                     $scope.xhr = false;
                 });
         };
