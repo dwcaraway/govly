@@ -42,15 +42,20 @@ angular.module('loginService', ['ui.router', 'config'])
 
                 }
 
-                //Persist the ro:le for reloads
+                //Persist the role for reloads
                 localStorage.setItem('userRole', angular.toJson(wrappedService.userRole));
             };
 
-            var getLoginData = function () {
+            var loadSavedData = function () {
+                var userJsonData = localStorage.getItem('userData');
+
                 if (!userToken) {
-                    wrappedService.userRole = userRoles.public;
+                    setUserRole();
                     wrappedService.isLogged = false;
                     wrappedService.doneLoading = true;
+                }else if(userJsonData){
+                    wrappedService.doneLoading = true;
+                    wrappedService.loginHandler(angular.fromJson(userJsonData));
                 }
             };
 
@@ -175,7 +180,8 @@ angular.module('loginService', ['ui.router', 'config'])
                         'username': user.email,
                         'password': user.password
                     }).success(function(data) {
-                        wrappedService.loginHandler(data);
+                            wrappedService.loginHandler(data);
+                            localStorage.setItem('userData', angular.toJson(data));
                             $state.go(loginState);
                     }
                     );
@@ -196,16 +202,18 @@ angular.module('loginService', ['ui.router', 'config'])
                     this.isLogged = false;
                     $state.go(logoutState);
                 },
-                resolvePendingState: function (httpPromise) {
+                resolvePendingState: function (_httpPromise_) {
                     var checkUser = $q.defer(),
                         self = this,
                         pendingState = self.pendingStateChange;
 
+                    var httpPromise = _httpPromise_ ? _httpPromise_ : $http.get(ENV.apiEndpoint+'/user');
+
                     // When the $http is done, we register the http result into loginHandler, `data` parameter goes into loginService.loginHandler
-                    httpPromise.success(function (data,  head) {
+                    httpPromise.success(function (data) {
                         self.loginHandler(data);
                         self.doneLoading = true;
-                        // duplicated logic from $stateChangeStart, slightly different, now we surely have the userRole informations.
+                        // duplicated logic from $stateChangeStart, slightly different, now we surely have the userRole information.
                         if (pendingState.to.accessLevel === undefined || pendingState.to.accessLevel.bitMask & self.userRole.bitMask) {
                             checkUser.resolve();
                         } else {
@@ -213,8 +221,8 @@ angular.module('loginService', ['ui.router', 'config'])
                         }
                     });
 
-                    httpPromise.error(function (data, status, headers, config) {
-                        setUserRole(); //Ensure that some user roles is set
+                    httpPromise.error(function (data, status) {
+                        setUserRole(); //Set the user roles to public
                         checkUser.reject(status);
                     });
 
@@ -235,7 +243,7 @@ angular.module('loginService', ['ui.router', 'config'])
                 doneLoading: null
             };
 
-            getLoginData();
+            loadSavedData();
             managePermissions();
 
             return wrappedService;
