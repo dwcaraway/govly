@@ -103,7 +103,7 @@ describe('Provider: login-service', function () {
             }).respond(200);
 
             //login should set headers
-            loginService.loginHandler(user);
+            localStorage.setItem('userData', angular.toJson(user));
 
             //Make request which httpBackend will intercept and set the expectation
             $http.get('/checkheaders');
@@ -358,13 +358,13 @@ describe('Provider: login-service', function () {
            expect(localStorage.getItem('userToken')).toBeNull();
         });
 
-        it('should set the user role to public in local storage', function(){
+        it('should remove userrole from localStorage', function(){
            var user = {token: 'sometoken', roles: [userRoles.admin]};
 
            loginService.loginHandler(user);
 
            loginService.logoutUser();
-            expect(localStorage.getItem('userRole')).toBe(angular.toJson(userRoles.public));
+            expect(localStorage.getItem('userRole')).toBeNull();
             expect(loginService.userRole).toEqual(userRoles.public);
 
         });

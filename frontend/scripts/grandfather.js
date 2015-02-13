@@ -19,7 +19,6 @@ angular.module('angular-login.grandfather', ['ui.router', 'templates-app', 'conf
                             console.log('pendingStateChange is true, so resolvePendingState');
                             return loginService.resolvePendingState();
                         } else {
-                            console.log('roleDefined called to resolve: '+angular.toJson(roleDefined));
                             roleDefined.resolve();
                         }
                         return roleDefined.promise;

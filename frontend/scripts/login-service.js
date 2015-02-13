@@ -35,15 +35,15 @@ angular.module('loginService', ['ui.router', 'config'])
                     //TODO change this to process all roles, not just first one? dwc
                     $log.log('setUserRole called, role is ' + role[0]);
                     wrappedService.userRole = role[0];
+
+                    //Persist the role for reloads
+                    localStorage.setItem('userRole', angular.toJson(wrappedService.userRole));
                 } else {
                     //if role not in userRoles, then we're done here
                     $log.log('setUserRole called with null: reset to public role');
                     wrappedService.userRole = userRoles.public;
-
+                    localStorage.removeItem('userRole');
                 }
-
-                //Persist the role for reloads
-                localStorage.setItem('userRole', angular.toJson(wrappedService.userRole));
             };
 
             var loadSavedData = function () {
@@ -51,11 +51,12 @@ angular.module('loginService', ['ui.router', 'config'])
 
                 if (!userToken) {
                     setUserRole();
-                    wrappedService.isLogged = false;
-                    wrappedService.doneLoading = true;
+                    localStorage.removeItem('userData');
+                    //wrappedService.isLogged = false;
+                    //wrappedService.doneLoading = true;
                 }else if(userJsonData){
-                    wrappedService.doneLoading = true;
                     wrappedService.loginHandler(angular.fromJson(userJsonData));
+                    wrappedService.doneLoading = true;
                 }
             };
 
@@ -180,8 +181,9 @@ angular.module('loginService', ['ui.router', 'config'])
                         'username': user.email,
                         'password': user.password
                     }).success(function(data) {
-                            wrappedService.loginHandler(data);
+                            //Save the last successful login to userData localStorage
                             localStorage.setItem('userData', angular.toJson(data));
+                            wrappedService.loginHandler(data);
                             $state.go(loginState);
                     }
                     );
@@ -238,9 +240,9 @@ angular.module('loginService', ['ui.router', 'config'])
                  */
                 userRole: null,
                 user: {},
-                isLogged: null,
+                isLogged: false,
                 pendingStateChange: null,
-                doneLoading: null
+                doneLoading: true
             };
 
             loadSavedData();
@@ -252,10 +254,14 @@ angular.module('loginService', ['ui.router', 'config'])
         'use strict';
 
         return {
-            request: function (config) {
-                var token = localStorage.getItem('userToken');
-                if (token) {
-                    config.headers.Authorization = 'Bearer ' + token;
+            request: function (config, loginService) {
+                var userStr= localStorage.getItem('userData'), token;
+                if (userStr) {
+                   token = angular.fromJson(userStr).token;
+
+                    if (token) {
+                        config.headers.Authorization = 'Bearer ' + token;
+                    }
                 }
                 //TODO should check for expired token???
                 return config;
