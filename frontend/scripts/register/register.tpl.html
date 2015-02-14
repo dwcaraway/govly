@@ -58,12 +58,6 @@
       </div>
     </div>
   </div>
-  <div class="form-input role">
-    <select class="form-control" name="role" ng-model="registerObj.role">
-      <option value="user" selected>User</option>
-      <option value="admin">Administrator</option>
-    </select>
-  </div>
   <button class="btn btn-lg btn-block" type="submit"
     ng-class="{ 'btn-primary': registerForm.$valid && registerForm.$dirty, 'btn-success': redirect }"
     ng-disabled="registerForm.$invalid || registerForm.$pristine || xhr || redirect">
