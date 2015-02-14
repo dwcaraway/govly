@@ -488,7 +488,7 @@ module.exports = function (grunt) {
                 constants: {
                     ENV: {
                         name: 'development',
-                        apiEndpoint: 'http://localhost:5000'
+                        apiEndpoint: 'http://localhost:5000/api'
                     }
                 }
             },
@@ -499,7 +499,7 @@ module.exports = function (grunt) {
                 constants: {
                     ENV: {
                         name: 'staging',
-                        apiEndpoint: 'https://staging-api.fogmine.com'
+                        apiEndpoint: '/api'
                     }
                 }
             },
@@ -510,7 +510,7 @@ module.exports = function (grunt) {
                 constants: {
                     ENV: {
                         name: 'production',
-                        apiEndpoint: 'https://api.fogmine.com'
+                        apiEndpoint: '/api'
                     }
                 }
             }
