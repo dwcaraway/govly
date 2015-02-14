@@ -16,7 +16,7 @@ export MEMCACHE_SERVERS='' MEMCACHIER_SERVERS=''
 python manage.py db upgrade
 
 #Downloading a copy of the client from amazon s3 and unzipping it
-wget http://s3.amazonaws.com/fogmine-vitals/codeship/staging/dist.tar.gz
+wget http://s3.amazonaws.com/fogmine-vitals/codeship/${STAGING_PRODUCTION}/dist.tar.gz
 tar -xvf dist.tar.gz
 
 echo "-----> Post-compile done"
