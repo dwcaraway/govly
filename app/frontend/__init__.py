@@ -11,7 +11,10 @@ def create_app(settings_override=None):
     from . import assets
     from . import extensions
 
-    app = Flask(settings_override, static_folder=assets_directory, static_url_path='')
+    app = Flask(__name__, static_folder=assets_directory, static_url_path='')
+
+    # Initialize settings
+    app.config.from_object(settings_override)
 
     @app.route('/')
     def root():
