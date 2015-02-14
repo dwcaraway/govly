@@ -3,6 +3,6 @@
 __author__ = 'DavidWCaraway'
 from app.settings import ProductionConfig
 
-from app.api import create_app
+from app import create_app
 
 application = create_app(ProductionConfig)
