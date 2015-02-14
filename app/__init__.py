@@ -1,3 +1,9 @@
+from werkzeug.wsgi import DispatcherMiddleware
+from . import api
+from . import frontend
+
+
 def create_app(override_settings=None):
-    from . import api
-    return api.create_app(override_settings)
+    return DispatcherMiddleware(frontend.create_app(override_settings), {
+        '/api': api.create_app(override_settings),
+    })

@@ -21,11 +21,11 @@ import os
 
 application = create_app(override_settings=os.environ.get('APPLICATION_SETTINGS', 'app.settings.DevelopmentConfig'))
 
-manager = Manager(application)
+manager = Manager(application.mounts['/api'])
 TEST_CMD = "py.test ./tests/server"
 
 from app.framework.extensions import celery
-celery.init_app(application)
+celery.init_app(application.mounts['/api'])
 
 class Worker(Command):
 
