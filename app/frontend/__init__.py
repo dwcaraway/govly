@@ -26,6 +26,10 @@ def create_app(settings_override=None):
     # Flask-DebugToolbar
     extensions.debug_toolbar.init_app(app)
 
+    if not app.debug and not app.testing:
+        from flask_sslify import SSLify
+        SSLify(app, permanent=True)
+
     _log.info("Flask frontend app created")
     return app
 
