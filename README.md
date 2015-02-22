@@ -54,7 +54,7 @@ Create the database and role within your system user name
 
 To create the (empty) database tables
 
-    $ python manage.py db migrate
+    $ python manage.py db upgrade
 
 
 To create and populate the database tables with canned data
