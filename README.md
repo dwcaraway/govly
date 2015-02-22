@@ -136,3 +136,11 @@ Modifications to the database should be performed through migrations. The genera
 3.  Edit the generated migration file to ensure that downgrade and upgrade functions are properly defined. Upgrades move forward in time while downgrads are backwards in time.
 4.  Verify migration completes successfully by ```python manage.py db upgrade```.
 5.  Verify migration downgrade completes by ```python manage.py db downgrade```. Repeat step 4 to get back to upgraded state.
+
+Deploying
+---------
+To deploy to staging, simply push your changes to the "master" branch in Bitbucket. If the build passes then you'll be able to view the results at
+https://staging.dash.fogmine.com
+
+To deploy to production, you push your changes to the "production" branch. *Due to a Bitbucket bug, you need to use ```--no-ff``` for merges
+from master to production in order to generate a change event and trigger the build.
