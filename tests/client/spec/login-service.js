@@ -6,7 +6,7 @@ describe('Provider: login-service', function () {
 
     var loginService;
 
-    beforeEach(module('loginService', 'angular-login.grandfather', 'angular-login.home'));
+    beforeEach(module('loginService', 'angular-login.grandfather', 'angular-login.register'));
 
     // Initialize the controller and a mock scope
     beforeEach(inject(function (_loginService_) {
