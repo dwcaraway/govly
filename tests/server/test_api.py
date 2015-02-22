@@ -186,7 +186,8 @@ class TestRegistration:
         return resp
 
     def test_register_user_assigns_user_role(self, apidb, testapi, role):
-        self.test_register_user(apidb, testapi, role)
+        resp = self.test_register_user(apidb, testapi, role)
+        resp.json['user']['roles'].should.have.length_of(1)
 
         u = User.first(email='agent@secret.com')
         u.roles.should.have.length_of(1)
@@ -197,8 +198,8 @@ class TestRegistration:
         resp.status_code.should.equal(201)
         resp.json['status'].should.equal(201)
         resp.json['message'].should.contain("A confirmation email has been sent to agent@secret.com")
-        resp.json['token'].should_not.be.none
-        resp.json['roles'].should.have.length_of(1)
+        resp.json['user'].should_not.be.none
+        resp.json['user']['token'].should_not.be.none
 
     def test_register_user_sends_confirmation_email(self, apidb, testapi, mail, role):
         with mail.record_messages() as outbox:
