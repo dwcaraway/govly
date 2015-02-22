@@ -104,7 +104,7 @@ def recreate():
 def populate():
     "Populate database with default data"
     from tests.fixtures import setup, mixer
-    mixer.init_app(application)
+    mixer.init_app(application.mounts['/api'])
     setup()
 
 manager.add_command('runserver', WSGI(host='0.0.0.0'))

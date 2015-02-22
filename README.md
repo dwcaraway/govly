@@ -52,7 +52,17 @@ Create the database and role within your system user name
     $ psql -c 'create user vitals password 'vitals';' -U postgres
     $ psql -c 'CREATE DATABASE vitalsdev WITH OWNER vitals;' -U postgres
 
+To create the (empty) database tables
 
+    $ python manage.py db migrate
+
+
+To create and populate the database tables with canned data
+
+    $ python manage.py db recreate
+
+
+## Run the Development Server
 To launch a development server, run the below. _NOTE: DO NOT USE BUILT-IN SERVER FOR PRODUCTION_
 ```
 $ python manage.py runserver

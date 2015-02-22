@@ -30,6 +30,7 @@ class Role(RoleMixin, Model):
 
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
+    bitmask = db.Column(db.SmallInteger, unique=True)
 
 
 class Connection(Model):

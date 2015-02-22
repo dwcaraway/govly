@@ -15,14 +15,28 @@ import pytest
 from flask import url_for
 from jsonschema import Draft4Validator
 from flask_jwt import generate_token
-from tests.factories import UserFactory
+from tests.factories import UserFactory, RoleFactory
 from app.models.users import User
 from bs4 import BeautifulSoup
 import re
 
 @pytest.fixture
-def user(apidb):
-    return UserFactory(password='myprecious')
+def role(apidb):
+    return RoleFactory()
+
+@pytest.fixture
+def user(role):
+    u = UserFactory(password='myprecious')
+    u.roles = [role] #Add a role
+    u.save()
+
+    return u
+
+@pytest.fixture
+def userNotSaved(role):
+    """Build a user instance but don't save to database"""
+    u = UserFactory.build(password='myprecious')
+    return u
 
 @pytest.fixture
 def token(user):
@@ -150,20 +164,20 @@ class TestLoggingOut:
 class TestRegistration:
     """Test user registration via the API"""
 
-    def test_register_data_invalid_email_generates_400(self, testapi):
-        data = {"email":"notareal email address", "password":"supersecret"}
+    def test_register_data_invalid_email_generates_400(self, testapi, role):
+        data = {"firstName":"myFirstName", "lastName":"myLastName", "email":"notareal email address", "password":"supersecret"}
         resp = testapi.post_json(url_for('v1.AuthView:register_user'), data, expect_errors=True)
 
         resp.status_code.should.equal(400)
         resp.json['status'].should.equal(400)
         resp.json['message'].should.contain("is not a 'email'")
 
-    def test_register_user(self, apidb, testapi):
-        data = {"email":"agent@secret.com", "password":"supersecret"}
+    def test_register_user(self, apidb, testapi, role):
+        data = {"firstName":"myFirstName", "lastName":"myLastName", "email":"agent@secret.com", "password":"supersecret"}
         resp = testapi.post_json(url_for('v1.AuthView:register_user'), data)
 
         #test register user creates user but confirmed_at is not set
-        u = User.query.filter_by(email='agent@secret.com').first()
+        u = User.query.filter_by(email=data['email']).first()
 
         from flask_security.utils import verify_and_update_password
         verify_and_update_password(user=u, password='supersecret').should_not.be.none
@@ -171,39 +185,44 @@ class TestRegistration:
 
         return resp
 
-    def test_register_user_returns_201(self, apidb, testapi):
-        resp = self.test_register_user(apidb, testapi)
+    def test_register_user_assigns_user_role(self, apidb, testapi, role):
+        self.test_register_user(apidb, testapi, role)
+
+        u = User.first(email='agent@secret.com')
+        u.roles.should.have.length_of(1)
+        u.roles.should.contain(role)
+
+    def test_register_user_returns_201(self, apidb, testapi, role):
+        resp = self.test_register_user(apidb, testapi, role)
         resp.status_code.should.equal(201)
         resp.json['status'].should.equal(201)
-        resp.json['message'].should.contain("A confirmation email has been sent.")
+        resp.json['message'].should.contain("A confirmation email has been sent to agent@secret.com")
+        resp.json['token'].should_not.be.none
+        resp.json['roles'].should.have.length_of(1)
 
-    def test_register_user_sends_confirmation_email(self, apidb, testapi, mail):
+    def test_register_user_sends_confirmation_email(self, apidb, testapi, mail, role):
         with mail.record_messages() as outbox:
-            self.test_register_user(apidb, testapi)
+            self.test_register_user(apidb, testapi, role)
             outbox.should.have.length_of(1)
             m = outbox[0]
             return m
 
-    def test_registered_but_unconfirmed_user_can_not_login(self, apidb, testapi):
-        self.test_register_user(apidb, testapi)
+    def test_registered_but_unconfirmed_user_may_login(self, apidb, testapi, role):
+        self.test_register_user(apidb, testapi, role)
         u = User.query.filter_by(email='agent@secret.com').first()
-        resp = testapi.post_json(url_for('jwt'), dict(username=u.email, password='supersecret'), expect_errors=True)
-        resp.status_code.should.equal(400)
-
-        resp.json['status_code'].should.equal(400)
-        resp.json['description'].should.equal('Invalid credentials')
-        resp.json['error'].should.equal('Bad Request')
-
+        resp = testapi.post_json(url_for('jwt'), dict(username=u.email, password='supersecret'))
+        resp.status_code.should.equal(200)
 
     def test_user_may_not_register_twice(self, apidb, testapi, user):
-        resp = testapi.post_json(url_for('v1.AuthView:register_user'), dict(email=user.email, password='doesnt_matter'), expect_errors=True)
+        data = {'email': user.email, 'password':'doesnt_matter', 'firstName':'joe', 'lastName':'bob'}
+        resp = testapi.post_json(url_for('v1.AuthView:register_user'), data, expect_errors=True)
         resp.status_code.should.equal(409)
         resp.json['status'].should.equal(409)
         resp.json['message'].should.contain('email already exists')
 
 
-    def test_confirm_user(self, apidb, testapi, mail):
-        m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail)
+    def test_confirm_user(self, apidb, testapi, mail, role):
+        m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail, role)
 
         href = self.get_confirmation_link_from_email(m)
         resp = testapi.get(href)
@@ -212,15 +231,15 @@ class TestRegistration:
         resp.status_code.should.equal(200)
         resp.json.get('token').should_not.be.none
 
-    def test_confirm_user_with_bad_token_409(self, apidb, testapi, mail):
-        m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail)
+    def test_confirm_user_with_bad_token_409(self, apidb, testapi, mail, role):
+        m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail, role)
         resp = testapi.get(url_for('v1.AuthView:confirm_email', token='notarealtoken'), expect_errors=True)
         resp.status_code.should.equal(409)
         resp.json['status'].should.equal(409)
         resp.json['message'].should.contain('Invalid')
 
-    def test_user_may_not_confirm_twice(self, apidb, testapi, mail):
-        m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail)
+    def test_user_may_not_confirm_twice(self, apidb, testapi, mail, role):
+        m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail, role)
 
         href = self.get_confirmation_link_from_email(m)
         resp1 = testapi.get(href)

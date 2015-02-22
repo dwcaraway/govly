@@ -8,7 +8,7 @@
  * Controller of the vitalsApp
  */
 angular.module('vitalsApp')
-    .controller('RegisterCtrl', ['LinkRelation', 'Security', '$scope', '$http', '$log' , function (LinkRelation, Security, $scope, $http, $log) {
+    .controller('RegisterCtrl', ['LinkRelation', 'Security', '$scope', '$http', '$log' , function (LinkRelation, $scope, $http, $log) {
         $scope.user = {};
         $scope.alerts = [];
 

@@ -168,40 +168,41 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
         });
 
         // fakeRegister
-        $httpBackend.when('POST', '/user').respond(function (method, url, data) {
+        $httpBackend.when('POST', AUTH_BASE_URL+'/register').respond(function (method, url, data) {
             var postData = angular.fromJson(data),
                 newUser,
                 errors = [];
             $log.info(method, '->', url);
 
-            if (angular.isDefined(userStorage[postData.username])) {
-                errors.push({field: 'username', name: 'used'});
-            }
-
-            if (angular.isDefined(emailStorage[postData.email])) {
-                errors.push({field: 'email', name: 'used'});
-            }
-
-            if (errors.length) {
-                return [409, {
-                    valid: false,
-                    errors: errors
-                }, {}];
-            } else {
-                newUser = angular.extend(postData, {roles: [userRoles[postData.role]], tokens: []});
-                delete newUser.role;
-
-                userStorage[newUser.username] = newUser;
-                emailStorage[newUser.email] = newUser.username;
-                localStorage.setItem('userStorage', angular.toJson(userStorage));
-                localStorage.setItem('emailStorage', angular.toJson(emailStorage));
-                return [201, {valid: true, creationDate: Date.now()}, {}];
-            }
+            return [201, {token: 'something', name:postData['firstName']}];
+            //if (angular.isDefined(userStorage[postData.username])) {
+            //    errors.push({field: 'username', name: 'used'});
+            //}
+            //
+            //if (angular.isDefined(emailStorage[postData.email])) {
+            //    errors.push({field: 'email', name: 'used'});
+            //}
+            //
+            //if (errors.length) {
+            //    return [409, {
+            //        valid: false,
+            //        errors: errors
+            //    }, {}];
+            //} else {
+            //    newUser = angular.extend(postData, {roles: [userRoles[postData.role]], tokens: []});
+            //    delete newUser.role;
+            //
+            //    userStorage[newUser.username] = newUser;
+            //    emailStorage[newUser.email] = newUser.username;
+            //    localStorage.setItem('userStorage', angular.toJson(userStorage));
+            //    localStorage.setItem('emailStorage', angular.toJson(emailStorage));
+            //    return [201, {valid: true, creationDate: Date.now()}, {}];
+            //}
         });
 
         $httpBackend.when('GET', /data\/.*\.json/).passThrough();
 
-        $httpBackend.when('GET', /http:\/\/localhost:5000\/opps.*/).respond(function (method, url) {
+        $httpBackend.when('GET', /http:\/\/localhost:5000\/api\/opps.*/).respond(function (method, url) {
             $log.info(method, '->', url);
             return [200, oppsExample];
         });

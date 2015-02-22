@@ -1,54 +1,39 @@
-<form class="form-signin" name="registerForm" role="registration" ng-submit="submit(registerForm)">
- <h2 class="form-signin-heading"><i class="fa fa-user"></i> New User</h2>
-  <!--div class="form-group">
-    <label for="username" class="col-lg-2 control-label">Email</label>
-    <div class="col-lg-10">
-      <input type="text" class="form-control" id="username" placeholder="Username">
+<form class="form-signin" name="registerForm" role="registration" ng-submit="submit(registerForm)" ng-controller="RegisterController">
+ <div class="center-block"><h1><i class="fa fa-user"></i> Register</h1></div>
+
+    <div class="form-input firstName form-group">
+        <label for="firstName">First Name</label>
+        <input type="text" class="form-control" placeholder="First Name" name="firstName" id="firstName"
+               ng-model="registerObj.firstName" ng-maxlength="32" ng-required="true">
+
+        <div class="errors" ng-class="{ active: registerForm.firstName.$invalid && registerForm.firstName.$dirty }">
+            <div class="error ng-hide" ng-show="registerForm.firstname.$dirty && registerForm.firstName.$error.required">
+                <p>Required</p>
+            </div>
+            <div class="error ng-hide" ng-show="registerForm.firstName.$error.maxlength">
+                <p>Max length is 32, please shorten it.</p>
+            </div>
+        </div>
     </div>
-  </div-->
-  <div class="form-input username">
-    <input type="text" class="form-control" placeholder="Username" name="username" ng-model="registerObj.username" autofocus="true"
-      ng-minlength="4" ng-maxlength="16" ng-required="true" remote-validated="used">
-    <div class="errors" ng-class="{ active: registerForm.username.$invalid && registerForm.username.$dirty }">
-      <div class="error ng-hide" ng-show="registerForm.username.$error.minlength">
-        <p>Username is too short!</p>
-      </div>
-      <div class="error ng-hide" ng-show="registerForm.username.$error.maxlength">
-        <p>Max username length is 16, please shorten it.</p>
-      </div>
-      <div class="error ng-hide" ng-show="registerForm.username.$error.used">
-        <p>Username is already taken.</p>
-      </div>
+
+    <div class="form-input lastName form-group">
+        <label for="lastName">Last Name</label>
+        <input type="text" class="form-control" placeholder="Last Name" name="lastName" id="lastName"
+               ng-model="registerObj.lastName" ng-maxlength="32" ng-required="true">
+
+        <div class="errors" ng-class="{ active: registerForm.lastName.$invalid && registerForm.lastName.$dirty }">
+            <div class="error ng-hide" ng-show="registerForm.lastName.$dirty && registerForm.lastName.$error.required">
+                <p>Required</p>
+            </div>
+            <div class="error ng-hide" ng-show="registerForm.lastName.$error.maxlength">
+                <p>Max length is 32, please shorten it.</p>
+            </div>
+        </div>
     </div>
-  </div>
-  <div class="form-input name">
-    <input type="text" class="form-control" placeholder="Real Name" name="name" ng-model="registerObj.name" ng-minlength="4" ng-maxlength="32" ng-required="true">
-    <div class="errors" ng-class="{ active: registerForm.name.$invalid && registerForm.name.$dirty }">
-      <div class="error ng-hide" ng-show="registerForm.name.$error.minlength">
-        <p>Provided name is too short!</p>
-      </div>
-      <div class="error ng-hide" ng-show="registerForm.name.$error.maxlength">
-        <p>Max name length is 32, please shorten it.</p>
-      </div>
-    </div>
-  </div>
-  <div class="form-input password">
-    <input type="password" class="form-control password" placeholder="Password" name="password" ng-model="registerObj.password" ng-minlength="4" ng-maxlength="16" ng-required="true" password-match="registerObj.password2">
-    <input type="password" class="form-control password2" placeholder="Repeat Password" name="password2" ng-model="registerObj.password2">
-    <div class="errors" ng-class="{ active: registerForm.password.$invalid && registerForm.password.$dirty }">
-      <div class="error ng-hide" ng-show="registerForm.password.$error.match">
-        <p>Passwords do not match.</p>
-      </div>
-      <div class="error ng-hide" ng-show="registerForm.password.$error.minlength">
-        <p>For your own safety, use a password longer than 4 characters.</p>
-      </div>
-      <div class="error ng-hide" ng-show="registerForm.password.$error.maxlength">
-        <p>For your own <b>SANITY</b>, use a password shorter than 16 characters.</p>
-      </div>
-    </div>
-  </div>
-  <div class="form-input email">
-    <input type="email" class="form-control email" placeholder="E-Mail" name="email" ng-model="registerObj.email" ng-required="true" remote-validated="used">
+
+  <div class="form-input email form-group">
+      <label for="emailaddress">Email</label>
+    <input type="email" class="form-control email" placeholder="E-Mail" name="email" id="emailaddress" ng-model="registerObj.email" ng-required="true" remote-validated="used">
     <div class="errors" ng-class="{ active: registerForm.email.$invalid && registerForm.email.$dirty }">
       <div class="error ng-hide" ng-show="registerForm.email.$error.email">
         <p>E-Mail seems invalid.</p>
@@ -58,10 +43,42 @@
       </div>
     </div>
   </div>
-  <button class="btn btn-lg btn-block" type="submit"
+
+  <div class="form-input password form-group">
+      <label for="passwordInput1">Password</label>
+    <input type="{{ inputType }}" class="form-control password1" placeholder="Password (6 or more characters)" name="password1" id="passwordInput1" ng-model="registerObj.password" ng-minlength="6" ng-maxlength="32" ng-required="true">
+    <div class="errors" ng-class="{ active: registerForm.password.$invalid && registerForm.password.$dirty }">
+      <div class="error ng-hide" ng-show="registerForm.password.$error.minlength">
+        <p>Please use a password of at least 6 characters.</p>
+      </div>
+      <div class="error ng-hide" ng-show="registerForm.password.$error.maxlength">
+        <p>Please use a password shorter than 32 characters.</p>
+      </div>
+    </div>
+</div>
+    <div class="form-input password2 form-group">
+    <label for="passwordInput2">Repeat Password</label>
+      <input type="{{ inputType }}" class="form-control password2" placeholder="Enter password again..." name="password2" id="passwordInput2" ng-model="registerObj.password2" password-match="registerObj.password">
+    <div class="errors" ng-class="{ active: registerForm.password2.$invalid && registerForm.password2.$dirty }">
+      <div class="error ng-hide" ng-show="registerForm.password2.$error.match">
+        <p>Passwords do not match.</p>
+      </div>
+    </div>
+</div>
+
+    <div class="form-group form-input text-center">
+    <input class="password-check" type="checkbox" name="showPasswordCheckbox" id="showPasswordCheckbox" ng-model="showPassword" ng-click="hideShowPassword();" ><label for="showPasswordCheckbox">Show Password</label>
+  </div>
+
+    <div class="legal text-center">
+        <!-- TODO add links to ToS and Privacy Policy -->
+        <small>By clicking Join Now, you agree to Fogmine's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</small>
+    </div>
+
+  <button class="btn btn-lg btn-block " type="submit"
     ng-class="{ 'btn-primary': registerForm.$valid && registerForm.$dirty, 'btn-success': redirect }"
     ng-disabled="registerForm.$invalid || registerForm.$pristine || xhr || redirect">
-    <span ng-hide="redirect">Register <i class="fa fa-repeat fa-spin" ng-show="xhr"></i></span>
+    <span ng-hide="redirect">Join Now <i class="fa fa-repeat fa-spin" ng-show="xhr"></i></span>
     <span ng-show="redirect">Redirecting... <i class="fa fa-repeat fa-spin"></i></span>
   </button>
 </form>

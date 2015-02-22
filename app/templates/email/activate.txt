@@ -1,4 +1,4 @@
-Welcome {{ user.email }}!
+Greetings {{ user.firstName }}!
 
 You can confirm your email through the link below:
 

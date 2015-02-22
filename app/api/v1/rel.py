@@ -53,9 +53,17 @@ RELS = {
                              "minLength":8,
                              "maxLength":120
                              },
-                "email": {"type": "string", "format":"email"}
+                "email": {"type": "string", "format":"email"},
+                "firstName": {
+                    "type":"string",
+                    "maxLength":32
+                },
+                "lastName":{
+                    "type":"string",
+                    "maxLength":32
+                }
             },
-            "required": ["email", "password"],
+            "required": ["email", "password", "firstName", "lastName"],
             "additionalProperties": False
         },
     }

@@ -3,7 +3,7 @@ angular.module('angular-login.opps', ['angular-login.grandfather', 'ngResource',
         'use strict';
         $stateProvider
             .state('app.opps', {
-                url: '/opps',
+                url: '/',
                 templateUrl: 'opps/opps.tpl.html',
                 accessLevel: accessLevels.user
             });

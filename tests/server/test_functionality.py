@@ -15,11 +15,23 @@ import pytest
 from flask import url_for
 
 from app.models.users import User
-from tests.factories import UserFactory
+from tests.factories import UserFactory, RoleFactory
 
 
 @pytest.fixture
-def user(apidb):
+def role(apidb):
+    return RoleFactory()
+
+@pytest.fixture
+def user(role):
+    u = UserFactory(password='myprecious')
+    u.roles = [role] #Add a role
+    u.save()
+
+    return u
+
+@pytest.fixture
+def userWithNoRoles(role):
     return UserFactory(password='myprecious')
 
 class TestLoggingIn:
@@ -29,6 +41,11 @@ class TestLoggingIn:
         res = testapi.post_json(url_for('jwt'), data)
         assert res.status_code == 200
         assert 'token' in res.json
+
+    def test_jwt_log_in_fails_when_user_has_no_roles(self, userWithNoRoles, testapi):
+        data = dict(username=userWithNoRoles.email, password='myprecious')
+        res = testapi.post_json(url_for('jwt'), data, expect_errors=True)
+        assert res.status_code == 400
 
     # def test_log_in_returns_200_with_email_on_page(self, user, testapi):
     #     # Goes to homepage

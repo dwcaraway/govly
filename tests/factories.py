@@ -10,7 +10,7 @@
     templated from https://github.com/ryanolson/cookiecutter-webapp
 """
 from datetime import datetime
-from factory import Factory, Sequence, LazyAttribute, post_generation
+from factory import Factory, Sequence, post_generation, SubFactory, List
 from flask.ext.security.utils import encrypt_password
 
 from app.models.users import User, Role
@@ -29,8 +29,10 @@ class BaseFactory(Factory):
 
 class RoleFactory(BaseFactory):
     FACTORY_FOR = Role
-    name = 'admin'
-    description = 'Administrator'
+    name = 'user'
+    description = 'A basic system user'
+    bitmask = 2
+
 
 class UserFactory(BaseFactory):
     FACTORY_FOR = User

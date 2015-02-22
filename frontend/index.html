@@ -23,15 +23,9 @@
      <div class="navbar navbar-default" role="navigation">
         <div class="navbar-collapse">
           <!-- Navbar links -->
-          <ul class="nav navbar-nav">
-            <li ng-class="{ active: $state.is('app.home') }">
-              <a ui-sref="app.home">Home</a>
-            </li>
+          <ul class="nav navbar-nav" ng-show="ls.isLogged">
            <li ng-class="{ active: $state.is('app.user') }">
-              <a ui-sref="app.opps">Opportunities</a>
-            </li>
-            <li ng-class="{ active: $state.is('app.register') }">
-              <a ui-sref="app.register">Register <i class="fa fa-user"></i>+</a>
+              <a ui-sref="app.opps">Fogmine</a>
             </li>
           </ul>
           <!-- Right side of the navbar -->

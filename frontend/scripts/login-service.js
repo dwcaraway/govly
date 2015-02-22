@@ -11,7 +11,7 @@ angular.module('loginService', ['ui.router', 'config'])
         var userToken = localStorage.getItem('userToken'),
             errorState = 'app.error',//State user is directed to when error occurs
             loginState = 'app.opps',//State user is directed to when logging in
-            logoutState = 'app.home'; //State user is directed to when logging out
+            logoutState = 'app.register'; //State user is directed to when logging out
 
         var AUTH_BASE_URL = ENV.apiEndpoint + '/auth';
 
@@ -235,6 +235,20 @@ angular.module('loginService', ['ui.router', 'config'])
                     self.pendingStateChange = null;
                     return checkUser.promise;
                 },
+                register: function (user){
+                    var checkRegistration = $q.defer();
+
+                    $http.post(AUTH_BASE_URL + '/register', user).success(function(data, status){
+                        localStorage.setItem('userData', angular.toJson(data.user));
+                        wrappedService.loginHandler(data.user);
+                        checkRegistration.resolve(data, status);
+                    }).error(function(data, status){
+                        checkRegistration.reject(data, status);
+                    });
+
+                    return checkRegistration.promise;
+                },
+
                 /**
                  * Public properties
                  */
@@ -254,7 +268,7 @@ angular.module('loginService', ['ui.router', 'config'])
         'use strict';
 
         return {
-            request: function (config, loginService) {
+            request: function (config) {
                 var userStr= localStorage.getItem('userData'), token;
                 if (userStr) {
                    token = angular.fromJson(userStr).token;

@@ -54,7 +54,7 @@ module.exports = function (grunt) {
                 tasks: ['html2js']
             },
             less: {
-                files: ['<%= appConfig.app=>/styles/style.less', '<%= appConfig.app =>/**/*.less'],
+                files: ['<%= appConfig.app %>/styles/style.less', '<%= appConfig.app %>/**/*.less'],
                 tasks: ['less']
             },
             sources: {

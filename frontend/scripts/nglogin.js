@@ -8,7 +8,6 @@ angular.module('angular-login', [
     'loginService',
     'angular-login.directives',
     // different app sections
-    'angular-login.home',
     'angular-login.register',
     'angular-login.error',
     'angular-login.opps',
@@ -17,7 +16,7 @@ angular.module('angular-login', [
 ])
     .config(function ($urlRouterProvider) {
         'use strict';
-        $urlRouterProvider.otherwise('/');
+        $urlRouterProvider.otherwise('/register');
     })
     .run(function ($rootScope) {
         /**

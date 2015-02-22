@@ -16,18 +16,21 @@ from flask.ext.restful.reqparse import RequestParser
 from flask_security.registerable import encrypt_password
 from ..base import BaseView, secure_endpoint
 from .rel import RELS
-from app.models.users import User
+from app.models.users import User, Role
 from jsonschema import validate, ValidationError, FormatChecker
 from urlparse import urljoin
 
 from itsdangerous import URLSafeTimedSerializer, TimestampSigner
 from flask import current_app, url_for
 from app.framework.utils import send_message
+from app.framework.security import generate_response_dict
 from datetime import datetime
 
 request_register_options = RequestParser()
 request_register_options.add_argument('email', type=str, location='json', required=True)
 request_register_options.add_argument('password', type=str, location='json', required=True)
+request_register_options.add_argument('firstName', type=str, location='json', required=True)
+request_register_options.add_argument('lastName', type=str, location='json', required=True)
 
 request_confirm_options = RequestParser()
 request_confirm_options.add_argument('token', type=str, location='args', required=True)
@@ -68,10 +71,12 @@ class AuthView(BaseView):
 
             password = encrypt_password(data['password'])
 
-            #TODO need to accept first and last name on register
-            user = User.create(email=data['email'], password=password, first_name='samplefirstname', last_name="samplelastname")
+            # to assign roles of user by default
+            user = User.create(email=data['email'], password=password, first_name=data['firstName'],
+                               last_name=data['lastName'], roles=[Role.first(name='user')])
             confirmation_link = self.generate_confirmation_link(user)
 
+            #TODO this mail send should be performed asynchronously using celery, see issue #88850472
             send_message(
                 subject='Please Confirm Your Fogmine Account',
                 sender="do-not-reply@fogmine.com",
@@ -80,7 +85,10 @@ class AuthView(BaseView):
                 text_body=render_template('email/activate.txt', user=user, confirmation_link=confirmation_link)
             )
 
-            return {'status': 201, 'message':'A confirmation email has been sent.'}, 201
+            user_data = generate_response_dict(user=user)
+
+            return dict(status=201, message='A confirmation email has been sent to '+user.email, user=user_data), 201
+
         except ValidationError as e:
             return {
                 'status': 400,
