@@ -6,7 +6,7 @@ from flask.ext.security.utils import verify_password
 
 from app.models.users import User, Role
 from tests.factories import UserFactory
-
+import sure
 
 @pytest.mark.usefixtures('apidb')
 class TestUser:

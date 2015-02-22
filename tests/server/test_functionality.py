@@ -13,6 +13,7 @@
 """
 import pytest
 from flask import url_for
+import sure
 
 from app.models.users import User
 from tests.factories import UserFactory, RoleFactory

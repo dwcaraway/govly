@@ -19,6 +19,7 @@ from tests.factories import UserFactory, RoleFactory
 from app.models.users import User
 from bs4 import BeautifulSoup
 import re
+import sure
 
 @pytest.fixture
 def role(apidb):

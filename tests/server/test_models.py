@@ -16,6 +16,7 @@ from flask.ext.restless.helpers import to_dict
 from app.framework.sql import db, Model
 
 from tests.factories import BaseFactory
+import sure
 
 class ApiModel(Model):
     __tablename__ = 'tests'
