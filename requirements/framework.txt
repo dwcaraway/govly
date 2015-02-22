@@ -24,6 +24,9 @@ psycopg2==2.5.2
 SQLAlchemy-Searchable==0.7.0
 SQLAlchemy-ImageAttach==0.8.2
 
+# Database Population (canned data)
+mixer == 5.0.7
+
 # Assets
 Flask-Assets==0.10
 cssmin==0.2.0
