@@ -16,8 +16,7 @@ export MEMCACHE_SERVERS='' MEMCACHIER_SERVERS=''
 python manage.py db upgrade
 
 # If staging environment, then run the db populate command
-if [ "$STAGING_PRODUCTION" = "staging" ]
-then
+if [ "$STAGING_PRODUCTION" = "staging" ]; then
     python manage.py db populate
 fi
 
