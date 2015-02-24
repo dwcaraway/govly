@@ -1,49 +1,44 @@
-'use strict';
-
-/**
- * @ngdoc function
- * @name vitalsApp.controller:RegisterCtrl
- * @description
- * # RegisterCtrl
- * Controller of the vitalsApp
- */
-angular.module('vitalsApp')
-    .controller('ConfirmationCtrl', ['Security', '$scope', '$stateParams', '$location', '$log', '$state', function (Security, $scope, $stateParams, $location, $log, $state) {
-        var token = $stateParams.token;
-
-        if (token) {
-            $log.debug('Contacting server');
-
-            Security.confirm($stateParams.token).
-                success(
-                function (data) {
-                    $log.info('Confirmation successful');
-                    $scope.alerts = [
-                        {type: 'success', msg: 'Account Confirmed!'}
-                    ];
-                    localStorage.setItem('fogmine-token', data.token);
-                    $state.go('main');
-                }).error(
-                function (data, status) {
-                    $log.warn('Confirmation failed');
-
-                    if (status === 0) {
-                        $scope.alerts = [
-                            {type: 'danger', msg: 'Unable to connect'}
-                        ];
-                    } else {
-                        $scope.alerts = [
-                            {type: 'danger', msg: data.message}
-                        ];
-                    }
-                });
-        } else {
-            $scope.alerts = [
-                {type: 'danger', msg: 'Bad confirmation URL'}
-            ];
+angular.module('angular-login.confirm', ['angular-login.grandfather'])
+    .config(function ($stateProvider) {
+        'use strict';
+        $stateProvider
+            .state('app.confirm', {
+                url: '/confirm?token',
+                templateUrl: 'confirm/confirm.tpl.html',
+                controller: 'ConfirmationController',
+                accessLevel: accessLevels.public
+            });
+    })
+    .controller('ConfirmationController', function ($scope, $stateParams, $log, $state, $timeout, loginService) {
+        'use strict';
+        if (!$stateParams.token) {
+            $scope.alert = 'Bad confirmation URL';
+            return;
         }
 
-        $scope.closeAlert = function (index) {
-            $scope.alerts.splice(index, 1);
+        var init = function() {
+            loginService.confirm($stateParams.token).
+                then(
+                function success() {
+                    $scope.confirmed = true;
+
+                    $timeout(function () {
+                            $state.go('app.opps');
+                        }, 1000
+                    );
+                },
+                function error(data, status) {
+                    if (status === 0) {
+                        $scope.alert = 'Unable to connect';
+                    } else if (data.message) {
+                        $scope.alert = data.message;
+                    } else {
+                        $scope.alert = "Unknown error";
+                    }
+
+                }
+            );
         };
-    }]);
+
+        init();
+    });

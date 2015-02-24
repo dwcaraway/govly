@@ -226,16 +226,19 @@ class TestRegistration:
     def test_confirm_user(self, apidb, testapi, mail, role):
         m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail, role)
 
-        href = self.get_confirmation_link_from_email(m)
-        resp = testapi.get(href)
+        token = self.get_confirmation_token_from_email(m)
+        href = url_for('v1.AuthView:confirm_email')
 
-        # confirmed user should receive a token
+        resp = testapi.post_json(href, dict(token=token))
+
+        # confirmed user should receive a login credential set
         resp.status_code.should.equal(200)
-        resp.json.get('token').should_not.be.none
+        resp.json.get('user').should_not.be.none
 
     def test_confirm_user_with_bad_token_409(self, apidb, testapi, mail, role):
         m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail, role)
-        resp = testapi.get(url_for('v1.AuthView:confirm_email', token='notarealtoken'), expect_errors=True)
+        href = url_for('v1.AuthView:confirm_email')
+        resp = testapi.post_json(href, dict(token='notarealtoken'), expect_errors=True)
         resp.status_code.should.equal(409)
         resp.json['status'].should.equal(409)
         resp.json['message'].should.contain('Invalid')
@@ -243,24 +246,25 @@ class TestRegistration:
     def test_user_may_not_confirm_twice(self, apidb, testapi, mail, role):
         m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail, role)
 
-        href = self.get_confirmation_link_from_email(m)
-        resp1 = testapi.get(href)
-        resp2 = testapi.get(href, expect_errors=True)
+        token = self.get_confirmation_token_from_email(m)
+        href = url_for('v1.AuthView:confirm_email')
+
+        testapi.post_json(href, dict(token=token))
+        resp2 = testapi.post_json(href, dict(token=token), expect_errors=True)
 
         resp2.status_code.should.equal(409)
 
     def test_user_may_not_use_expired_token(self, apidb, testapi, mail):
         #Token used via itsdangerous.URLSafeTimedSerializer
         old_token = {'secret':'super secret', 'salt':'salty', 'token':'ImZvbyI.B4ovjQ.UAh0LfwlwReM9_FTughkAHpvxkQ'}
-        resp = testapi.get(url_for('v1.AuthView:confirm_email', token='notarealtoken'), expect_errors=True)
+        resp = testapi.post_json(url_for('v1.AuthView:confirm_email'), dict(token='notarealtoken'), expect_errors=True)
 
-    def get_confirmation_link_from_email(self, message):
+    def get_confirmation_token_from_email(self, message):
 
         """Retrieves the confirmation link from the message"""
 
         soup = BeautifulSoup(message.html)
-        token = re.search('token=(.*)', soup.a['href']).group(1)
-        return url_for('v1.AuthView:confirm_email', token=token)
+        return re.search('token=(.*)', soup.a['href']).group(1)
 
 
 class TestLinkRelation:

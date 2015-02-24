@@ -66,6 +66,18 @@ RELS = {
             "required": ["email", "password", "firstName", "lastName"],
             "additionalProperties": False
         },
+    },
+    "v1.AuthView:confirm": {
+        "POST": {
+            "properties": {
+                "token": {"type": "string",
+                          "minLength": 8,
+                          "maxLength": 120
+                        }
+            },
+            "required": ["token"],
+            "additionalProperties": False
+        }
     }
 }
 

@@ -11,6 +11,7 @@ angular.module('angular-login', [
     'angular-login.register',
     'angular-login.error',
     'angular-login.opps',
+    'angular-login.confirm',
     // components
     'ngAnimate'
 ])

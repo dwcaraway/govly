@@ -1,7 +1,9 @@
-<div class="container" ng-controller="ConfirmationCtrl">
+<div class="container" ng-controller="ConfirmationController">
     <h1>Account Confirmation</h1>
 
-        <alert ng-repeat="alert in alerts" type="{{ alert.type }}" close="closeAlert($index)">{{ alert.msg }}</alert>
+    <div class="alert alert-info" ng-show="!confirmed && !alert" role="alert"><span class="glyphicon glyphicon-remove-sign"> Confirming Account...</div>
 
+    <div class="alert alert-danger" ng-show="alert" role="alert"><span class="glyphicon glyphicon-remove-sign"></span> {{ alert }}</div>
+    <div class="alert alert-success" ng-show="confirmed" role="alert"><span class="glyphicon glyphicon-ok-sign"></span> Confirmation successful. Redirecting...</div>
 </div>
 

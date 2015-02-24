@@ -207,4 +207,12 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
             return [200, oppsExample];
         });
 
+        $httpBackend.when('POST', AUTH_BASE_URL+'/confirm').respond(function (method, url) {
+            $log.info(method, '->', url);
+
+            var userResp = {name: 'bilbo', roles: [userRoles.user], token: randomUUID()};
+
+            return [200, {user: userResp, status: 200, message: 'foo'}, {}];
+        });
+
     });

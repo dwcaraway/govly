@@ -33,7 +33,7 @@ angular.module('loginService', ['ui.router', 'config'])
             var setUserRole = function (role) {
                 if (role) {
                     //TODO change this to process all roles, not just first one? dwc
-                    $log.log('setUserRole called, role is ' + role[0]);
+                    $log.log('setUserRole called, role is ' + angular.toJson(role[0]));
                     wrappedService.userRole = role[0];
 
                     //Persist the role for reloads
@@ -247,6 +247,23 @@ angular.module('loginService', ['ui.router', 'config'])
                     });
 
                     return checkRegistration.promise;
+                },
+                confirm : function(token){
+                    var checkConfirmation = $q.defer();
+
+                    $http.post(AUTH_BASE_URL+'/confirm', {token: token}).success(function(data, status){
+                        if(!wrappedService.isLogged) {
+                            //Perform login
+                            localStorage.setItem('userData', angular.toJson(data.user));
+                            wrappedService.loginHandler(data.user);
+                        }
+                        checkConfirmation.resolve(data, status);
+                    }).error(function(data, status){
+                        checkConfirmation.reject(data, status);
+                    });
+
+                    return checkConfirmation.promise;
+
                 },
 
                 /**
