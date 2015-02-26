@@ -265,6 +265,28 @@ angular.module('loginService', ['ui.router', 'config'])
                     return checkConfirmation.promise;
 
                 },
+                reset: function(email){
+                    return $http.post(AUTH_BASE_URL+'/reset', {email: email});
+                },
+                updatePassword: function(password, token){
+                    var updateConfirmation = $q.defer();
+
+                    $http.post(AUTH_BASE_URL + '/update', {
+                        password: password,
+                        token: token
+                    }).success(function (data, status) {
+                        if (!wrappedService.isLogged) {
+                            //Perform login
+                            localStorage.setItem('userData', angular.toJson(data.user));
+                            wrappedService.loginHandler(data.user);
+                        }
+                        updateConfirmation.resolve(data, status);
+                    }).error(function (data, status) {
+                        updateConfirmation.reject(data, status);
+                    });
+
+                    return updateConfirmation.promise;
+                },
 
                 /**
                  * Public properties

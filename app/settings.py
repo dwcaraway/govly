@@ -18,7 +18,8 @@ class Config(object):
     DEBUG = True
     TESTING = False
     SECRET_KEY = os.environ.get('SECRET_KEY', 'superdupersecret')
-    EMAIL_CONFIRM_SALT = os.environ.get('EMAIL_CONFIRM_SALT', 'email-confirm-key')
+    EMAIL_CONFIRM_SALT = os.environ.get('EMAIL_CONFIRM_SALT', 'hL^50_mTOUWL_kv^QAg1%LMHL62jGtxrj^vfJUrBAjV1*Hc3AVuxsiqlG=Hj')
+    PASSWORD_RESET_SALT = os.environ.get('PASSWORD_RESET_SALT', 'suw1gHvoZdYeKhVK0so_izb6J+1Yt=|=TeY2CbMQ_gxcMo9tEQST2qqqdgO4')
 
     CLIENT_DOMAIN = 'http://localhost:9000'
 
@@ -42,7 +43,7 @@ class Config(object):
 
     # Flask-Security basics
     SECURITY_CHANGEABLE = True
-    SECURITY_CONFIRMABLE = True
+    SECURITY_CONFIRMABLE = False
     SECURITY_RECOVERABLE = True
     SECURITY_REGISTERABLE = True
     SECURITY_TRACKABLE = True
@@ -62,10 +63,15 @@ class Config(object):
     WTF_CSRF_ENABLED = False
 
     # Flask-Security email options
+    SECURITY_EMAIL_SENDER = 'support@fogmine.com'
     SECURITY_SEND_PASSWORD_CHANGE_EMAIL = True
     SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = True
-    SECURITY_SEND_REGISTER_EMAIL = True
+    SECURITY_SEND_REGISTER_EMAIL = False
+    SECURITY_SEND_PASSWORD_RESET_NOTICE_EMAIL = True
 
+    # Flask-Security salt options
+    SECURITY_CONFIRM_SALT = os.environ.get('EMAIL_CONFIRM_SALT', 'hL^50_mTOUWL_kv^QAg1%LMHL62jGtxrj^vfJUrBAjV1*Hc3AVuxsiqlG=Hj')
+    SECURITY_RESET_SALT = os.environ.get('PASSWORD_RESET_SALT', 'suw1gHvoZdYeKhVK0so_izb6J+1Yt=|=TeY2CbMQ_gxcMo9tEQST2qqqdgO4')
 
     # Celery
     CELERY_BROKER_URL= os.environ.get('REDISTOGO_URL', 'redis://127.0.0.1:6379')

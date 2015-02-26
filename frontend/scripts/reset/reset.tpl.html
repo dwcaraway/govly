@@ -1,0 +1,28 @@
+<div ui-view>
+    <form class="form-reset" name="resetForm" role="passwordReset" ng-submit="submit(resetForm)"
+          ng-controller="ResetController">
+        <div class="center-block"><h1><i class="fa fa-question-circle"></i> Reset Your Password </h1></div>
+
+        <div class="form-input email form-group">
+            <label for="emailaddress">Email</label>
+            <input type="email" class="form-control email" placeholder="E-Mail" name="email" id="emailaddress"
+                   ng-model="email" ng-required="true" remote-validated="notFound">
+
+            <div class="errors" ng-class="{ active: resetForm.email.$invalid && resetForm.email.$dirty }">
+                <div class="error ng-hide" ng-show="resetForm.email.$error.email">
+                    <p>E-Mail seems invalid.</p>
+                </div>
+                <div class="error ng-hide" ng-show="resetForm.email.$pristine && resetForm.email.$error.notFound">
+                    <p>E-Mail not found.</p>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-lg btn-block" type="submit"
+                ng-class="{ 'btn-primary': resetForm.$valid && resetForm.$dirty, 'btn-success': sent }"
+                ng-disabled="resetForm.$invalid || resetForm.$pristine || xhr || sent">
+            <span ng-hide="sent">Reset Password <i class="fa fa-repeat fa-spin" ng-show="xhr"></i></span>
+            <span ng-show="sent">Email Sent <i class="fa fa-check-circle"></i></span>
+        </button>
+    </form>
+</div>

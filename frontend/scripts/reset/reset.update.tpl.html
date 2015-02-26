@@ -1,0 +1,49 @@
+<div ng-controller="ResetUpdateController">
+    <div class="alert alert-danger" ng-show="alert" role="alert"><span
+            class="glyphicon glyphicon-remove-sign"></span> {{ alert }}</div>
+
+    <form class="form-reset" name="updateForm" role="passwordUpdate" ng-submit="submit(updateForm)" ng-hide="alert">
+        <div class="center-block"><h1><i class="fa fa-lock"></i> New Password </h1></div>
+
+        <div class="form-input password form-group">
+            <label for="password">Password</label>
+            <input type="{{ inputType }}" class="form-control password1" placeholder="Password (6 or more characters)"
+                   name="password" id="password" ng-model="registerObj.password" ng-minlength="6"
+                   ng-maxlength="32" ng-required="true">
+
+            <div class="errors" ng-class="{ active: updateForm.password.$invalid && updateForm.password.$dirty }">
+                <div class="error ng-hide" ng-show="updateForm.password.$error.minlength">
+                    <p>Please use a password of at least 6 characters.</p>
+                </div>
+                <div class="error ng-hide" ng-show="updateForm.password.$error.maxlength">
+                    <p>Please use a password shorter than 32 characters.</p>
+                </div>
+            </div>
+        </div>
+        <div class="form-input password2 form-group">
+            <label for="passwordInput2">Repeat Password</label>
+            <input type="{{ inputType }}" class="form-control password2" placeholder="Enter password again..."
+                   name="password2" id="passwordInput2" ng-model="registerObj.password2"
+                   password-match="registerObj.password">
+
+            <div class="errors" ng-class="{ active: updateForm.password2.$invalid && updateForm.password2.$dirty }">
+                <div class="error ng-hide" ng-show="updateForm.password2.$error.match">
+                    <p>Passwords do not match.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group form-input text-center">
+            <input class="password-check" type="checkbox" name="showPasswordCheckbox" id="showPasswordCheckbox"
+                   ng-model="showPassword" ng-click="hideShowPassword();"><label for="showPasswordCheckbox">Show
+            Password</label>
+        </div>
+
+        <button class="btn btn-lg btn-block " type="submit"
+                ng-class="{ 'btn-primary': updateForm.$valid && updateForm.$dirty, 'btn-success': redirect }"
+                ng-disabled="updateForm.$invalid || updateForm.$pristine || xhr || redirect">
+            <span ng-hide="redirect">Change Password <i class="fa fa-repeat fa-spin" ng-show="xhr"></i></span>
+            <span ng-show="redirect">Password Changed. Redirecting... <i class="fa fa-repeat fa-spin"></i></span>
+        </button>
+    </form>
+</div>

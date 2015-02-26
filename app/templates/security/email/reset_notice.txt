@@ -1,0 +1,4 @@
+Greetings {{ user.first_name }}!
+
+This is just a note that your Fogmine password has been reset. If you did not make this change, please contact us
+at support@fogmine.com.

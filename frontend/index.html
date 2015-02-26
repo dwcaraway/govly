@@ -1,86 +1,110 @@
 <!doctype html>
 <html class="no-js" ng-app="angular-login">
-  <head>
+<head>
     <meta charset="utf-8">
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
     <link rel='icon' href="favicon.png" type="image/png"/>
     <!-- build:css(.tmp) styles/main.css -->
-        <!-- bower:css -->
-        <!-- endbower -->
-      <link rel="stylesheet" href="styles/_style.css" />
+    <!-- bower:css -->
+    <!-- endbower -->
+    <link rel="stylesheet" href="styles/_style.css"/>
     <!-- endbuild -->
-  </head>
-  <!-- <body ng-app="vitalsApp">-->
+</head>
+<!-- <body ng-app="vitalsApp">-->
 
-  <body ng-controller="BodyController">
-    <!--[if lt IE 9]>
+<body ng-controller="BodyController">
+<!--[if lt IE 9]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
-    <div class="container">
-     <div class="navbar navbar-default" role="navigation">
+<div class="container">
+    <div class="navbar navbar-default" role="navigation">
         <div class="navbar-collapse">
-          <!-- Navbar links -->
-          <ul class="nav navbar-nav" ng-show="ls.isLogged">
-           <li ng-class="{ active: $state.is('app.user') }">
-              <a ui-sref="app.opps">Fogmine</a>
-            </li>
-          </ul>
-          <!-- Right side of the navbar -->
-          <!-- Login Form -->
-          <form class="navbar-form navbar-right" name="loginForm" role="login" ng-submit="loginMe()" ng-hide="ls.isLogged || !ls.doneLoading">
-            <div class="form-group">
-              <input type="text" class="form-control" ng-model="login.email" name="email" placeholder="Email">
-            </div>
-            <div class="form-group">
-              <input type="password" class="form-control" ng-model="login.password" name="password" placeholder="Password">
-            </div>
-            <button type="submit" class="btn btn-default hidden-devices" ng-disabled="login.working">Login <i class="fa" ng-class="login.working ? 'fa-cog fa-spin' : 'fa-sign-in'"></i></button>
-          </form>
-          <!-- Spinner -->
-          <button class="btn btn-default navbar-btn navbar-right" ng-hide="ls.doneLoading">
-            <i class="fa fa-spinner fa-spin"></i>
-          </button>
-          <!-- Logout Form -->
-          <form class="navbar-form navbar-right" role="logout" ng-submit="logoutMe()" ng-show="ls.isLogged">
-            <div class="form-group">
-              <label>Hello {{ ls.user.name }}</label>
-            </div>
-            <div class="form-group">
-              <button  type="submit" class="btn btn-default">Logout <i class="fa fa-signout"></i></button>
-            </div>
-          </form>
+            <!-- Navbar links -->
+            <ul class="nav navbar-nav" >
+                <li ng-class="{ active: $state.is('app.user') }" ng-show="ls.isLogged">
+                    <a ui-sref="app.opps">Fogmine</a>
+                </li>
+
+                <li ng-hide="ls.isLogged">
+                    <a ui-sref="app.register">Fogmine</a>
+                </li>
+
+            </ul>
+
+            <!-- Right side of the navbar -->
+            <!-- Login Form -->
+            <form class="navbar-form navbar-right" name="loginForm" role="login" ng-submit="loginMe()"
+                  ng-hide="ls.isLogged || !ls.doneLoading">
+                <a ui-sref="app.reset">Forgot Your Password?</a>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="text" class="form-control" ng-model="login.email" name="email" id="email"
+                           placeholder="Email">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" ng-model="login.password" name="password" id="password"
+                           placeholder="Password">
+                </div>
+
+                <button type="submit" class="btn btn-default hidden-devices" ng-disabled="login.working">Login <i
+                        class="fa" ng-class="login.working ? 'fa-cog fa-spin' : 'fa-sign-in'"></i></button>
+            </form>
+            <!-- Spinner -->
+            <button class="btn btn-default navbar-btn navbar-right" ng-hide="ls.doneLoading">
+                <i class="fa fa-spinner fa-spin"></i>
+            </button>
+            <!-- Logout Form -->
+            <form class="navbar-form navbar-right" role="logout" ng-submit="logoutMe()" ng-show="ls.isLogged">
+                <div class="form-group">
+                    <label>Hello {{ ls.user.name }}</label>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-default">Logout <i class="fa fa-signout"></i></button>
+                </div>
+            </form>
         </div>
         <div class="login-error" ng-class="{ 'active': login.wrong }">
-          <div class="alert alert-danger"><b>Error:</b> Server (WUT?) said your user/pass doesn't match existing users.</div>
+            <div class="alert alert-danger"><b>Error:</b> Server (WUT?) said your user/pass doesn't match existing
+                users.
+            </div>
         </div>
-      </div>
-      <ui-view ng-hide="doingResolve"></ui-view>
-      <div class="jumbotron loading-jumbo" ng-show="doingResolve">
+    </div>
+    <ui-view ng-hide="doingResolve"></ui-view>
+    <div class="jumbotron loading-jumbo" ng-show="doingResolve">
         <h1><i class="fa fa-refresh fa-2x fa-spin"></i> Loading</h1>
-      </div>
     </div>
+</div>
 
-    </div>
+</div>
 
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
-      ga('create', 'UA-XXXXXXXX-X', 'auto');
+    ga('create', 'UA-XXXXXXXX-X', 'auto');
 
-    </script>
+</script>
 
-    <!-- build:js(.tmp) scripts/main.js -->
-    <!-- bower:js -->
-    <!-- endbower -->
-    <script src="scripts/_templates.js"></script>
-    <!-- injector:js -->
-    <!-- endinjector -->
-    <!-- endbuild -->
+<!-- build:js(.tmp) scripts/main.js -->
+<!-- bower:js -->
+<!-- endbower -->
+<script src="scripts/_templates.js"></script>
+<!-- injector:js -->
+<!-- endinjector -->
+<!-- endbuild -->
 </body>
 </html>

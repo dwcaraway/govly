@@ -212,7 +212,21 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
 
             var userResp = {name: 'bilbo', roles: [userRoles.user], token: randomUUID()};
 
-            return [200, {user: userResp, status: 200, message: 'foo'}, {}];
+            return [200, {user: userResp, status: 200, message: 'Account confirmed!'}, {}];
+        });
+
+        $httpBackend.when('POST', AUTH_BASE_URL+'/reset').respond(function (method, url) {
+            $log.info(method, '->', url);
+
+            return [200, {status: 200, message: 'Password reset instructions sent.'}, {}];
+        });
+
+        $httpBackend.when('POST', AUTH_BASE_URL+'/update').respond(function (method, url) {
+            $log.info(method, '->', url);
+
+            var userResp = {name: 'bilbo', roles: [userRoles.user], token: randomUUID()};
+
+            return [200, {user: userResp, status: 200, message: 'Password changed!'}, {}];
         });
 
     });

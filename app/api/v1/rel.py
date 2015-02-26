@@ -50,7 +50,7 @@ RELS = {
         "POST": {
             "properties": {
                 "password": {"type": "string",
-                             "minLength":8,
+                             "minLength":6,
                              "maxLength":120
                              },
                 "email": {"type": "string", "format":"email"},
@@ -76,6 +76,56 @@ RELS = {
                         }
             },
             "required": ["token"],
+            "additionalProperties": False
+        }
+    },
+    "v1.AuthView:change": {
+        "POST": {
+        "properties": {
+                "old": {
+                    "type":"string",
+                    "maxLength":32
+                },
+                "new": {
+                    "type":"string",
+                    "mimLength": 6,
+                    "maxLength": 32
+                }
+           },
+            "required": ["new", "old"],
+            "additionalProperties": False
+        }
+    },
+    "v1.AuthView:update": {
+        "POST": {
+            "properties": {
+                "password": {"type": "string",
+                             "minLength": 6,
+                             "maxLength": 120
+                },
+                "token": {"type": "string",
+                          "minLength": 8,
+                          "maxLength": 120
+                }
+            },
+            "required": ["token"],
+            "additionalProperties": False
+        }
+    },
+    "v1.AuthView:reset": {
+        "POST": {
+                        "properties": {
+                    "token": {"type": "string",
+                              "minLength": 8,
+                              "maxLength": 120
+                    },
+                "password": {
+                    "type":"string",
+                    "minLength": 6,
+                    "maxLength":32
+                }
+           },
+            "required": ["password", "token"],
             "additionalProperties": False
         }
     }
