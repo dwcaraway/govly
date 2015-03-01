@@ -5,7 +5,8 @@ angular.module('angular-login.home', ['angular-login.grandfather'])
             .state('app.home', {
                 url: '/',
                 templateUrl: 'home/home.tpl.html',
-                controller: 'HomeController'
+                controller: 'HomeController',
+                accessLevel: accessLevels.public
             });
     })
     .controller('HomeController', function () {
