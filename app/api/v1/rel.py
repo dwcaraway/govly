@@ -61,7 +61,11 @@ RELS = {
                 "lastName":{
                     "type":"string",
                     "maxLength":32
-                }
+                },
+                            "token": {"type": "string",
+                      "minLength": 8,
+                      "maxLength": 120
+            }
             },
             "required": ["email", "password", "firstName", "lastName"],
             "additionalProperties": False
@@ -76,6 +80,15 @@ RELS = {
                         }
             },
             "required": ["token"],
+            "additionalProperties": False
+        }
+    },
+    "v1.UserView.InvitationsView": {
+        "POST": {
+            "properties": {
+                "email": {"type": "string", "format":"email"}
+            },
+            "required": ["email"],
             "additionalProperties": False
         }
     },

@@ -18,23 +18,6 @@ import sure
 from app.models.users import User
 from tests.factories import UserFactory, RoleFactory
 
-
-@pytest.fixture
-def role(apidb):
-    return RoleFactory()
-
-@pytest.fixture
-def user(role):
-    u = UserFactory(password='myprecious')
-    u.roles = [role] #Add a role
-    u.save()
-
-    return u
-
-@pytest.fixture
-def userWithNoRoles(role):
-    return UserFactory(password='myprecious')
-
 class TestLoggingIn:
 
     def test_jwt_log_in_returns_200_with_token(self, user, testapi):

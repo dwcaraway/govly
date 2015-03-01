@@ -1,84 +1,105 @@
-<form class="form-signin" name="registerForm" role="registration" ng-submit="submit(registerForm)" ng-controller="RegisterController">
- <div class="center-block"><h1><i class="fa fa-user"></i> Register</h1></div>
+<div ng-controller="RegisterController">
 
-    <div class="form-input firstName form-group">
-        <label for="firstName">First Name</label>
-        <input type="text" class="form-control" placeholder="First Name" name="firstName" id="firstName"
-               ng-model="registerObj.firstName" ng-maxlength="32" ng-required="true">
+    <div class="alert alert-danger" ng-show="alert" role="alert"><span
+            class="glyphicon glyphicon-remove-sign"></span> {{ alert }}</div>
 
-        <div class="errors" ng-class="{ active: registerForm.firstName.$invalid && registerForm.firstName.$dirty }">
-            <div class="error ng-hide" ng-show="registerForm.firstname.$dirty && registerForm.firstName.$error.required">
-                <p>Required</p>
-            </div>
-            <div class="error ng-hide" ng-show="registerForm.firstName.$error.maxlength">
-                <p>Max length is 32, please shorten it.</p>
-            </div>
-        </div>
-    </div>
+    <form class="form-signin" name="registerForm" role="registration" ng-submit="submit(registerForm)" ng-hide="alert">
+        <div class="center-block"><h1><i class="fa fa-user"></i> Register</h1></div>
 
-    <div class="form-input lastName form-group">
-        <label for="lastName">Last Name</label>
-        <input type="text" class="form-control" placeholder="Last Name" name="lastName" id="lastName"
-               ng-model="registerObj.lastName" ng-maxlength="32" ng-required="true">
+        <div class="form-input firstName form-group">
+            <label for="firstName">First Name</label>
+            <input type="text" class="form-control" placeholder="First Name" name="firstName" id="firstName"
+                   ng-model="registerObj.firstName" ng-maxlength="32" ng-required="true">
 
-        <div class="errors" ng-class="{ active: registerForm.lastName.$invalid && registerForm.lastName.$dirty }">
-            <div class="error ng-hide" ng-show="registerForm.lastName.$dirty && registerForm.lastName.$error.required">
-                <p>Required</p>
-            </div>
-            <div class="error ng-hide" ng-show="registerForm.lastName.$error.maxlength">
-                <p>Max length is 32, please shorten it.</p>
+            <div class="errors" ng-class="{ active: registerForm.firstName.$invalid && registerForm.firstName.$dirty }">
+                <div class="error ng-hide"
+                     ng-show="registerForm.firstName.$dirty && registerForm.firstName.$error.required">
+                    <p>Required</p>
+                </div>
+                <div class="error ng-hide" ng-show="registerForm.firstName.$error.maxlength">
+                    <p>Max length is 32, please shorten it.</p>
+                </div>
             </div>
         </div>
-    </div>
 
-  <div class="form-input email form-group">
-      <label for="emailaddress">Email</label>
-    <input type="email" class="form-control email" placeholder="E-Mail" name="email" id="emailaddress" ng-model="registerObj.email" ng-required="true" remote-validated="used">
-    <div class="errors" ng-class="{ active: registerForm.email.$invalid && registerForm.email.$dirty }">
-      <div class="error ng-hide" ng-show="registerForm.email.$error.email">
-        <p>E-Mail seems invalid.</p>
-      </div>
-      <div class="error ng-hide" ng-show="registerForm.email.$error.used">
-        <p>E-Mail is already taken.</p>
-      </div>
-    </div>
-  </div>
+        <div class="form-input lastName form-group">
+            <label for="lastName">Last Name</label>
+            <input type="text" class="form-control" placeholder="Last Name" name="lastName" id="lastName"
+                   ng-model="registerObj.lastName" ng-maxlength="32" ng-required="true">
 
-  <div class="form-input password form-group">
-      <label for="passwordInput1">Password</label>
-    <input type="{{ inputType }}" class="form-control password1" placeholder="Password (6 or more characters)" name="password1" id="passwordInput1" ng-model="registerObj.password" ng-minlength="6" ng-maxlength="32" ng-required="true">
-    <div class="errors" ng-class="{ active: registerForm.password.$invalid && registerForm.password.$dirty }">
-      <div class="error ng-hide" ng-show="registerForm.password.$error.minlength">
-        <p>Please use a password of at least 6 characters.</p>
-      </div>
-      <div class="error ng-hide" ng-show="registerForm.password.$error.maxlength">
-        <p>Please use a password shorter than 32 characters.</p>
-      </div>
-    </div>
+            <div class="errors" ng-class="{ active: registerForm.lastName.$invalid && registerForm.lastName.$dirty }">
+                <div class="error ng-hide"
+                     ng-show="registerForm.lastName.$dirty && registerForm.lastName.$error.required">
+                    <p>Required</p>
+                </div>
+                <div class="error ng-hide" ng-show="registerForm.lastName.$error.maxlength">
+                    <p>Max length is 32, please shorten it.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-input email form-group">
+            <label for="emailaddress">Email</label>
+            <input type="email" class="form-control email" placeholder="E-Mail" name="email" id="emailaddress"
+                   ng-model="registerObj.email" ng-required="true" remote-validated="used">
+
+            <div class="errors" ng-class="{ active: registerForm.email.$invalid && registerForm.email.$dirty }">
+                <div class="error ng-hide" ng-show="registerForm.email.$error.email">
+                    <p>E-Mail seems invalid.</p>
+                </div>
+                <div class="error ng-hide" ng-show="registerForm.email.$error.used">
+                    <p>E-Mail is already taken.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-input password form-group">
+            <label for="passwordInput1">Password</label>
+            <input type="{{ inputType }}" class="form-control password1" placeholder="Password (6 or more characters)"
+                   name="password1" id="passwordInput1" ng-model="registerObj.password" ng-minlength="6"
+                   ng-maxlength="32" ng-required="true">
+
+            <div class="errors" ng-class="{ active: registerForm.password.$invalid && registerForm.password.$dirty }">
+                <div class="error ng-hide" ng-show="registerForm.password.$error.minlength">
+                    <p>Please use a password of at least 6 characters.</p>
+                </div>
+                <div class="error ng-hide" ng-show="registerForm.password.$error.maxlength">
+                    <p>Please use a password shorter than 32 characters.</p>
+                </div>
+            </div>
+        </div>
+        <div class="form-input password2 form-group">
+            <label for="passwordInput2">Repeat Password</label>
+            <input type="{{ inputType }}" class="form-control password2" placeholder="Enter password again..."
+                   name="password2" id="passwordInput2" ng-model="registerObj.password2"
+                   password-match="registerObj.password">
+
+            <div class="errors" ng-class="{ active: registerForm.password2.$invalid && registerForm.password2.$dirty }">
+                <div class="error ng-hide" ng-show="registerForm.password2.$error.match">
+                    <p>Passwords do not match.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group form-input text-center">
+            <input class="password-check" type="checkbox" name="showPasswordCheckbox" id="showPasswordCheckbox"
+                   ng-model="showPassword" ng-click="hideShowPassword();"><label for="showPasswordCheckbox">Show
+            Password</label>
+        </div>
+
+        <div class="legal text-center">
+            <!-- TODO add links to ToS and Privacy Policy -->
+            <small>By clicking Join Now, you agree to FogMine's <a href="http://www.fogmine.com/policy/terms_of_service"
+                                                                   target="_blank">Terms of Service</a> and <a
+                    href="http://www.fogmine.com/policy/privacy_policy" target="_blank">Privacy Policy</a>.
+            </small>
+        </div>
+
+        <button class="btn btn-lg btn-block " type="submit"
+                ng-class="{ 'btn-primary': registerForm.$valid && registerForm.$dirty, 'btn-success': redirect }"
+                ng-disabled="registerForm.$invalid || registerForm.$pristine || xhr || redirect">
+            <span ng-hide="redirect">Join Now <i class="fa fa-repeat fa-spin" ng-show="xhr"></i></span>
+            <span ng-show="redirect">Redirecting... <i class="fa fa-repeat fa-spin"></i></span>
+        </button>
+    </form>
 </div>
-    <div class="form-input password2 form-group">
-    <label for="passwordInput2">Repeat Password</label>
-      <input type="{{ inputType }}" class="form-control password2" placeholder="Enter password again..." name="password2" id="passwordInput2" ng-model="registerObj.password2" password-match="registerObj.password">
-    <div class="errors" ng-class="{ active: registerForm.password2.$invalid && registerForm.password2.$dirty }">
-      <div class="error ng-hide" ng-show="registerForm.password2.$error.match">
-        <p>Passwords do not match.</p>
-      </div>
-    </div>
-</div>
-
-    <div class="form-group form-input text-center">
-    <input class="password-check" type="checkbox" name="showPasswordCheckbox" id="showPasswordCheckbox" ng-model="showPassword" ng-click="hideShowPassword();" ><label for="showPasswordCheckbox">Show Password</label>
-  </div>
-
-    <div class="legal text-center">
-        <!-- TODO add links to ToS and Privacy Policy -->
-        <small>By clicking Join Now, you agree to Fogmine's <a href="http://www.fogmine.com/policy/terms_of_service" target="_blank">Terms of Service</a> and <a href="http://www.fogmine.com/policy/privacy_policy" target="_blank">Privacy Policy</a>.</small>
-    </div>
-
-  <button class="btn btn-lg btn-block " type="submit"
-    ng-class="{ 'btn-primary': registerForm.$valid && registerForm.$dirty, 'btn-success': redirect }"
-    ng-disabled="registerForm.$invalid || registerForm.$pristine || xhr || redirect">
-    <span ng-hide="redirect">Join Now <i class="fa fa-repeat fa-spin" ng-show="xhr"></i></span>
-    <span ng-show="redirect">Redirecting... <i class="fa fa-repeat fa-spin"></i></span>
-  </button>
-</form>

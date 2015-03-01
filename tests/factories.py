@@ -10,10 +10,11 @@
     templated from https://github.com/ryanolson/cookiecutter-webapp
 """
 from datetime import datetime
-from factory import Factory, Sequence, post_generation, SubFactory, List
+from factory import Factory, Sequence, post_generation, SubFactory, LazyAttribute
 from flask.ext.security.utils import encrypt_password
+from app.framework.utils import generate_invitation_token
 
-from app.models.users import User, Role
+from app.models.users import User, Role, Invite
 from app.models.model import Organization
 from app.framework.sql import db
 
@@ -54,3 +55,9 @@ class UserFactory(BaseFactory):
 class OrganizationFactory(BaseFactory):
     FACTORY_FOR = Organization
     legalName = Sequence(lambda n: 'legalname{0}'.format(n))
+
+class InviteFactory(BaseFactory):
+    FACTORY_FOR = Invite
+    invitee_email = Sequence(lambda n: 'user{0}@foobar.com'.format(n))
+    token = LazyAttribute(lambda o: generate_invitation_token(o.invitor))
+    invitor = SubFactory(UserFactory)

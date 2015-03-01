@@ -14,14 +14,16 @@ from flask.ext.classy import route
 from flask.ext.jwt import SignatureExpired, BadSignature, current_user
 from flask.ext.restful.reqparse import RequestParser
 from flask_security.registerable import encrypt_password, register_user
+import werkzeug
+from werkzeug.exceptions import Conflict
 
 from flask_security.changeable import change_user_password
 from flask_security.recoverable import update_password, reset_password_token_status, generate_reset_password_token, send_password_reset_notice
 from flask_security.confirmable import generate_confirmation_token, confirm_email_token_status, confirm_user
-from flask_security.utils import verify_password, logout_user
+from flask_security.utils import verify_password, logout_user, get_token_status
 from ..base import BaseView, secure_endpoint
 from .rel import RELS
-from app.models.users import User, Role
+from app.models.users import User, Role, Invite
 from jsonschema import validate, ValidationError, FormatChecker
 from sqlalchemy.exc import IntegrityError
 from urlparse import urljoin
@@ -37,6 +39,7 @@ request_register_options.add_argument('email', type=str, location='json', requir
 request_register_options.add_argument('password', type=str, location='json', required=True)
 request_register_options.add_argument('firstName', type=str, location='json', required=True)
 request_register_options.add_argument('lastName', type=str, location='json', required=True)
+request_register_options.add_argument('token', type=str, location='json', required=True)
 
 request_confirm_options = RequestParser()
 request_confirm_options.add_argument('token', type=str, location='json', required=True)
@@ -81,20 +84,42 @@ class AuthView(BaseView):
     def register_user(self):
 
         schema = RELS['v1.AuthView:register'][request.method]
-        data = request_register_options.parse_args()
 
         try:
+            data = request_register_options.parse_args()
             validate(data, schema, format_checker=FormatChecker())
+
+            invite_token = data['token']
+
+            expired, invalid, invitor = get_token_status(invite_token, 'invite', 'USE_INVITE')
+
+            if invalid or not invitor:
+                return dict(status=409, message="Invite is invalid"), 409
+
+            if expired:
+                return dict(status=409, message="Invite has expired"), 409
+
+            inviteTokenObj = Invite.find(token=invite_token).first()
+
+            if not inviteTokenObj:
+                return dict(status=409, message="Invite not found"), 409
+
+            if inviteTokenObj.invitee_id:
+                return dict(status=409, message="Invite already used"), 409
+
             password = encrypt_password(data['password'])
             user = register_user(email=data['email'], password=password, first_name=data['firstName'],
                    last_name=data['lastName'], roles=[Role.first(name='user')])
+
+            inviteTokenObj.invitee_id = user.id
+            inviteTokenObj.save()
 
             token = generate_confirmation_token(user)
             confirmation_link = urljoin(current_app.config['CLIENT_DOMAIN'], '/#/confirm?token='+token)
 
             #TODO this mail send should be performed asynchronously using celery, see issue #88850472
             send_message(
-                subject='Please Confirm Your Fogmine Account',
+                subject='Please Confirm Your FogMine Account',
                 sender="do-not-reply@fogmine.com",
                 recipients = [user.email],
                 html_body=render_template('email/activate.html', user=user, confirmation_link=confirmation_link),
@@ -109,6 +134,8 @@ class AuthView(BaseView):
             return dict(status=400, message=e.message), 400
         except IntegrityError:
             return {'status': 409, 'message': 'An account with that email already exists.'}, 409
+        except werkzeug.exceptions.ClientDisconnected:
+            return dict(status=400, message='one or more required arguments missing from this request'), 400
 
     @route('/confirm', methods=['POST'])
     def confirm_email(self):
@@ -199,7 +226,7 @@ class AuthView(BaseView):
 
         #TODO this mail send should be performed asynchronously using celery, see issue #88850472
         send_message(
-            subject='Fogmine Reset Request',
+            subject='FogMine Reset Request',
             sender="do-not-reply@fogmine.com",
             recipients = [user.email],
             html_body=render_template('email/reset.html', user=user, reset_link=reset_link),

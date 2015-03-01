@@ -3,13 +3,13 @@ angular.module('angular-login.register', ['angular-login.grandfather'])
         'use strict';
         $stateProvider
             .state('app.register', {
-                url: '/register',
+                url: '/register?token',
                 templateUrl: 'register/register.tpl.html',
                 controller: 'RegisterController',
                 accessLevel: accessLevels.anon
             });
     })
-    .controller('RegisterController', function ($scope, $http, $timeout, $state, $log, loginService) {
+    .controller('RegisterController', function ($scope, $http, $timeout, $state, $log, loginService, $stateParams) {
         'use strict';
         $scope.xhr = false;
         $scope.redirect = false;
@@ -31,7 +31,7 @@ angular.module('angular-login.register', ['angular-login.grandfather'])
             $scope.xhr = true;
             $scope.inputType = 'password';
 
-            $log.debug('cross domain post!');
+            $scope.registerObj.token = $stateParams.token;
 
             loginService.register($scope.registerObj)
                 .then(function success(data) {
@@ -51,4 +51,9 @@ angular.module('angular-login.register', ['angular-login.grandfather'])
                     $scope.xhr = false;
                 });
         };
+
+        if (!$stateParams.hasOwnProperty('token') || !$stateParams.token) {
+            $scope.alert = 'Bad registration URL';
+            $log.debug('bad url detected');
+        }
     });

@@ -29,11 +29,7 @@ representations.json.settings = {
     'sort_keys': True,
 }
 
-request_options = RequestParser()
-request_options.add_argument('Content-Type', type=str, location='headers')
-request_options.add_argument('fields', type=str, location='args')
-request_options.add_argument('page', type=int, location='args')
-request_options.add_argument('per_page', type=int, location='args')
+from flask import request
 
 response_options = RequestParser()
 response_options.add_argument('envelope', type=fields.Boolean, location='args')
@@ -110,7 +106,7 @@ class BaseView(FlaskView):
     trailing_slash = None
 
     def before_request(self, name, *args, **kwargs):
-        """Enforce Content-Type == application/json"""
+        """Enforce Content-Type is json or some variant"""
         enforce_json_post_put_patch_requests()
 
     def after_request(self, name, response):
@@ -136,11 +132,11 @@ def secure_endpoint(jwt=True, oauth2=True, jwt_realm=None):
 def enforce_json_post_put_patch_requests():
     """
     Incoming POST, PUT and PATCH requests should have Content-Type set to
-    'application/json' or else a 415 - Unsupported Media Type is returned.
+    standard JSON or else a 415 - Unsupported Media Type is returned.
     """
-    options = request_options.parse_args()
-    content_type, options = parse_options_header(options.get("Content-Type"))
-    content_json = content_type == 'application/json'
+    content_type = request.content_type
+    content_json = (content_type.lower() == 'application/json')\
+        if content_type else False
     post_put_or_patch = request.method.lower() in ['post', 'put', 'patch']
     if post_put_or_patch and not content_json:
         abort(415)

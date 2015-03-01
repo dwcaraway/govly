@@ -113,8 +113,6 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
                 localStorage.setItem('userStorage', angular.toJson(userStorage));//Is the update to userStorage necessary?
                 localStorage.setItem('tokenStorage', angular.toJson(tokenStorage));
 
-                //TODO remove debug statement below
-                console.log('tokenStorage keys'+Object.keys(angular.fromJson(localStorage.getItem('tokenStorage'))));
                 return [200, {name: user.name, roles: [user.userRole], token: newToken}, {}];
             } else {
                 return [401, 'wrong combination email/password', {}];
@@ -174,30 +172,27 @@ angular.module('angular-login.mock', ['ngMockE2E', 'config'])
                 errors = [];
             $log.info(method, '->', url);
 
-            return [201, {token: 'something', name:postData['firstName']}];
-            //if (angular.isDefined(userStorage[postData.username])) {
-            //    errors.push({field: 'username', name: 'used'});
-            //}
-            //
-            //if (angular.isDefined(emailStorage[postData.email])) {
-            //    errors.push({field: 'email', name: 'used'});
-            //}
-            //
-            //if (errors.length) {
-            //    return [409, {
-            //        valid: false,
-            //        errors: errors
-            //    }, {}];
-            //} else {
-            //    newUser = angular.extend(postData, {roles: [userRoles[postData.role]], tokens: []});
-            //    delete newUser.role;
-            //
-            //    userStorage[newUser.username] = newUser;
-            //    emailStorage[newUser.email] = newUser.username;
-            //    localStorage.setItem('userStorage', angular.toJson(userStorage));
-            //    localStorage.setItem('emailStorage', angular.toJson(emailStorage));
-            //    return [201, {valid: true, creationDate: Date.now()}, {}];
-            //}
+            if (angular.isDefined(userStorage[postData.username])) {
+                errors.push({field: 'username', name: 'used'});
+            }
+
+            if (angular.isDefined(emailStorage[postData.email])) {
+                errors.push({field: 'email', name: 'used'});
+            }
+
+            if (errors.length) {
+                return [409, {
+                    valid: false,
+                    errors: errors
+                }, {}];
+            } else {
+                //newUser = angular.extend(postData, {roles: [userRoles[postData.role]], tokens: []});
+                //delete newUser.role;
+                //
+                //userStorage[newUser.username] = newUser;
+                //localStorage.setItem('userStorage', angular.toJson(userStorage));
+                return [200, {user: {name: postData.firstName, roles: [userRoles.user], token: randomUUID()}}, {}];
+            }
         });
 
         $httpBackend.when('GET', /data\/.*\.json/).passThrough();

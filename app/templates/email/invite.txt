@@ -1,0 +1,6 @@
+Greetings!
+
+{{ user.firstName }} {{ user.lastName }} has invited you to receive early access to FogMine.
+To create your account, please navigate to {{ confirmation_link }}.
+
+- The FogMine Team

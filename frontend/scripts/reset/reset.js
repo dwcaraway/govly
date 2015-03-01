@@ -55,10 +55,6 @@ angular.module('angular-login.reset', ['angular-login.grandfather'])
             }
         };
 
-        if (!$stateParams.hasOwnProperty('token') || $stateParams.token.length < 1) {
-            $scope.alert = 'Bad password reset URL';
-        }
-
         $scope.submit = function (formInstance) {
             $scope.xhr = true;
 
@@ -83,5 +79,9 @@ angular.module('angular-login.reset', ['angular-login.grandfather'])
 
                 });
         };
+
+        if (!$stateParams.hasOwnProperty('token') || $stateParams.token.length < 1) {
+            $scope.alert = 'Bad password reset URL';
+        }
     });
 

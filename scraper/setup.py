@@ -14,7 +14,7 @@ print reqs
 
 setup(name='Vitals',
       version='0.0.1',
-      description='Fogmine Economic Dashboard Application of Dayton Region',
+      description='FogMine Department of Defense Procurement Market Research Tool',
       author='David Caraway',
       author_email='dave@fogmine.com',
       url='http://www.fogmine.com',

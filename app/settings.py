@@ -18,7 +18,8 @@ class Config(object):
     DEBUG = True
     TESTING = False
     SECRET_KEY = os.environ.get('SECRET_KEY', 'superdupersecret')
-    EMAIL_CONFIRM_SALT = os.environ.get('EMAIL_CONFIRM_SALT', 'hL^50_mTOUWL_kv^QAg1%LMHL62jGtxrj^vfJUrBAjV1*Hc3AVuxsiqlG=Hj')
+    MAX_INVITES = os.environ.get('MAX_INVITES', 5)
+
     PASSWORD_RESET_SALT = os.environ.get('PASSWORD_RESET_SALT', 'suw1gHvoZdYeKhVK0so_izb6J+1Yt=|=TeY2CbMQ_gxcMo9tEQST2qqqdgO4')
 
     CLIENT_DOMAIN = 'http://localhost:9000'
@@ -72,6 +73,10 @@ class Config(object):
     # Flask-Security salt options
     SECURITY_CONFIRM_SALT = os.environ.get('EMAIL_CONFIRM_SALT', 'hL^50_mTOUWL_kv^QAg1%LMHL62jGtxrj^vfJUrBAjV1*Hc3AVuxsiqlG=Hj')
     SECURITY_RESET_SALT = os.environ.get('PASSWORD_RESET_SALT', 'suw1gHvoZdYeKhVK0so_izb6J+1Yt=|=TeY2CbMQ_gxcMo9tEQST2qqqdgO4')
+    SECURITY_INVITE_SALT = os.environ.get('SECURITY_INVITE_SALT', 'iL0_mTOUWL_kv^QAg1%23kdkjhs0@===xrj^vfJUrBAjV1*Hc3AVux^iql=Hj')
+
+    # Flask-Security token expiration options
+    SECURITY_USE_INVITE_WITHIN = "90 days"
 
     # Celery
     CELERY_BROKER_URL= os.environ.get('REDISTOGO_URL', 'redis://127.0.0.1:6379')

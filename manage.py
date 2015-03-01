@@ -67,7 +67,7 @@ def _make_context():
     app, db, and the User model by default.
     """
     return {
-        'app': application,
+        'app': application.mounts['/api'],
         'db': db,
         'User': User
     }

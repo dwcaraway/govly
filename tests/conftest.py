@@ -16,9 +16,11 @@ from app import api
 from app.framework.sql import db as _db
 from .settings import TestingConfig
 from .apis import classy_api
-from .factories import UserFactory, OrganizationFactory
+from .factories import UserFactory, OrganizationFactory, RoleFactory, InviteFactory
+from flask_jwt import generate_token
 from webtest import TestResponse
 from dougrain import Document
+from app.framework.utils import generate_invitation_token
 
 #monkey patch the TestResponse to return a HAL dougrain object
 def hal(self):
@@ -68,3 +70,46 @@ def org(apidb):
 @pytest.fixture
 def orgs(apidb):
     return OrganizationFactory.create_batch(size=100)
+
+@pytest.fixture
+def role(apidb):
+    return RoleFactory()
+
+@pytest.fixture
+def user(role):
+    u = UserFactory(password='myprecious')
+    u.roles = [role] #Add a role
+    u.save()
+
+    return u
+
+@pytest.fixture
+def userNotSaved(role):
+    """Build a user instance but don't save to database"""
+    u = UserFactory.build(password='myprecious')
+    return u
+
+@pytest.fixture
+def token(user):
+    """Returns a JWT"""
+    return generate_token(user)
+
+@pytest.fixture
+def authHeader(token):
+    return dict(Authorization="Bearer {token}".format(token=token))
+
+@pytest.fixture
+def mail(apiapp):
+    return apiapp.extensions['mail']
+
+@pytest.fixture
+def invite_token(user):
+    return generate_invitation_token(user)
+
+@pytest.fixture
+def invite():
+    return InviteFactory()
+
+@pytest.fixture
+def userWithNoRoles(role):
+    return UserFactory(password='myprecious')

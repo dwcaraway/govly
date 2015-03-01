@@ -15,6 +15,7 @@ import os
 from flask import Flask
 from flask.ext.security import SQLAlchemyUserDatastore
 from raven.contrib.flask import Sentry
+from itsdangerous import URLSafeTimedSerializer
 
 from .extensions import *
 from .middleware import HTTPMethodOverrideMiddleware
@@ -60,6 +61,9 @@ def create_app(package_name, package_path, settings_override=None,
     # Flask-Security
     security.init_app(app, SQLAlchemyUserDatastore(db, User, Role),
                       register_blueprint=security_register_blueprint)
+    ## patching flask security to support invite tokens
+    app.extensions['security'].invite_serializer = URLSafeTimedSerializer(secret_key=app.config.get('SECRET_KEY'), salt=app.config.get('SECURITY_INVITE_SALT'))
+
 
     # Flask-JWT
     jwt.init_app(app)

@@ -15,7 +15,9 @@ import os
 from flask import flash, current_app
 from werkzeug.local import LocalProxy
 from flask.ext.mail import Message
+import uuid
 
+_security = LocalProxy(lambda: current_app.extensions['security'])
 _mail = LocalProxy(lambda: current_app.extensions['mail'])
 
 def flash_errors(form, category="warning"):
@@ -24,7 +26,6 @@ def flash_errors(form, category="warning"):
         for error in errors:
             flash("{0} - {1}"
                     .format(getattr(form, field).label.text, error), category)
-
 
 def generate_salt():
     """Generate a random string used for salts and secret keys."""
@@ -36,3 +37,12 @@ def send_message(subject, sender, recipients, text_body, html_body):
     msg.body = text_body
     msg.html = html_body
     _mail.send(msg)
+
+def generate_invitation_token(user):
+    """Generates a unique invitation token for the specified user.
+
+    :param user: The user to work with
+    """
+    data = [user.id, str(uuid.uuid4())]
+    return _security.invite_serializer.dumps(data)
+

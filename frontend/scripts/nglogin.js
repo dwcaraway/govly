@@ -13,12 +13,13 @@ angular.module('angular-login', [
     'angular-login.opps',
     'angular-login.confirm',
     'angular-login.reset',
+    'angular-login.home',
     // components
     'ngAnimate'
 ])
     .config(function ($urlRouterProvider) {
         'use strict';
-        $urlRouterProvider.otherwise('/register');
+        $urlRouterProvider.otherwise('/');
     })
     .run(function ($rootScope) {
         /**

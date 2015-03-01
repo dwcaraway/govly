@@ -48,6 +48,15 @@ class Connection(Model):
     image_url = db.Column(db.String(512))
     rank = db.Column(db.Integer)
 
+class Invite(Model):
+
+    __tablename__ = "invitations"
+
+    invitor_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    invitee_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    invitee_email = db.Column(db.String(128), unique=True, nullable=False)
+    token = db.Column(db.String(255), unique=True, nullable=False)
+    created = db.Column(db.DateTime(), default=db.func.now())
 
 def generate_secret():
     """Generate a random string used for salts and secret keys."""
@@ -64,6 +73,7 @@ class User(UserMixin, Model):
     last_name = db.Column(db.String(120), nullable=False)
     active = db.Column(db.Boolean())
     secret = db.Column(db.String(64), default=generate_secret)
+    created = db.Column(db.DateTime(), default=db.func.now())
     confirmed_at = db.Column(db.DateTime())
     last_login_at = db.Column(db.DateTime())
     current_login_at = db.Column(db.DateTime())
@@ -74,6 +84,7 @@ class User(UserMixin, Model):
             backref=db.backref('users', lazy='dynamic'))
     connections = db.relationship('Connection',
             backref=db.backref('user', lazy='joined'), cascade='all')
+    invitations = db.relationship('Invite', backref='invitor', foreign_keys='Invite.invitor_id')
 
     def reset_secret(self):
         self.secret = generate_secret()

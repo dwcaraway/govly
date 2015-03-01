@@ -11,7 +11,7 @@ angular.module('loginService', ['ui.router', 'config'])
         var userToken = localStorage.getItem('userToken'),
             errorState = 'app.error',//State user is directed to when error occurs
             loginState = 'app.opps',//State user is directed to when logging in
-            logoutState = 'app.register'; //State user is directed to when logging out
+            logoutState = 'app.home'; //State user is directed to when logging out
 
         var AUTH_BASE_URL = ENV.apiEndpoint + '/auth';
 
