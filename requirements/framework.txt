@@ -42,7 +42,7 @@ aniso8601
 pytz
 jsonschema==2.4.0
 Flask-Cors==1.10.2
-mashmallow==1.2.2
+marshmallow==1.2.2
 
 # Auth
 Flask-Security==1.7.4
