@@ -26,9 +26,9 @@ IMAGES_THUMBS = {
 LOG_LEVEL='WARNING'
 
 #Feed output
-#FEED_URI = './scrapeddata/scraped_business.json'
-#FEED_FORMAT = 'json'
+FEED_URI = './scrapeddata/%(name)s/%(time)s.json'
+FEED_FORMAT = 'json'
 
 LOG_ENABLED=True
 LOG_LEVEL='WARNING'
-LOG_FILE='./scrapeddata/scrapy.log'
+LOG_FILE='./scrapeddata/log/scrapy.log'

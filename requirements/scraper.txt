@@ -10,3 +10,6 @@ cssselect==0.9.1
 phonenumbers==7.0.1
 service-identity==14.0.0
 lxml==3.4.1
+
+#ScrapingHub Commandline client
+shub==1.1.1

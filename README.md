@@ -144,3 +144,9 @@ https://staging.dash.fogmine.com
 
 To deploy to production, you push your changes to the "production" branch. *Due to a Bitbucket bug, you need to use ```--no-ff``` for merges
 from master to production in order to generate a change event and trigger the build.
+
+Scraping
+--------
+To install the required python libraries for scraping, run
+```$ pip install -r requirements/scraper.txt```
+
