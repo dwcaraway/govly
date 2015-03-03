@@ -5,7 +5,7 @@ import urlparse
 import re
 from scrapy.http import Request
 from urlparse import urljoin
-from scraper.items import BusinessItem
+from items import BusinessItem
 from scrapy.contrib.loader.processor import MapCompose, TakeFirst
 from scrapy.contrib.loader import ItemLoader
 from urllib2 import urlopen

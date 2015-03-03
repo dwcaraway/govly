@@ -4,7 +4,7 @@ from scrapy.spider import Spider
 from scrapy import Request
 from scrapy.contrib.loader import ItemLoader 
 from scrapy.shell import inspect_response
-from scraper.items import BusinessItem
+from items import BusinessItem
 from scrapy.contrib.loader.processor import MapCompose, TakeFirst
 from scrapy import log
 from scrapy.shell import inspect_response

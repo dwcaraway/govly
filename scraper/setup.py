@@ -1,16 +1,12 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 import os
-from pip.req import parse_requirements
 
+req_file = os.path.abspath(os.path.join(os.path.abspath(__file__), '../requirements.txt'))
 
-# parse_requirements() returns generator of pip.req.InstallRequirement objects
-install_reqs = parse_requirements('requirements/scraper.txt')
+with open(req_file) as f:
+    required = [z for z in f.read().splitlines() if (z and z[0] != '#')]
 
-# reqs is a list of requirement
-# e.g. ['django==1.5.1', 'mezzanine==1.4.6']
-reqs = [str(ir.req) for ir in install_reqs]
-
-print reqs
+print required
 
 setup(name='Vitals',
       version='0.0.1',
@@ -18,7 +14,7 @@ setup(name='Vitals',
       author='David Caraway',
       author_email='dave@fogmine.com',
       url='http://www.fogmine.com',
-      packages = ['scraper', 'scraper.spiders','app'],
-      entry_points={'scrapy':['settings=scraper.settings']},
-      install_requires=reqs
+      packages = ['.', 'spiders'],
+      entry_points={'scrapy':['settings=settings']},
+      install_requires=required
      )

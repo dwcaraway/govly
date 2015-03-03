@@ -1,17 +1,16 @@
 # Scrapy settings for Vitals project
 BOT_NAME = 'fedvitals'
 
-SPIDER_MODULES = ['scraper.spiders']
-NEWSPIDER_MODULE = 'scraper.spiders'
+SPIDER_MODULES = ['spiders']
+NEWSPIDER_MODULE = 'spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = 'fedvitals'
 
 ITEM_PIPELINES = {
     #'scrapy.contrib.pipeline.images.ImagesPipeline': 1,
-    'scraper.pipelines.PhoneNormalizationPipeline':5,
-    'scraper.pipelines.AddressNormalizationPipeline':6,
-    'scraper.pipelines.DatabasePipeline': 1000
+    '..pipelines.PhoneNormalizationPipeline':5,
+    '..pipelines.AddressNormalizationPipeline':6
 }
 
 #Image Download Support
@@ -31,4 +30,4 @@ FEED_FORMAT = 'json'
 
 LOG_ENABLED=True
 LOG_LEVEL='WARNING'
-LOG_FILE='./scrapeddata/log/scrapy.log'
+LOG_FILE='./scrapeddata/scrapy.log'

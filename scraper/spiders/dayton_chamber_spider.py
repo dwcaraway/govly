@@ -2,7 +2,7 @@ __author__ = 'dwcaraway'
 
 from scrapy.spider import Spider
 from scrapy.http import FormRequest
-from scraper.items import BusinessItem
+from items import BusinessItem
 
 class DaytonChamberSpider(Spider):
     name = "dayton_chamber"
