@@ -17,7 +17,9 @@ from werkzeug.serving import run_simple
 from app import create_app
 from app.framework.sql import db
 from app.models.users import User
+from app.models.sam import Sam
 import os
+from tools.commands import SamCopyCommand
 
 application = create_app(override_settings=os.environ.get('APPLICATION_SETTINGS', 'app.settings.DevelopmentConfig'))
 
@@ -39,6 +41,48 @@ class Worker(Command):
                            '--concurrency', concurrency,
                            '--loglevel', loglevel,
                            ])
+
+copy_manager = Manager(usage="Perform data transfer operations")
+
+@copy_manager.command
+def shub():
+    pass
+
+@copy_manager.command
+def sam():
+    from app import create_app
+    app = application.mounts['/api']
+    ctx = app.test_request_context()
+    ctx.push()
+
+    s = SamCopyCommand(app=app)
+
+    unzipped_data_path = s.download_and_unzip_latest()
+    # unzipped_data_path = '/Users/dave/Downloads/SAM_PUBLIC_MONTHLY_20150301.dat'
+
+    conn = db.engine.connect()
+    try:
+        db.engine.execute('drop table if exists sam;')
+        db.create_all()
+
+        conn.execute(Sam.__table__.insert(), [biz for biz in s.read_business(unzipped_data_path)])
+
+        batch = []
+
+        for biz in s.read_business(unzipped_data_path):
+            batch.append(biz)
+
+            if len(batch) >= 100000:
+                print 'inserting 100,000 sam entries'
+                conn.execute(Sam.__table__.insert(), batch)
+                batch = []
+
+        #Insert any remaining
+                conn.execute(Sam.__table__.insert(), batch)
+
+    finally:
+        conn.close()
+        ctx.pop()
 
 class WSGI(Server):
 
@@ -85,7 +129,7 @@ def drop():
     """Drops all database tables"""
     if prompt_bool("Are you sure you want to lose all your data"):
         db.drop_all()
-        db.engine.execute("drop table alembic_version")
+        db.engine.execute("drop table if exists alembic_version")
 
 @MigrateCommand.command
 def create():
@@ -111,6 +155,7 @@ manager.add_command('runserver', WSGI(host='0.0.0.0'))
 manager.add_command('worker', Worker())
 manager.add_command('shell', Shell(make_context=_make_context))
 manager.add_command('db', MigrateCommand)
+manager.add_command('copy', copy_manager)
 
 if __name__ == '__main__':
     manager.run()

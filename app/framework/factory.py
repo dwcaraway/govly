@@ -21,6 +21,7 @@ from .extensions import *
 from .middleware import HTTPMethodOverrideMiddleware
 from .security import authenticate, load_user, make_payload, make_response
 from ..models.users import User, Role
+from ..models.sam import Sam
 
 _log = logging.getLogger(__name__)
 

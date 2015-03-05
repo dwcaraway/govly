@@ -17,6 +17,7 @@ from app.framework.sql import db as _db
 from .settings import TestingConfig
 from .apis import classy_api
 from .factories import UserFactory, OrganizationFactory, RoleFactory, InviteFactory
+from app.models.sam import *
 from flask_jwt import generate_token
 from webtest import TestResponse
 from dougrain import Document

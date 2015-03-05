@@ -18,3 +18,4 @@ dist
 .tmp
 .sass-cache
 .divshot-*
+notebooks
