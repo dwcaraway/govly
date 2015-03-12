@@ -12,9 +12,6 @@
 from flask.ext.sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
-from flask.ext.migrate import Migrate
-migrate = Migrate()
-
 from flask.ext.jwt import JWT
 jwt = JWT()
 
@@ -30,4 +27,4 @@ celery = Celery()
 from flask.ext.cors import CORS
 cors = CORS()
 
-__all__ = ("db", "migrate", "jwt", "mail", "security", "celery", 'cors')
+__all__ = ("db", "jwt", "mail", "security", "celery", 'cors')

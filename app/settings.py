@@ -98,6 +98,7 @@ class Config(object):
 
     #Flask-CORS
     CORS_ALLOW_HEADERS = ['Authorization', 'Content-Type'] #allow browsers to cross origin PUT and POST JSON, which is an OPTIONS followed by POST
+    CORS_ALLOW_ORIGINS = 'http://localhost:9000'
 
     #Flask-JWT
     JWT_AUTH_URL_RULE = '/auth/login'
@@ -119,6 +120,13 @@ class ProductionConfig(Config):
 
     #Flask-CORS
     CORS_ALLOW_ORIGINS='https://dash.fogmine.com'
+
+    SECURITY_CHANGEABLE = False
+    SECURITY_CONFIRMABLE = False
+    SECURITY_RECOVERABLE = False
+    SECURITY_REGISTERABLE = False
+    SECURITY_TRACKABLE = True
+    SECURITY_PASSWORDLESS = False
 
 class DevelopmentConfig(Config):
     DEBUG = True

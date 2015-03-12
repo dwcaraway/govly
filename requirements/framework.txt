@@ -5,6 +5,7 @@ Werkzeug==0.9.6
 Jinja2==2.7.3
 itsdangerous==0.24
 blinker==1.3
+Flask-Admin==1.1.0
 
 # Celery
 Flask-Celery-Helper==1.0.0

@@ -17,9 +17,14 @@ from werkzeug.serving import run_simple
 from app import create_app
 from app.framework.sql import db
 from app.models.users import User
+from app.models.sam import Sam
 import os
 
 application = create_app(override_settings=os.environ.get('APPLICATION_SETTINGS', 'app.settings.DevelopmentConfig'))
+
+# Flask-Migrate
+from flask.ext.migrate import Migrate
+Migrate(application, db)
 
 manager = Manager(application.mounts['/api'])
 TEST_CMD = "py.test ./tests/server"
@@ -67,9 +72,10 @@ def _make_context():
     app, db, and the User model by default.
     """
     return {
-        'app': application.mounts['/api'],
+        'api': application.mounts['/api'],
         'db': db,
-        'User': User
+        'User': User,
+        'admin': application.mounts['/admin']
     }
 
 @manager.command

@@ -32,9 +32,8 @@ def authenticate(username, password):
         _log.warn("Authentication failed; unknown username %s", username)
     else:
         _log.warn("Authentication failed; invalid password for %s", username)
-
-    if not user.roles:
-        _log.warn("Authentication failed; No user roles found.")
+        if not user.roles:
+            _log.warn("Authentication failed; No user roles found.")
 
 def load_user(payload):
     user = _datastore.get_user(payload['user_id'])
@@ -63,7 +62,6 @@ def generate_response_dict(user, payload=None):
     if not _payload:
         _payload = generate_token(user)
 
-    #TODO all bitmasks should NOT be the same and should be saved as an attribute of the role
-    masked_roles = [dict(bitMask=2, title=role.name) for role in user.roles]
+    masked_roles = [dict(bitMask=role.bitmask, title=role.name) for role in user.roles]
 
     return dict(token=_payload, roles=masked_roles, name=user.first_name)

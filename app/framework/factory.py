@@ -21,7 +21,6 @@ from .extensions import *
 from .middleware import HTTPMethodOverrideMiddleware
 from .security import authenticate, load_user, make_payload, make_response
 from ..models.users import User, Role
-from ..models.sam import Sam
 
 _log = logging.getLogger(__name__)
 
@@ -53,9 +52,6 @@ def create_app(package_name, package_path, settings_override=None,
     # Flask-SQLAlchemy
     db.init_app(app)
 
-    # Flask-Migrate
-    migrate.init_app(app, db)
-
     # Flask-Mail
     mail.init_app(app)
 
@@ -64,7 +60,6 @@ def create_app(package_name, package_path, settings_override=None,
                       register_blueprint=security_register_blueprint)
     ## patching flask security to support invite tokens
     app.extensions['security'].invite_serializer = URLSafeTimedSerializer(secret_key=app.config.get('SECRET_KEY'), salt=app.config.get('SECURITY_INVITE_SALT'))
-
 
     # Flask-JWT
     jwt.init_app(app)
