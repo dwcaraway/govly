@@ -108,7 +108,7 @@ class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
 
-    CLIENT_DOMAIN = 'https://dash.fogmine.com'
+    CLIENT_DOMAIN = os.environ.get('CLIENT_DOMAIN', 'https://dash.fogmine.com')
 
     # Flask-Mail
     MAIL_SERVER = 'smtp.sendgrid.net'
