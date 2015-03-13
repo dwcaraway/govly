@@ -135,7 +135,7 @@ def enforce_json_post_put_patch_requests():
     standard JSON or else a 415 - Unsupported Media Type is returned.
     """
     content_type = request.content_type
-    content_json = (content_type.lower() == 'application/json')\
+    content_json = ('application/json' in content_type.lower())\
         if content_type else False
     post_put_or_patch = request.method.lower() in ['post', 'put', 'patch']
     if post_put_or_patch and not content_json:

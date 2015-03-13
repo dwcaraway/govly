@@ -44,6 +44,9 @@ class MyAdminIndexView(AdminIndexView):
 
     @expose('/login/', methods=('GET', 'POST'))
     def login_view(self):
+        if current_user.is_authenticated():
+            return redirect(url_for('.index'))
+
         # handle user login
         form = LoginForm(request.form)
 
@@ -52,12 +55,14 @@ class MyAdminIndexView(AdminIndexView):
 
             if user:
                 if user.has_role('admin'):
-                    login_user(user)
-                    return redirect(url_for('.index'))
+                    if login_user(user):
+                        redirect(url_for('.index'))
+                    else:
+                        self._template_args['error'] = "User is not active or could not be logged in."
                 else:
-                    self._template_args['error']="User has insufficient privilege."
+                    self._template_args['error'] = "User has insufficient privilege."
             else:
-                self._template_args['error']="Invalid user and/or password"
+                self._template_args['error'] = "Invalid user and/or password"
 
         self._template_args['form'] = form
         return self.render('admin/login.html')
