@@ -119,8 +119,8 @@ Primary Grunt Tasks
 -------------------
 ##Build
 *  **build:local** or **build (default)**: Build files to dist folder ready for deployment on host which also contains the api (localhost:5000). Used for development only.
-*  **build:staging**: Build files to dist folder ready for staging deployment on CDN. Built files will assume the api is at https://staging-api.fogmine.com
-*  **build:production**: Build files to dist folder ready for production deployment on CDN. Built files will assume the api is at https://api.fogmine.com
+*  **build:staging**: Build files to dist folder ready for staging deployment. Built files will assume the api is at https://staging-dash.fogmine.com/api
+*  **build:production**: Build files to dist folder ready for production deployment. Built files will assume the api is at https://dash.fogmine.com/api
 
 ##Serve
 *  **serve:mock** or **serve (default)**: Starts a grunt server on localhost:9000 with live reload connected to angular source files.. mock backend is used.

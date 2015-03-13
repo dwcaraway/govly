@@ -1,29 +1,30 @@
 import logging
 from .. import framework
 from ..framework.sql import db
-from flask_admin import Admin, expose, AdminIndexView, helpers
+from flask_admin import Admin, expose, AdminIndexView, helpers, BaseView
 from flask_admin.contrib.sqla import ModelView
 from flask_security import current_user, login_user, logout_user
 from flask import url_for, redirect, request
-from wtforms import form, fields, validators, ValidationError
-from flask.ext import login
+from wtforms import form, fields, validators
 from ..framework.security import authenticate
+from ..models.users import User
 
 _log = logging.getLogger(__name__)
 
-from ..models.users import User
-
-
 
 def create_app(settings_override=None):
-    """Returns an API application instance."""
+    """Returns an Admin application instance."""
 
     # Create and extend a minimal application
     app = framework.create_app(__name__, __path__, settings_override, security_register_blueprint=False)
 
+    from .invite_view import InviteView
+    from .user_view import UserView
+
     #Init the flask-admin
     admin = Admin(app, name='FogMine Admin', url='/', index_view=MyAdminIndexView(url='/'), template_mode='bootstrap3', base_template='admin/my_master.html')
-    admin.add_view(MyModelView(User, db.session))
+    admin.add_view(UserView(db.session))
+    admin.add_view(InviteView(db.session))
 
     return app
 
@@ -67,6 +68,15 @@ class MyAdminIndexView(AdminIndexView):
         return redirect(url_for('.login_view'))
 
 class MyModelView(ModelView):
+
+    def is_accessible(self):
+        """Runs before each view access, ensures that we have the correct admin role"""
+        if current_user.is_authenticated() and current_user.has_role('admin'):
+            return True
+
+        return False
+
+class MyBaseView(BaseView):
 
     def is_accessible(self):
         """Runs before each view access, ensures that we have the correct admin role"""

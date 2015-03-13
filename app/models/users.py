@@ -85,6 +85,7 @@ class User(UserMixin, Model):
     connections = db.relationship('Connection',
             backref=db.backref('user', lazy='joined'), cascade='all')
     invitations = db.relationship('Invite', backref='invitor', foreign_keys='Invite.invitor_id')
+    invited_by = db.relationship('Invite', uselist=False, backref='invitee', foreign_keys='Invite.invitee_id')
 
     def reset_secret(self):
         self.secret = generate_secret()
