@@ -320,4 +320,35 @@ angular.module('loginService', ['ui.router', 'config'])
                 return config;
             }
         };
+    }).factory('authInterceptor', function () {
+        'use strict';
+
+        return {
+            request: function (config) {
+                var userStr = localStorage.getItem('userData'), token;
+                if (userStr) {
+                    token = angular.fromJson(userStr).token;
+
+                    if (token) {
+                        config.headers.Authorization = 'Bearer ' + token;
+                    }
+                }
+                //TODO should check for expired token???
+                return config;
+            },
+
+            'response': function (response, loginService, $q) {
+                //Globally reacts when certain response codes are received
+
+                var status = response.status;
+
+                if (status === 401) {
+                   //TODO is this blocking? is directly calling logoutUser an issue? should flag be used?
+                   loginService.logoutUser();
+                    return $q.reject(response);
+                }
+
+                return response;
+            }
+        };
     });
