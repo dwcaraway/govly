@@ -22,8 +22,8 @@ index_reqparse.add_argument('limit', type=int, help='number of results to return
 index_reqparse.add_argument('data_source', type=str, help="get results only from a particular data source. As of "
                                                           "2014-04-10, the available sources are ‘FBO’ and "
                                                           "‘grants.gov’. Case sensitive.", default="")
-index_reqparse.add_argument('show_closed', type=bool, help="include opportunities with deadlines that have already passed in the results", default=False)
-index_reqparse.add_argument('show_noncompeted', type=bool, help="include opportunities with deadlines that have already passed in the results", default=False)
+index_reqparse.add_argument('show_closed', type=str, help="include opportunities with deadlines that have already passed in the results", default="false")
+index_reqparse.add_argument('show_noncompeted', type=str, help="include opportunities with deadlines that have already passed in the results", default="false")
 
 class OpportunitiesView(BaseView):
     """A complete Flask-Classy-based Opportunities API resource."""
