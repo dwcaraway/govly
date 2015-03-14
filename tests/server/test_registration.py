@@ -118,10 +118,16 @@ class TestRegistration:
     def test_confirm_user(self, apidb, testapi, mail, role, invite):
         m = self.test_register_user_sends_confirmation_email(apidb, testapi, mail, role, invite=invite)
 
+        u = User.find(email='agent@secret.com').first()
+        u.confirmed_at.should.be.none
+
         token = self.get_confirmation_token_from_email(m)
         href = url_for('v1.AuthView:confirm_email')
 
         resp = testapi.post_json(href, dict(token=token))
+
+        # confirmed status should be set
+        u.confirmed_at.should_not.be.none
 
         # confirmed user should receive a login credential set
         resp.status_code.should.equal(200)

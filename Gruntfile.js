@@ -644,10 +644,10 @@ module.exports = function (grunt) {
             } else if (target === 'production') {
                 //Build files to dist folder ready for production deployment on CDN. Built files will assume the api is at https://api.fogmine.com
                 tasks.unshift('ngconstant:production', 'replace:production');
-            } else if (target == 'local' || !target){
+            } else if (target === 'local' || !target){
                 tasks.unshift('ngconstant:development');
             } else{
-               grunt.fail.warn("Undefined target: "+target);
+               grunt.fail.warn('Undefined target: '+target);
             }
 
             return grunt.task.run(tasks);

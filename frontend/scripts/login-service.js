@@ -308,23 +308,6 @@ angular.module('loginService', ['ui.router', 'config'])
 
         return {
             request: function (config) {
-                var userStr= localStorage.getItem('userData'), token;
-                if (userStr) {
-                   token = angular.fromJson(userStr).token;
-
-                    if (token) {
-                        config.headers.Authorization = 'Bearer ' + token;
-                    }
-                }
-                //TODO should check for expired token???
-                return config;
-            }
-        };
-    }).factory('authInterceptor', function () {
-        'use strict';
-
-        return {
-            request: function (config) {
                 var userStr = localStorage.getItem('userData'), token;
                 if (userStr) {
                     token = angular.fromJson(userStr).token;

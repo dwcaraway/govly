@@ -155,6 +155,7 @@ class AuthView(BaseView):
                 return dict(status=409, message="Confirmation token has expired"), 409
 
             confirmed = confirm_user(user)
+            user.save()
 
             if not confirmed:
                 return dict(status=409, message='Email already confirmed'), 409
