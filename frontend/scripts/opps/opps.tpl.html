@@ -42,7 +42,7 @@
 </form>
 </div>
 
- <div id="opps-found" class="col-md-9">
+ <div id="opps-found" class="col-md-9" infinite-scroll="infiniteScroll()">
     <div id="results-topline" class="row">
     <div id="result-count" class="col-md-4 col-sm-4">
   {{ opps.numFound }} Search Results
@@ -51,24 +51,18 @@
         Sorted by relevancy
       </div>
     </div>
-    <pagination total-items="opps.numFound" ng-model="currentPage" ng-change="pageChanged()" max-size="5" ng-show="!opps.numFound"></pagination>
-  <div class="panel panel-info" ng-repeat="opp in opps.docs" shorten>
+  <div class="panel panel-info" ng-repeat="opp in opps.docs" shorten >
     <div class="panel-heading">
             <a href={{opp.listing_url}} target="_blank" class="text-danger">
                <b>{{ opp.title }}</b>
             </a>
-
-            <div id="rel-score">
-               -- Score {{ opp.score }}
-            </div>
     </div>
     <div class="panel-body shorten">
 
             {{ opp.description }}
 
     </div>
-    </div>
-    <pagination total-items="opps.numFound" ng-model="currentPage" ng-change="pageChanged()" max-size="5" ng-show="!opps.numFound"></pagination>
+  </div>
 </div>
 </div>
 </div>

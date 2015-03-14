@@ -1,4 +1,4 @@
-angular.module('angular-login.opps', ['angular-login.grandfather', 'ngResource', 'config'])
+angular.module('angular-login.opps', ['angular-login.grandfather', 'ngResource', 'config', 'infinite-scroll'])
     .config(function ($stateProvider) {
         'use strict';
         $stateProvider
@@ -18,7 +18,14 @@ angular.module('angular-login.opps', ['angular-login.grandfather', 'ngResource',
         $scope.getOpps = function (filter) {
             $scope.filter = filter || {};
             Opp.get($scope.filter, function (data) {
-                $scope.opps = data;
+                if ($scope.currentPage === 1) {
+                    $log.debug('reseting data page to 1');
+                    $scope.opps = data;
+                }else{
+                    $log.debug('adding new page of data to result set');
+                    $scope.opps.docs = $scope.opps.docs.concat(data.docs);
+                }
+
                 $timeout(function () {
                     $scope.$broadcast('dataloaded');
                 }, 0, false);
@@ -27,10 +34,16 @@ angular.module('angular-login.opps', ['angular-login.grandfather', 'ngResource',
             });
         };
 
-        $scope.pageChanged = function () {
+        $scope.infiniteScroll = function () {
+            if (!$scope.opps) {
+                return;
+            }
+            var size = $scope.filter.limit || 20;
+
+            $scope.currentPage = $scope.currentPage + 1;
             $log.debug('page: ' + $scope.currentPage);
             $scope.filter = $scope.filter || {};
-            $scope.filter.start = 10 * ($scope.currentPage - 1);
+            $scope.filter.start = size * ($scope.currentPage - 1);
             $log.debug('start: ' + $scope.filter.start);
             $scope.getOpps($scope.filter);
         };

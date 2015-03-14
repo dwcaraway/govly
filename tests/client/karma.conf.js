@@ -37,6 +37,7 @@ module.exports = function (config) {
             'bower_components/angular-localforage/dist/angular-localForage.js',
             'bower_components/angular-animate/angular-animate.js',
             'bower_components/bootstrap/dist/js/bootstrap.js',
+            'bower_components/ngInfiniteScroll/build/ng-infinite-scroll.js',
             // endbower
             '.tmp/scripts/_templates.js',
             'frontend/scripts/**/*.js',
