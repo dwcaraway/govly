@@ -44,7 +44,7 @@ class MyAdminIndexView(AdminIndexView):
 
     @expose('/login/', methods=('GET', 'POST'))
     def login_view(self):
-        if current_user.is_authenticated():
+        if request.method=='GET' and current_user.is_authenticated():
             return redirect(url_for('.index'))
 
         # handle user login
@@ -56,7 +56,7 @@ class MyAdminIndexView(AdminIndexView):
             if user:
                 if user.has_role('admin'):
                     if login_user(user):
-                        redirect(url_for('.index'))
+                        return redirect(url_for('.index'))
                     else:
                         self._template_args['error'] = "User is not active or could not be logged in."
                 else:

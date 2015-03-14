@@ -12,7 +12,7 @@
 import pytest
 from webtest import TestApp
 
-from app import api
+from app import api, admin
 from app.framework.sql import db as _db
 from .settings import TestingConfig
 from .apis import classy_api
@@ -44,6 +44,12 @@ TestResponse.hal = property(hal)
 def apiapp(request):
     _app = api.create_app(TestingConfig)
     classy_api(_app)
+    with _app.test_request_context():
+        yield _app
+
+@pytest.yield_fixture(scope='function')
+def adminapp(request):
+    _app = admin.create_app(TestingConfig)
     with _app.test_request_context():
         yield _app
 
@@ -83,6 +89,14 @@ def user(role):
     u.save()
 
     return u
+
+@pytest.fixture
+def admin_role(apidb):
+    return RoleFactory(name='admin', bitmask=3)
+
+@pytest.fixture
+def admin_user(admin_role):
+    return user(admin_role)
 
 @pytest.fixture
 def userNotSaved(role):
