@@ -15,7 +15,10 @@ angular.module('angular-login', [
     'angular-login.reset',
     'angular-login.home',
     // components
-    'ngAnimate'
+    'ngAnimate',
+    //plugins
+    'angulartics',
+    'angulartics.google.analytics'
 ])
     .config(function ($urlRouterProvider) {
         'use strict';

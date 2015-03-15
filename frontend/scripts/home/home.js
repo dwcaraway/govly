@@ -9,7 +9,11 @@ angular.module('angular-login.home', ['angular-login.grandfather'])
                 accessLevel: accessLevels.public
             });
     })
-    .controller('HomeController', function () {
+    .controller('HomeController', function (loginService, $state) {
         'use strict';
+
+        if(loginService.isLogged){
+            $state.go('app.opps');
+        }
 
     });
