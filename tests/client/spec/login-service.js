@@ -125,6 +125,24 @@ describe('Provider: login-service', function () {
             //Flush triggers the intercept and resolves the $http promise
             $httpBackend.flush();
         }));
+
+        it('should be called when a 401 response is received from the server', inject(function($httpBackend, $http){
+            //Log in the user
+            var user = {token: 'sometoken', roles: [userRoles.admin]};
+            loginService.loginHandler(user);
+
+            spyOn(loginService, 'logoutUser');
+
+            //Try to get a resource from the server, simulate access denied
+            //This would be the case if the JWT had expired or we tried to access
+            //resources that we weren't allowed to access.
+            $httpBackend.expectGET('/notallowed').respond(401);
+
+            $http.get('/notallowed');
+
+            $httpBackend.flush();
+            expect(loginService.logoutUser).toHaveBeenCalled();
+        }));
     });
 
     describe('managePermissions', function () {

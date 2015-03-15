@@ -193,16 +193,19 @@ angular.module('loginService', ['ui.router', 'config'])
                      * De-registers the userToken remotely
                      * then clears the loginService as it was on startup
                      */
+                    var promise = null;
                     //TODO remove debug statement
                     $log.log('logout called');
                     if(this.isLogged) {
-                        $http.get(AUTH_BASE_URL + '/logout');
+                       promise = $http.get(AUTH_BASE_URL + '/logout');
                     }
                     setToken();
                     setUserRole();
                     this.user = {};
                     this.isLogged = false;
                     $state.go(logoutState);
+
+                    return promise;
                 },
                 resolvePendingState: function (_httpPromise_) {
                     var checkUser = $q.defer(),
@@ -303,7 +306,7 @@ angular.module('loginService', ['ui.router', 'config'])
 
             return wrappedService;
         };
-    }).factory('authInterceptor', function () {
+    }).factory('authInterceptor', function ($log, $q, $injector) {
         'use strict';
 
         return {
@@ -320,18 +323,15 @@ angular.module('loginService', ['ui.router', 'config'])
                 return config;
             },
 
-            'response': function (response, loginService, $q) {
-                //Globally reacts when certain response codes are received
-
-                var status = response.status;
-
-                if (status === 401) {
-                   //TODO is this blocking? is directly calling logoutUser an issue? should flag be used?
-                   loginService.logoutUser();
-                    return $q.reject(response);
+            'responseError': function (rejection) {
+                //Globally reacts when an error response is received
+                if (rejection.status === 401) {
+                    $log.debug('Access denied response. Logging out user as a precaution');
+                    $injector.get('loginService').logoutUser();
                 }
 
-                return response;
+                return $q.reject(rejection);
             }
+
         };
     });
