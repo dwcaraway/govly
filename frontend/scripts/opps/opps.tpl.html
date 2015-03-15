@@ -3,8 +3,8 @@
         <form id="opps-form" novalidate role="form" class="form-inline">
             <div id="form-search-grp">
                 <label class="sr-only" for="q">Search</label>
-                <input name="q" id="q" type="text" class="search-query" ng-model="filter.q" placeholder="Search Opps..." autocomplete="off" >
-                <button class="btn-primary" ng-click="filterChanged(filter)"><span class="glyphicon glyphicon-search"></span></button>
+                <input name="q" id="q" type="text" analytics-on analytics-event="q" analytics-category="Search" class="search-query" ng-model="filter.q" placeholder="Search Opps..." autocomplete="off" >
+                <button class="btn-primary" analytics-on analytics-event="q-btn" analytics-category="Search" ng-click="filterChanged(filter)"><span class="glyphicon glyphicon-search"></span></button>
             </div>
 
             <div class="form-group">
@@ -18,19 +18,19 @@
 
                 <div class="checkbox">
                     <label>
-                    <input id="show_closed" name="show_closed" type="checkbox" ng-model="filter.show_closed" ng-change="filterChanged(filter)"/> Show closed listings
+                    <input id="show_closed" name="show_closed" type="checkbox" analytics-on="click" analytics-event="show_closed" analytics-category="Filter" ng-model="filter.show_closed" ng-change="filterChanged(filter)"/> Show closed listings
                 </label>
             </div>
 
             <div id="opps-form-src" class="checkbox form-group-more">
               <label>
-                <input id="show_noncompeted" name="show_noncompeted" type="checkbox" ng-model="filter.show_noncompeted" ng-change="filterChanged(filter)" /> Show non-competed listings (sole source)
+                <input id="show_noncompeted" name="show_noncompeted" type="checkbox" analytics-on="click" analytics-event="show_noncompeted" analytics-category="Filter" ng-model="filter.show_noncompeted" ng-change="filterChanged(filter)" /> Show non-competed listings (sole source)
             </label>
         </div>
 
         <div id="opps-form-src">
           <label for="data_source">Data Source:</label>
-          <select id="data_source" name="data_source" type="search" class="form-control" ng-model="filter.data_source" ng-change="filterChanged(filter)">
+          <select id="data_source" name="data_source" type="search" analytics-on analytics-event="data_source" analytics-category="Filter" class="form-control" ng-model="filter.data_source" ng-change="filterChanged(filter)">
             <option value="">All</option>
             <option value="FBO">FedBizOpps (fbo.gov)</option>
             <option value="grants.gov">grants.gov</option>

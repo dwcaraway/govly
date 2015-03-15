@@ -639,10 +639,10 @@ module.exports = function (grunt) {
             ];
 
             if (target === 'staging') {
-                //Build files to dist folder ready for staging deployment on CDN. Built files will assume the api is at https://staging-api.fogmine.com
+                //Build files to dist folder ready for staging deployment on CDN. Built files will assume the api is at https://staging.dash.fogmine.com/api
                 tasks.unshift('ngconstant:staging');
             } else if (target === 'production') {
-                //Build files to dist folder ready for production deployment on CDN. Built files will assume the api is at https://api.fogmine.com
+                //Build files to dist folder ready for production deployment on CDN. Built files will assume the api is at https://dash.fogmine.com/api
                 tasks.unshift('ngconstant:production', 'replace:production');
             } else if (target === 'local' || !target){
                 tasks.unshift('ngconstant:development');

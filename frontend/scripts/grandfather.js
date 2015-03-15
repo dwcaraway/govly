@@ -1,5 +1,6 @@
-angular.module('angular-login.grandfather', ['ui.router', 'templates-app', 'config'])
-    .config(function ($stateProvider) {
+angular.module('angular-login.grandfather', ['ui.router', 'templates-app', 'config', 'angulartics',
+    'angulartics.google.analytics'])
+    .config(function ($stateProvider, $analyticsProvider) {
         'use strict';
         $stateProvider
             .state('app', {
