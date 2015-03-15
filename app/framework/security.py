@@ -13,7 +13,7 @@ import logging
 
 from flask import current_app,jsonify, _request_ctx_stack
 from flask.ext.jwt import JWTError, current_user, generate_token
-from flask.ext.security.utils import verify_and_update_password
+from flask.ext.security.utils import verify_and_update_password, login_user
 from werkzeug.local import LocalProxy
 
 _log = logging.getLogger(__name__)
@@ -24,7 +24,9 @@ def authenticate(username, password):
     user = _datastore.get_user(username)
 
     if user and verify_and_update_password(password, user) and user.roles:
-        _log.info("%s authenticated successfully", username)
+        _log.info("%s authenticated successfully, logging in", username)
+        login_user(user)
+        user.save() #Saving just in case to make sure the login stats are tracked.
         _request_ctx_stack.top.current_user = user
         return user
 

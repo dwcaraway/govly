@@ -39,6 +39,19 @@ class TestLoggingIn:
         payload = d(token)
         user.id.should.equal(payload['user_id'])
 
+    def test_login_records_login_information(self, user, testapi):
+        last_login_at = user.last_login_at
+        last_login_ip = user.last_login_ip
+        current_login_at = user.current_login_at
+        current_login_ip = user.current_login_ip
+
+        token = self.test_jwt_log_in_returns_200_with_token(user, testapi)
+
+        user.last_login_at.should.equal(current_login_at)
+        user.last_login_ip.should.equal(current_login_ip)
+        user.current_login_at.should_not.equal(current_login_at)
+        user.current_login_ip.should_not.equal(current_login_ip)
+
     def test_secure_endpoint_fails_without_token(self, user, testapi):
         resp = testapi.get("/secure", expect_errors=True)
         assert resp.status_code == 401

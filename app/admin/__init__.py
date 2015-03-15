@@ -56,6 +56,8 @@ class MyAdminIndexView(AdminIndexView):
             if user:
                 if user.has_role('admin'):
                     if login_user(user):
+                        user.save() #This is to make sure the track changes occur
+
                         return redirect(url_for('.index'))
                     else:
                         self._template_args['error'] = "User is not active or could not be logged in."
