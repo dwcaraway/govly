@@ -32,12 +32,12 @@ module.exports = function (config) {
             'bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
             'bower_components/angular-ui-router/release/angular-ui-router.js',
             'bower_components/angular-route/angular-route.js',
-            'bower_components/jquery-shorten/jquery.shorten.js',
             'bower_components/localforage/dist/localforage.js',
             'bower_components/angular-localforage/dist/angular-localForage.js',
             'bower_components/angular-animate/angular-animate.js',
             'bower_components/bootstrap/dist/js/bootstrap.js',
             'bower_components/ngInfiniteScroll/build/ng-infinite-scroll.js',
+            'bower_components/angular-truncate/src/truncate.js',
             // endbower
             '.tmp/scripts/_templates.js',
             'frontend/scripts/**/*.js',

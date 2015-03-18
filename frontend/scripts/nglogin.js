@@ -14,6 +14,8 @@ angular.module('angular-login', [
     'angular-login.confirm',
     'angular-login.reset',
     'angular-login.home',
+    // search service
+    'searchService',
     // components
     'ngAnimate'
 ])
@@ -39,7 +41,7 @@ angular.module('angular-login', [
         $rootScope.$on('$stateChangeError', resolveDone);
         $rootScope.$on('$statePermissionError', resolveDone);
     })
-    .controller('BodyController', function ($scope, $state, $stateParams, loginService, $timeout) {
+    .controller('BodyController', function ($scope, $state, $stateParams, loginService, $timeout, searchService) {
         'use strict';
         // Expose $state and $stateParams to the <body> tag
         $scope.$state = $state;
@@ -71,5 +73,13 @@ angular.module('angular-login', [
         $scope.logoutMe = function (){
             loginService.logoutUser();
         };
+
+        $scope.search = function(){
+            $state.go('app.opps');
+            searchService.getOpps();
+        };
+
+        //Navbar search service
+        $scope.ss = searchService;
 
     });

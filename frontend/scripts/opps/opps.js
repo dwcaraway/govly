@@ -1,4 +1,4 @@
-angular.module('angular-login.opps', ['angular-login.grandfather', 'ngResource', 'config', 'infinite-scroll'])
+angular.module('angular-login.opps', ['angular-login.grandfather', 'config', 'infinite-scroll', 'searchService', 'truncate'])
     .config(function ($stateProvider) {
         'use strict';
         $stateProvider
@@ -8,70 +8,44 @@ angular.module('angular-login.opps', ['angular-login.grandfather', 'ngResource',
                 accessLevel: accessLevels.user
             });
     })
-    .controller('MainCtrl', function ($scope, $http, $resource, $timeout, $log, ENV) {
+    .controller('OppsCtrl', function ($scope, $log, $timeout, searchService) {
         'use strict';
 
+        var currentPage = 1;
 
-        var Opp = $resource(ENV.apiEndpoint+'/opps');
-        $scope.currentPage = 1;
-
-        $scope.getOpps = function (filter) {
-            $scope.filter = filter || {};
-            Opp.get($scope.filter, function (data) {
-                if ($scope.currentPage === 1) {
-                    $log.debug('reseting data page to 1');
-                    $scope.opps = data;
-                }else{
-                    $log.debug('adding new page of data to result set');
-                    $scope.opps.docs = $scope.opps.docs.concat(data.docs);
-                }
-
-                $timeout(function () {
-                    $scope.$broadcast('dataloaded');
-                }, 0, false);
-            }, function (data, status) {
-                console.log('Request failed:' + status);
-            });
-        };
+        $scope.ss = searchService;
 
         $scope.infiniteScroll = function () {
-            if (!$scope.opps) {
+            $log.debug('infinite scroll called');
+
+            if (searchService.isLoading){
+                $log.debug('ignoring the call, already loading');
                 return;
             }
-            var size = $scope.filter.limit || 20;
 
-            $scope.currentPage = $scope.currentPage + 1;
-            $log.debug('page: ' + $scope.currentPage);
-            $scope.filter = $scope.filter || {};
-            $scope.filter.start = size * ($scope.currentPage - 1);
-            $log.debug('start: ' + $scope.filter.start);
-            $scope.getOpps($scope.filter);
+            searchService.isLoading = true;//in the chance that infinite scroll will trigger before the load starts,
+            // we're blocking further calls until a value returns
+
+            $scope.$apply(searchService.nextPage);
+
+                //.then(
+                //function refreshView() {
+                //    $log.debug('opps executed, trying to update the view!');
+                //    $scope.$apply();
+                //});
+
+            currentPage = currentPage + 1;
         };
 
-        $scope.filterChanged = function () {
-            $log.debug('page: ' + $scope.currentPage);
-            $scope.currentPage = 1;
-            $scope.filter = $scope.filter || {};
-            $scope.filter.start = 0;
-            $scope.getOpps($scope.filter);
-        };
-
+        $scope.$watch(
+            function () {
+                return searchService.opps;
+            },
+            function () {
+                $log.debug('$watch triggered an update to the view! size of docs: '+searchService.opps.length);
+            });
 
         //On page load, get opportunities with no filtering.
-        $scope.getOpps();
+        searchService.getOpps();
 
     });
-
-//// apply jquery shorten to all div children with class shorten
-//    .directive('shorten', ['$timeout', function ($timeout) {
-//        return {
-//            link: function ($scope, element, attrs) {
-//                $scope.$on('dataloaded', function () {
-//                    $timeout(function () { // You might need this timeout to be sure its run after DOM render
-//                        $('div.shorten').shorten({
-//                            'showChars': 255});
-//                    }, 0, false);
-//                });
-//            }
-//        };
-//    }]);

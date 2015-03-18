@@ -20,7 +20,7 @@
     <![endif]-->
 
 <div class="container">
-    <div class="navbar navbar-default" role="navigation">
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="navbar-collapse">
             <!-- Navbar links -->
             <ul class="nav navbar-nav" >
@@ -34,9 +34,19 @@
 
             </ul>
 
+            <div id="search" ng-show="ls.isLogged">
+                <form id="searchForm" name="searchForm" novalidate role="search" class="form-inline navbar-form navbar-left">
+                    <div id="form-search-grp">
+                        <label class="sr-only" for="q">Search</label>
+                        <input name="q" id="q" type="text" analytics-on analytics-event="q" analytics-category="Search" class="search-query" ng-model="ss.filter.q" placeholder="Search Opps..." autocomplete="off" >
+                        <button class="btn-primary" analytics-on analytics-event="q-btn" analytics-category="Search" type="submit" ng-click="search()"><span class="glyphicon glyphicon-search"></span></button>
+                    </div>
+                </form>
+            </div>
+
             <!-- Right side of the navbar -->
             <!-- Login Form -->
-            <form class="navbar-form navbar-right" name="loginForm" role="login" ng-submit="loginMe()"
+            <form class="navbar-form navbar-right" name="loginForm" id="loginForm" role="login" ng-submit="loginMe()"
                   ng-hide="ls.isLogged || !ls.doneLoading">
                 <a ui-sref="app.reset">Forgot Your Password?</a>
 
@@ -74,7 +84,9 @@
             </div>
         </div>
     </div>
+
     <ui-view ng-hide="doingResolve"></ui-view>
+
     <div class="jumbotron loading-jumbo" ng-show="doingResolve">
         <h1><i class="fa fa-refresh fa-2x fa-spin"></i> Loading</h1>
     </div>

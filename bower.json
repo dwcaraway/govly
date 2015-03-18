@@ -14,12 +14,12 @@
     "angular-bootstrap": "~0.12.0",
     "angular-ui-router": "~0.2.13",
     "angular-route": "~1.3.8",
-    "jquery-shorten": "~0.9.0",
     "angular-localforage": "~1.2.2",
     "localforage": "~1.2.1",
     "angular-animate": "~1.3.9",
     "bootstrap": "~3.3.1",
-    "ngInfiniteScroll": "~1.2.0"
+    "ngInfiniteScroll": "~1.2.0",
+    "angular-truncate": "*"
   },
   "devDependencies": {},
   "appPath": "frontend",

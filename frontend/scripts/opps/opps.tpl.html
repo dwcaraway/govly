@@ -1,68 +1,54 @@
-<div class="container" id="find" name="find" ng-controller="MainCtrl">
-    <div id="sidebar" class="col-sm-3 col-md-3" >
-        <form id="opps-form" novalidate role="form" class="form-inline">
-            <div id="form-search-grp">
-                <label class="sr-only" for="q">Search</label>
-                <input name="q" id="q" type="text" analytics-on analytics-event="q" analytics-category="Search" class="search-query" ng-model="filter.q" placeholder="Search Opps..." autocomplete="off" >
-                <button class="btn-primary" analytics-on analytics-event="q-btn" analytics-category="Search" ng-click="filterChanged(filter)"><span class="glyphicon glyphicon-search"></span></button>
-            </div>
-
-            <div class="form-group">
-                <a id="form-advanced-label" data-toggle="collapse" data-target="#form-advanced-options">
-                    <label for="advanced-toggle">ADVANCED</label>
-                    <button id="advanced-toggle" type="button" >+</button>
-                </a>
-            </div>
-
-            <div id="form-advanced-options" class="collapse">
-
-                <div class="checkbox">
-                    <label>
-                    <input id="show_closed" name="show_closed" type="checkbox" analytics-on="click" analytics-event="show_closed" analytics-category="Filter" ng-model="filter.show_closed" ng-change="filterChanged(filter)"/> Show closed listings
-                </label>
-            </div>
-
-            <div id="opps-form-src" class="checkbox form-group-more">
-              <label>
-                <input id="show_noncompeted" name="show_noncompeted" type="checkbox" analytics-on="click" analytics-event="show_noncompeted" analytics-category="Filter" ng-model="filter.show_noncompeted" ng-change="filterChanged(filter)" /> Show non-competed listings (sole source)
-            </label>
-        </div>
-
-        <div id="opps-form-src">
-          <label for="data_source">Data Source:</label>
-          <select id="data_source" name="data_source" type="search" analytics-on analytics-event="data_source" analytics-category="Filter" class="form-control" ng-model="filter.data_source" ng-change="filterChanged(filter)">
-            <option value="">All</option>
-            <option value="FBO">FedBizOpps (fbo.gov)</option>
-            <option value="grants.gov">grants.gov</option>
-        </select>
-
-    </div>
-
-</div>
-</form>
-</div>
-
- <div id="opps-found" class="col-md-9" infinite-scroll="infiniteScroll()" infinite-scroll-distance="2">
-    <div id="results-topline" class="row">
-    <div id="result-count" class="col-md-4 col-sm-4">
-  {{ opps.numFound }} Search Results
-    </div>
-    <div id="results-sorted-by" class="col-md-4 col-sm-4">
-        Sorted by relevancy
+<div id="ops-body"  ng-controller="OppsCtrl">
+   <div id="opps-found" >
+      <div id="results-topline" class="row">
+         <div id="result-count" class="text-center">
+            {{ ss.hits }} Search Results
+         </div>
       </div>
-    </div>
-  <div class="panel panel-info" ng-repeat="opp in opps.docs" shorten >
-    <div class="panel-heading">
-            <a href={{opp.listing_url}} target="_blank" class="text-danger">
-               <b>{{ opp.title }}</b>
-            </a>
-    </div>
-    <div class="panel-body shorten">
 
-            {{ opp.description }}
+      <div id="filter" class="col-md-3">
+      <h3 class="text-center">Filters</h3>
+                <form id="searchForm" name="searchForm" novalidate role="search" class="form-inline">
 
-    </div>
-  </div>
-</div>
-</div>
+               <div class="checkbox">
+                  <label>
+                  <input id="show_closed" name="show_closed" type="checkbox" ng-model="ss.filter.show_closed" ng-change="ss.getOpps()"/> Show closed listings
+                  </label>
+               </div>
+               <div id="opps-form-src" class="checkbox form-group-more">
+                  <label>
+                  <input id="show_noncompeted" name="show_noncompeted" type="checkbox" ng-model="ss.filter.show_noncompeted" ng-change="ss.getOpps()" /> Show non-competed listings (sole source)
+                  </label>
+               </div>
+               <div id="opps-form-src">
+                  <label for="data_source">Data Source:</label>
+                  <select id="data_source" name="data_source" type="search" class="form-control" ng-model="ss.filter.data_source" ng-change="ss.getOpps()">
+                     <option value="">All</option>
+                     <option value="FBO">FedBizOpps (fbo.gov)</option>
+                     <option value="grants.gov">grants.gov</option>
+                  </select>
+               </div>
+
+                </form>
+            </div>
+
+      <div  id="search-results" class="col-md-9" infinite-scroll="ss.getOpps(true)" infinite-scroll-disabled='ss.isLoading || !ss.hasNextPage' infinite-scroll-distance="2">
+
+         <div class="row">
+            <div class="panel panel-info col-md-4" ng-repeat-start="opp in ss.opps" >
+               <div class="panel-heading">
+                  <a href={{opp.listing_url}} target="_blank" class="text-danger">
+                  <b>{{ opp.title }}</b>
+                  </a>
+               </div>
+               <div class="panel-body shorten" shorten>
+                  {{ opp.description | characters: 500 }}
+               </div>
+            </div>
+            <div class="clearfix" ng-if="$index%3==2"></div>
+            <div ng-repeat-end></div>
+         </div>
+      </div>
+   </div>
+   <div ng-show="ss.isLoading">Loading data...</div>
 </div>

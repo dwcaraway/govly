@@ -329,6 +329,11 @@ angular.module('loginService', ['ui.router', 'config'])
                     $log.debug('Access denied response. Logging out user as a precaution');
                     $injector.get('loginService').logoutUser();
                 }
+                else if(rejection.data && rejection.data.error === 'Invalid JWT'){
+                    $log.debug('Bad JWT detected. Logging out user as a precaution');
+                    $injector.get('loginService').logoutUser();
+                }
+
 
                 return $q.reject(rejection);
             }
