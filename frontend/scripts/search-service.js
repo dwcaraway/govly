@@ -18,6 +18,8 @@ angular.module('searchService', ['ngResource', 'ui.router', 'config'])
                  * Resets the filter's starting point
                  */
                 wrappedService.filter.start = 0;
+                page = 0;
+                wrappedService.hasNextPage = true;
             };
 
             var incrementFilterStart = function(){
@@ -60,7 +62,6 @@ angular.module('searchService', ['ngResource', 'ui.router', 'config'])
                         incrementFilterStart();
                     }else{
                         resetFilterStart();
-                        wrappedService.hasNextPage = true;
                     }
 
                     wrappedService.isLoading = true;
