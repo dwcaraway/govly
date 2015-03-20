@@ -14,6 +14,8 @@ angular.module('angular-login.opps', ['angular-login.grandfather', 'config', 'in
         var currentPage = 1;
 
         $scope.ss = searchService;
+        $scope.oppsTitleMaxCharacters = 220;
+        $scope.oppsBodyMaxCharacters = 500;
 
         $scope.infiniteScroll = function () {
             $log.debug('infinite scroll called');
