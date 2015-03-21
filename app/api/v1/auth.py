@@ -20,7 +20,7 @@ from werkzeug.exceptions import Conflict
 from flask_security.changeable import change_user_password
 from flask_security.recoverable import update_password, reset_password_token_status, generate_reset_password_token, send_password_reset_notice
 from flask_security.confirmable import generate_confirmation_token, confirm_email_token_status, confirm_user
-from flask_security.utils import verify_password, logout_user, get_token_status
+from flask_security.utils import verify_password, logout_user, get_token_status, login_user
 from ..base import BaseView, secure_endpoint
 from .rel import RELS
 from app.models.users import User, Role, Invite
@@ -205,6 +205,10 @@ class AuthView(BaseView):
         update_password(user, args.get('password'))
         user.reset_secret()
         send_password_reset_notice(user)
+
+        #SEE 90720022, Login the user
+        login_user(user)
+        user.save() #saving the user as a precaution, want the log data
 
         return {'status': 200, 'message': 'Password updated', 'user': generate_response_dict(user=user)}
 

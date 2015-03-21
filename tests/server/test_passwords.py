@@ -71,6 +71,16 @@ class TestPasswordReset:
         testapi.post_json(url_for('v1.AuthView:update_password'), dict(password=newPassword, token=token))
         user.password.should.equal(newPassword)
 
+    def test_reset_records_user_login(self, testapi, user, mail):
+        #SEE 
+        current_login_at = user.current_login_at
+        last_login_at = user.last_login_at
+
+        self.test_user_may_reset_password(testapi, user, mail)
+
+        current_login_at.should_not.equal(user.current_login_at)
+        last_login_at.should_not.equal(user.last_login_at)
+
     def get_confirmation_token_from_email(self, message):
         """Retrieves the confirmation link from the message"""
         soup = BeautifulSoup(message.html)
