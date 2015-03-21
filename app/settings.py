@@ -128,5 +128,14 @@ class ProductionConfig(Config):
     SECURITY_TRACKABLE = True
     SECURITY_PASSWORDLESS = False
 
+class StagingConfig(ProductionConfig):
+    CLIENT_DOMAIN = os.environ.get('CLIENT_DOMAIN', 'https://staging.dash.fogmine.com')
+    MAIL_SERVER = 'mailtrap.io'
+    MAIL_PORT = 2525
+    MAIL_USE_SSL = False
+    MAIL_USE_TLS = False
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME', '278853aff981f06a9') #Mailtrap.io Username
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD', 'a0fc2ab5a08c7f') #Mailtrap Test SMTP Key
+
 class DevelopmentConfig(Config):
     DEBUG = True
