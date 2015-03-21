@@ -91,6 +91,18 @@ class TestRegistration:
             m = outbox[0]
             return m
 
+    def test_register_user_records_login(self, apidb, testapi, role, invite):
+        #SEE issue 90454516
+        self.test_register_user(apidb, testapi, role, invite)
+
+        #test register user creates user but confirmed_at is not set
+        u = User.query.filter_by(email='agent@secret.com').first()
+
+        u.current_login_at.should_not.be.none
+        u.current_login_ip.should_not.be.none
+        u.last_login_at.should_not.be.none
+        u.last_login_ip.should_not.be.none
+
     def test_registered_but_unconfirmed_user_may_login(self, apidb, testapi, role, invite):
         self.test_register_user(apidb, testapi, role, invite)
         u = User.query.filter_by(email='agent@secret.com').first()

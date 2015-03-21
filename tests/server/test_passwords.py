@@ -72,7 +72,7 @@ class TestPasswordReset:
         user.password.should.equal(newPassword)
 
     def test_reset_records_user_login(self, testapi, user, mail):
-        #SEE 
+        #SEE issue 90720022
         current_login_at = user.current_login_at
         last_login_at = user.last_login_at
 

@@ -128,6 +128,10 @@ class AuthView(BaseView):
 
             user_data = generate_response_dict(user=user)
 
+            #SEE 90454516, Login the user
+            login_user(user)
+            user.save() #saving the user as a precaution, want the log data
+
             return dict(status=201, message='A confirmation email has been sent to '+user.email, user=user_data), 201
 
         except ValidationError as e:
