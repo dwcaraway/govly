@@ -8,7 +8,7 @@ angular.module('angular-login.opps', ['angular-login.grandfather', 'config', 'in
                 accessLevel: accessLevels.user
             });
     })
-    .controller('OppsCtrl', function ($scope, $log, $timeout, searchService) {
+    .controller('OppsCtrl', function ($scope, $log, $timeout, searchService, $anchorScroll) {
         'use strict';
 
         var currentPage = 1;
@@ -16,6 +16,11 @@ angular.module('angular-login.opps', ['angular-login.grandfather', 'config', 'in
         $scope.ss = searchService;
         $scope.oppsTitleMaxCharacters = 220;
         $scope.oppsBodyMaxCharacters = 500;
+
+        $scope.filterChange = function(){
+            searchService.getOpps();
+            $anchorScroll();//Scroll back to top
+        };
 
         $scope.infiniteScroll = function () {
             $log.debug('infinite scroll called');
@@ -46,6 +51,10 @@ angular.module('angular-login.opps', ['angular-login.grandfather', 'config', 'in
             function () {
                 $log.debug('$watch triggered an update to the view! size of docs: '+searchService.opps.length);
             });
+
+        function scrollToTop (){
+
+        }
 
         //On page load, get opportunities with no filtering.
         searchService.getOpps();

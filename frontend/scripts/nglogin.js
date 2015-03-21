@@ -41,7 +41,7 @@ angular.module('angular-login', [
         $rootScope.$on('$stateChangeError', resolveDone);
         $rootScope.$on('$statePermissionError', resolveDone);
     })
-    .controller('BodyController', function ($scope, $state, $stateParams, loginService, $timeout, searchService) {
+    .controller('BodyController', function ($scope, $state, $stateParams, loginService, $timeout, searchService, $anchorScroll) {
         'use strict';
         // Expose $state and $stateParams to the <body> tag
         $scope.$state = $state;
@@ -77,6 +77,7 @@ angular.module('angular-login', [
         $scope.search = function(){
             $state.go('app.opps');
             searchService.getOpps();
+            $anchorScroll();
         };
 
         //Navbar search service

@@ -12,17 +12,17 @@
 
                <div class="checkbox">
                   <label>
-                  <input id="show_closed" name="show_closed" type="checkbox" ng-model="ss.filter.show_closed" ng-change="ss.getOpps()"/> Show closed listings
+                  <input id="show_closed" name="show_closed" type="checkbox" ng-model="ss.filter.show_closed" ng-change="filterChange()"/> Show closed listings
                   </label>
                </div>
                <div id="opps-form-src" class="checkbox form-group-more">
                   <label>
-                  <input id="show_noncompeted" name="show_noncompeted" type="checkbox" ng-model="ss.filter.show_noncompeted" ng-change="ss.getOpps()" /> Show non-competed listings (sole source)
+                  <input id="show_noncompeted" name="show_noncompeted" type="checkbox" ng-model="ss.filter.show_noncompeted" ng-change="filterChange()" /> Show non-competed listings (sole source)
                   </label>
                </div>
                <div id="opps-form-src">
                   <label for="data_source">Data Source:</label>
-                  <select id="data_source" name="data_source" type="search" class="form-control" ng-model="ss.filter.data_source" ng-change="ss.getOpps()">
+                  <select id="data_source" name="data_source" type="search" class="form-control" ng-model="ss.filter.data_source" ng-change="filterChange()">
                      <option value="">All</option>
                      <option value="FBO">FedBizOpps (fbo.gov)</option>
                      <option value="grants.gov">grants.gov</option>
