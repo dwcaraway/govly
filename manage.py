@@ -17,7 +17,6 @@ from werkzeug.serving import run_simple
 from app import create_app
 from app.framework.sql import db
 from app.models.users import User
-from app.models.sam import Sam
 import os
 
 application = create_app(override_settings=os.environ.get('APPLICATION_SETTINGS', 'app.settings.DevelopmentConfig'))
@@ -33,6 +32,7 @@ from app.framework.extensions import celery
 celery.init_app(application.mounts['/api'])
 
 class Worker(Command):
+    """Starts a celery worker"""
 
     option_list = (
         Option('-c', '--concurrency', dest='concurrency', default='1'),

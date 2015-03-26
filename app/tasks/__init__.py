@@ -8,4 +8,4 @@
     :license: Proprietary, see LICENSE for more details.
 """
 from .email import send_message
-from .workq import create_celery_app
+
