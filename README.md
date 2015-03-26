@@ -145,10 +145,12 @@ https://staging.dash.fogmine.com
 To deploy to production, you push your changes to the "production" branch. *Due to a Bitbucket bug, you need to use ```--no-ff``` for merges
 from master to production in order to generate a change event and trigger the build.
 
-Scraping
---------
-To install the required python libraries for scraping, run
-```$ pip install -r requirements/scraper.txt```
 
-To deploy to scrapinghub, in the ```scraper``` directory, run
-```$ scrapyd-deploy```
+Asynchronous Tasks
+------------------
+We use Celery to execute tasks asynchronously. Redis is both the task que and result storage.
+
+You can run the celery worker locally using foreman
+```foreman start celery```
+
+Then to execute a task, just call it from python

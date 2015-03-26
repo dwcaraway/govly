@@ -83,11 +83,9 @@ class Config(object):
     CELERY_RESULT_BACKEND=os.environ.get('REDISTOGO_URL', 'redis://127.0.0.1:6379')
     CELERYD_PREFETCH_MULTIPLIER=0
     CELERY_IMPORT = [
-        'vitals.tasks',
+        'app.tasks.fbo'
     ]
-    CELERY_INCLUDE = [
-        'vitals.tasks',
-    ]
+    CELERY_INCLUDE = CELERY_IMPORT
     CELERYBEAT_SCHEDULE = {
     #   example of a celery beat entry
     #   'database-maintenence': {
