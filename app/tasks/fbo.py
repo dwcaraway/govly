@@ -137,6 +137,9 @@ def sync_fbo_weekly():
     finally:
         ftp.close()
 
+    if not storage_path:
+        return
+
     print "zipping the fbo full file"
     zipped_storage_path = path.join(temp_dir, 'FBOFullXML.xml'+S3_ARCHIVE_FORMAT)
     with open(storage_path, 'rb') as f_in:
