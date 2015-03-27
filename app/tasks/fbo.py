@@ -112,6 +112,7 @@ def sync_fbo_weekly():
     Working files are stored in temp_dir and can be processed in other processes.
     """
     temp_dir = mkdtemp()
+    storage_path = None
 
     conn = S3Connection()
     vitals_bucket = conn.get_bucket('fogmine-data')
