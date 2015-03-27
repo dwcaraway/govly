@@ -78,8 +78,12 @@ def sync_fbo_daily():
                 continue
 
             #Save the FTP file locally
-            with open(local_file_path, 'wb') as fileObj:
-                ftp.retrbinary('RETR ' + f, fileObj.write)
+            try:
+                with open(local_file_path, 'wb') as fileObj:
+                    ftp.retrbinary('RETR ' + f, fileObj.write)
+            except:
+                #if exception happens, we weren't able to retrieve from the server (not found) so continue
+                continue
 
             #Compress the file
             zipped_storage_path = path.join(temp_dir, path.basename(local_file_path)+S3_ARCHIVE_FORMAT)

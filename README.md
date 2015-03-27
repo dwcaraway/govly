@@ -153,4 +153,13 @@ We use Celery to execute tasks asynchronously. Redis is both the task que and re
 You can run the celery worker locally using foreman
 ```foreman start celery```
 
-Then to execute a task, just call it from python
+Then to execute a task, just call it from python.
+
+To add a worker on heroku:
+```heroku ps:scale celery=1 --app vitals-api-production```
+
+You can then run tasks manually using
+```heroku run python``` and invoking the task
+
+OR
+you can use the schedule add-on and scripts
