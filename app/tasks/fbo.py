@@ -120,11 +120,12 @@ def sync_fbo_weekly():
     ftp = FTP('ftp.fbo.gov')
     ftp.login()
 
+    sourceModifiedTime = ftp.sendcmd('MDTM datagov/FBOFullXML.xml')[4:]
+    sourceModifiedDateTime = datetime.strptime(sourceModifiedTime, "%Y%m%d%H%M%S")
+    sourceModifiedDateTimeStr = sourceModifiedDateTime.strftime("%Y%m%d")
+    filename = 'FBOFullXML'+sourceModifiedDateTimeStr+'.xml'
+
     try:
-        sourceModifiedTime = ftp.sendcmd('MDTM datagov/FBOFullXML.xml')[4:]
-        sourceModifiedDateTime = datetime.strptime(sourceModifiedTime, "%Y%m%d%H%M%S")
-        sourceModifiedDateTimeStr = sourceModifiedDateTime.strftime("%Y%m%d")
-        filename = 'FBOFullXML'+sourceModifiedDateTimeStr+'.xml'
         fullFBOKey = vitals_bucket.get_key(S3_EXTRACT_PREFIX+filename+S3_ARCHIVE_FORMAT)
 
         if not fullFBOKey or parse_ts(fullFBOKey.last_modified) < sourceModifiedDateTime:
@@ -144,7 +145,7 @@ def sync_fbo_weekly():
         return
 
     print "zipping the fbo full file"
-    zipped_storage_path = path.join(temp_dir, 'FBOFullXML.xml'+S3_ARCHIVE_FORMAT)
+    zipped_storage_path = path.join(temp_dir, filename+S3_ARCHIVE_FORMAT)
     with open(storage_path, 'rb') as f_in:
         with gzip.GzipFile(zipped_storage_path, 'wb') as myzip:
             myzip.writelines(f_in)
@@ -180,6 +181,4 @@ def sync_fbo_weekly():
         for key in keys_to_delete:
             if 'FBOFeed' in key:
                 vitals_bucket.delete_key(key)
-
-        print "daily keys removed"
 
