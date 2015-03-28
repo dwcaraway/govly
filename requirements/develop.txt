@@ -11,6 +11,7 @@ liveandletdie >= 0.0.2
 pytest >= 2.5.2
 -e git+https://github.com/aromanovich/flask-webtest.git#egg=Flask-Webtest-devel
 factory-boy >= 2.2.1
+moto >=0.4.1
 
 #I also like ipython
 ipython >= 2.3
