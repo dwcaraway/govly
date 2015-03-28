@@ -45,6 +45,23 @@ class Worker(Command):
                            '--loglevel', loglevel,
                            ])
 
+class Task(Command):
+    """Runs a celery task"""
+
+    option_list = (
+        Option('taskname'),
+    )
+
+    def run(self, taskname):
+        """
+        Run the command
+        :task the name of the task, a string
+        """
+        import app.tasks as t
+
+        f = getattr(t, taskname)
+        f.delay()
+
 class WSGI(Server):
 
     def __call__(self, app, host, port, use_debugger, use_reloader,
@@ -117,6 +134,7 @@ manager.add_command('runserver', WSGI(host='0.0.0.0'))
 manager.add_command('worker', Worker())
 manager.add_command('shell', Shell(make_context=_make_context))
 manager.add_command('db', MigrateCommand)
+manager.add_command('task', Task())
 
 if __name__ == '__main__':
     manager.run()
