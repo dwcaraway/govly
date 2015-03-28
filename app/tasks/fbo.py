@@ -120,16 +120,17 @@ def sync_fbo_weekly():
     ftp = FTP('ftp.fbo.gov')
     ftp.login()
 
-    fullFBOKey = vitals_bucket.get_key(S3_EXTRACT_PREFIX+'FBOFullXML.xml'+S3_ARCHIVE_FORMAT)
     try:
         sourceModifiedTime = ftp.sendcmd('MDTM datagov/FBOFullXML.xml')[4:]
         sourceModifiedDateTime = datetime.strptime(sourceModifiedTime, "%Y%m%d%H%M%S")
+        filename = 'FBOFullXML'+sourceModifiedDateTime+'.xml'
+        fullFBOKey = vitals_bucket.get_key(S3_EXTRACT_PREFIX+filename+S3_ARCHIVE_FORMAT)
 
         if not fullFBOKey or parse_ts(fullFBOKey.last_modified) < sourceModifiedDateTime:
             #Update S3 copy with latest
 
             print "downloading the latest full xml from repository"
-            storage_path = path.join(temp_dir, 'FBOFullXML.xml')
+            storage_path = path.join(temp_dir, filename)
 
             with open(storage_path, 'wb') as local_file:
                 # Download the file a chunk at a time using RET
