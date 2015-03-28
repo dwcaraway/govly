@@ -123,7 +123,8 @@ def sync_fbo_weekly():
     try:
         sourceModifiedTime = ftp.sendcmd('MDTM datagov/FBOFullXML.xml')[4:]
         sourceModifiedDateTime = datetime.strptime(sourceModifiedTime, "%Y%m%d%H%M%S")
-        filename = 'FBOFullXML'+sourceModifiedDateTime+'.xml'
+        sourceModifiedDateTimeStr = sourceModifiedDateTime.strftime("%Y%m%d")
+        filename = 'FBOFullXML'+sourceModifiedDateTimeStr+'.xml'
         fullFBOKey = vitals_bucket.get_key(S3_EXTRACT_PREFIX+filename+S3_ARCHIVE_FORMAT)
 
         if not fullFBOKey or parse_ts(fullFBOKey.last_modified) < sourceModifiedDateTime:
