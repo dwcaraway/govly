@@ -16,7 +16,7 @@ from datetime import timedelta, datetime
 from filechunkio import FileChunkIO
 import gzip
 import xmltodict
-
+import shutil
 
 from ..framework.extensions import celery
 
@@ -72,16 +72,14 @@ class FBOTask:
         This task will sync the FBO's latest weekly intermediary files. We make a personal s3 copy of the data since the
         FBO ftp service is unreliable and tends to get hammered during peak hours. Files are stored to S3 in gzip format.
         """
-        temp_dir = mkdtemp()
+        self.temp_dir = mkdtemp()
 
-        ftp_files_to_sync = self.find_ftp_files_to_sync()
-        synced_local_files = self.sync_ftp_to_local_dir(ftp_files_to_sync, temp_dir)
-
-        # Put the local files in S3
-        for d in synced_local_files:
-            k = Key(self.vitals_bucket)
-            k.key = S3_EXTRACT_PREFIX+os.path.basename(d)
-            k.set_contents_from_filename(d)
+        try:
+            ftp_files_to_sync = self.find_ftp_files_to_sync()
+            synced_local_files = self.sync_ftp_to_local_dir(ftp_files_to_sync, self.temp_dir)
+            self.sync_local_files_to_s3(synced_local_files)
+        finally:
+           shutil.rmtree(self.temp_dir)
 
     def generate_daily_filenames(self):
             """
@@ -109,7 +107,6 @@ class FBOTask:
                 file_date = datetime.today()-timedelta(days=d)
                 filename = "FBOFeed{0}".format(file_date.strftime("%Y%m%d"))
                 daily_files.append(filename)
-
 
             return daily_files
 
@@ -148,7 +145,7 @@ class FBOTask:
 
         return ftp_files_to_sync
 
-    def sync_ftp_to_local_dir(self, filenames, temp_dir):
+    def sync_ftp_to_local_dir(self, filenames, storage):
         """
         Synchronize filenames from ftp to a local directory
         :return: list of files absolute path strings
@@ -162,14 +159,14 @@ class FBOTask:
 
             for f in filenames:
 
-                local_file_path = path.join(temp_dir, f+'.xml')
+                local_file_path = path.join(storage, f+'.xml')
 
                 #Save the FTP file locally
                 with open(local_file_path, 'wb') as fileObj:
                         self.ftp.retrbinary('RETR ' + f, fileObj.write)
 
                 #Compress the file
-                zipped_storage_path = path.join(temp_dir, path.basename(local_file_path)+S3_ARCHIVE_FORMAT)
+                zipped_storage_path = path.join(storage, path.basename(local_file_path)+S3_ARCHIVE_FORMAT)
                 with open(local_file_path, 'rb') as f_in:
                     with gzip.GzipFile(zipped_storage_path, 'wb') as myzip:
                         myzip.writelines(f_in)
@@ -181,6 +178,14 @@ class FBOTask:
 
         return synced_files
 
+    def sync_local_files_to_s3(self, files):
+
+         # Put the local files in S3
+        for d in files:
+            k = Key(self.vitals_bucket)
+            k.key = S3_EXTRACT_PREFIX+os.path.basename(d)
+            k.set_contents_from_filename(d)
+
     def sync_fbo_weekly(self):
         """
         This task will sync the latest full copy of FBO's xml and any intermediary files. It will overwrite the weekly file.
@@ -189,44 +194,38 @@ class FBOTask:
 
         Working files are stored in temp_dir and can be processed in other processes.
         """
-        temp_dir = mkdtemp()
         storage_path = None
 
-        conn = S3Connection()
-        vitals_bucket = conn.get_bucket(S3_BUCKET)
-
-        ftp = FTP(FBO_FTP_URL)
-
         try:
-            ftp.connect()
-            ftp.login()
+            self.ftp.connect()
+            self.ftp.login()
 
-            sourceModifiedTime = ftp.sendcmd('MDTM datagov/FBOFullXML.xml')[4:]
+            sourceModifiedTime = self.ftp.sendcmd('MDTM datagov/FBOFullXML.xml')[4:]
             sourceModifiedDateTime = datetime.strptime(sourceModifiedTime, "%Y%m%d%H%M%S")
             sourceModifiedDateTimeStr = sourceModifiedDateTime.strftime("%Y%m%d")
             filename = 'FBOFullXML'+sourceModifiedDateTimeStr+'.xml'
 
 
-            fullFBOKey = vitals_bucket.get_key(S3_EXTRACT_PREFIX+filename+S3_ARCHIVE_FORMAT)
+            fullFBOKey = self.vitals_bucket.get_key(S3_EXTRACT_PREFIX+filename+S3_ARCHIVE_FORMAT)
 
             if not fullFBOKey or parse_ts(fullFBOKey.last_modified) < sourceModifiedDateTime:
                 #Update S3 copy with latest
 
                 print "downloading the latest full xml from repository"
-                storage_path = path.join(temp_dir, filename)
+                storage_path = path.join(self.temp_dir, filename)
 
                 with open(storage_path, 'wb') as local_file:
                     # Download the file a chunk at a time using RET
-                    ftp.retrbinary('RETR datagov/FBOFullXML.xml', local_file.write)
+                    self.ftp.retrbinary('RETR datagov/FBOFullXML.xml', local_file.write)
 
         finally:
-            ftp.close()
+            self.ftp.close()
 
         if not storage_path:
             return
 
         print "zipping the fbo full file"
-        zipped_storage_path = path.join(temp_dir, filename+S3_ARCHIVE_FORMAT)
+        zipped_storage_path = path.join(self.temp_dir, filename+S3_ARCHIVE_FORMAT)
         with open(storage_path, 'rb') as f_in:
             with gzip.GzipFile(zipped_storage_path, 'wb') as myzip:
                 myzip.writelines(f_in)
@@ -236,7 +235,7 @@ class FBOTask:
         source_size = os.stat(zipped_storage_path).st_size
 
         # Create a multipart upload request
-        mp = vitals_bucket.initiate_multipart_upload(S3_EXTRACT_PREFIX+os.path.basename(zipped_storage_path))
+        mp = self.vitals_bucket.initiate_multipart_upload(S3_EXTRACT_PREFIX+os.path.basename(zipped_storage_path))
 
         # Use a chunk size of 50 MiB (feel free to change this)
         chunk_size = 52428800
@@ -258,8 +257,8 @@ class FBOTask:
             mp.complete_upload()
 
             print "clearing any delta files from s3"
-            keys_to_delete = vitals_bucket.list(prefix=S3_EXTRACT_PREFIX)
+            keys_to_delete = self.vitals_bucket.list(prefix=S3_EXTRACT_PREFIX)
             for key in keys_to_delete:
                 if 'FBOFeed' in key:
-                    vitals_bucket.delete_key(key)
+                    self.vitals_bucket.delete_key(key)
 

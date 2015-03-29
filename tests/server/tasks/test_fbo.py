@@ -5,6 +5,7 @@ from app.tasks import fbo
 from moto import mock_s3
 from app.tasks.fbo import FBOTask
 from mock import MagicMock
+from tempfile import mkstemp, mkdtemp
 
 @pytest.fixture
 def fbo():
@@ -64,5 +65,29 @@ class TestFBO:
         filenames[0].should.equal('somefbofeed')
 
     def test_sync_ftp_to_local_dir(self, fbo):
-        #TODO need to populate this test now
-        True.should.equal(False)
+
+        fbo.ftp.connect = MagicMock()
+        fbo.ftp.login = MagicMock()
+        fbo.ftp.retrbinary = MagicMock()
+        fbo.ftp.close = MagicMock()
+
+        dir = mkdtemp()
+
+        try:
+            synced_files = fbo.sync_ftp_to_local_dir(filenames=['SomeFBOFeed'], storage=dir)
+        finally:
+            import shutil
+            shutil.rmtree(dir)
+
+        synced_files.should.have.length_of(1)
+        synced_files[0].should.contain('SomeFBOFeed.xml.gz')
+
+    @mock_s3
+    def test_sync_local_files_to_s3(self, fbo):
+        try:
+            f, path = mkstemp()
+            fbo.sync_local_files_to_s3(files=[path])
+        finally:
+            import os
+            os.remove(path)
+
