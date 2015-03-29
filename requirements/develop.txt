@@ -1,5 +1,4 @@
 -r framework.txt
--r scraper.txt
 
 #Libraries for testing
 
