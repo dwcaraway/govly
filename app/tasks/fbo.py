@@ -6,7 +6,7 @@ __author__ = 'dave'
 
 from ftplib import FTP
 from tempfile import mkdtemp
-from boto.s3.connection import S3Connection
+from boto import connect_s3
 from boto.utils import parse_ts
 from boto.s3.key import Key
 from os import path
@@ -53,8 +53,7 @@ class FBOTask:
     Utility Class to perform data processing tasks for FedBizOpps.gov.
     """
     ftp = FTP(FBO_FTP_URL)
-    conn = S3Connection()
-    vitals_bucket = conn.get_bucket(S3_BUCKET)
+
 
     def convert_xml_to_jsonld(self):
         #TODO not fully implemented
@@ -117,6 +116,9 @@ class FBOTask:
         synchronized
         :return: a list of filenames that need to be sync'd to S3 bucket
         """
+        conn = connect_s3()
+        vitals_bucket = conn.get_bucket(S3_BUCKET)
+
         ftp_files_to_sync = []
 
         try:
@@ -128,7 +130,7 @@ class FBOTask:
                 bucket_key = S3_EXTRACT_PREFIX+l_file+S3_ARCHIVE_FORMAT
 
                 #See if key already exists in S3, if so, move on
-                k = self.vitals_bucket.get_key(bucket_key)
+                k = vitals_bucket.get_key(bucket_key)
                 if k:
                     continue
 
@@ -179,10 +181,12 @@ class FBOTask:
         return synced_files
 
     def sync_local_files_to_s3(self, files):
+        conn = connect_s3()
+        vitals_bucket = conn.get_bucket(S3_BUCKET)
 
          # Put the local files in S3
         for d in files:
-            k = Key(self.vitals_bucket)
+            k = Key(vitals_bucket)
             k.key = S3_EXTRACT_PREFIX+os.path.basename(d)
             k.set_contents_from_filename(d)
 
@@ -194,6 +198,11 @@ class FBOTask:
 
         Working files are stored in temp_dir and can be processed in other processes.
         """
+
+        conn = connect_s3()
+        vitals_bucket = conn.get_bucket(S3_BUCKET)
+
+
         storage_path = None
 
         try:
@@ -206,7 +215,7 @@ class FBOTask:
             filename = 'FBOFullXML'+sourceModifiedDateTimeStr+'.xml'
 
 
-            fullFBOKey = self.vitals_bucket.get_key(S3_EXTRACT_PREFIX+filename+S3_ARCHIVE_FORMAT)
+            fullFBOKey = vitals_bucket.get_key(S3_EXTRACT_PREFIX+filename+S3_ARCHIVE_FORMAT)
 
             if not fullFBOKey or parse_ts(fullFBOKey.last_modified) < sourceModifiedDateTime:
                 #Update S3 copy with latest
@@ -235,7 +244,7 @@ class FBOTask:
         source_size = os.stat(zipped_storage_path).st_size
 
         # Create a multipart upload request
-        mp = self.vitals_bucket.initiate_multipart_upload(S3_EXTRACT_PREFIX+os.path.basename(zipped_storage_path))
+        mp = vitals_bucket.initiate_multipart_upload(S3_EXTRACT_PREFIX+os.path.basename(zipped_storage_path))
 
         # Use a chunk size of 50 MiB (feel free to change this)
         chunk_size = 52428800
@@ -257,8 +266,8 @@ class FBOTask:
             mp.complete_upload()
 
             print "clearing any delta files from s3"
-            keys_to_delete = self.vitals_bucket.list(prefix=S3_EXTRACT_PREFIX)
+            keys_to_delete = vitals_bucket.list(prefix=S3_EXTRACT_PREFIX)
             for key in keys_to_delete:
                 if 'FBOFeed' in key:
-                    self.vitals_bucket.delete_key(key)
+                    vitals_bucket.delete_key(key)
 

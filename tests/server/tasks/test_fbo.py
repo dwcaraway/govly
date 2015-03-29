@@ -6,6 +6,7 @@ from moto import mock_s3
 from app.tasks.fbo import FBOTask
 from mock import MagicMock
 from tempfile import mkstemp, mkdtemp
+import boto
 
 @pytest.fixture
 def fbo():
@@ -49,6 +50,10 @@ class TestFBO:
         a list of file differences that should be synchronized
         """
 
+        conn = boto.connect_s3()
+        # We need to create the bucket since this is all in Moto's 'virtual' AWS account
+        conn.create_bucket('fogmine-data')
+
         #Mock FTP calls
         fbo.generate_daily_filenames = MagicMock(return_value=['somefbofeed'])
         fbo.ftp.connect = MagicMock()
@@ -82,8 +87,12 @@ class TestFBO:
         synced_files.should.have.length_of(1)
         synced_files[0].should.contain('SomeFBOFeed.xml.gz')
 
-    @mock_s3
+    @mock_s3()
     def test_sync_local_files_to_s3(self, fbo):
+        conn = boto.connect_s3()
+        # We need to create the bucket since this is all in Moto's 'virtual' AWS account
+        conn.create_bucket('fogmine-data')
+
         try:
             f, path = mkstemp()
             fbo.sync_local_files_to_s3(files=[path])
