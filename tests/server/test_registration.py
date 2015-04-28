@@ -31,14 +31,6 @@ class TestRegistration:
         resp.json['status'].should.equal(400)
         resp.json['message'].should.contain("is not a 'email'")
 
-    def test_invite_is_required_to_register(self, testapi, role):
-        data = {"firstName":"myFirstName", "lastName":"myLastName", "email":"notareal email address", "password":"supersecret"}
-        resp = testapi.post_json(url_for('v1.AuthView:register_user'), data, expect_errors=True)
-
-        resp.status_code.should.equal(400)
-        resp.json['status'].should.equal(400)
-        resp.json['message'].should.contain("required arguments missing")
-
     def test_syntactically_valid_invite_is_required_to_register(self, testapi, role, invite):
         data = {"firstName":"myFirstName", "lastName":"myLastName", "email":"someone@somewhere.com", "password":"supersecret", "token":"badto"}
         resp = testapi.post_json(url_for('v1.AuthView:register_user'), data, expect_errors=True)

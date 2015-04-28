@@ -31,7 +31,9 @@ angular.module('angular-login.register', ['angular-login.grandfather'])
             $scope.xhr = true;
             $scope.inputType = 'password';
 
-            $scope.registerObj.token = $stateParams.token;
+            if($stateParams.token){
+                $scope.registerObj.token = $stateParams.token;
+            }
 
             loginService.register($scope.registerObj)
                 .then(function success(data) {
@@ -51,9 +53,4 @@ angular.module('angular-login.register', ['angular-login.grandfather'])
                     $scope.xhr = false;
                 });
         };
-
-        if (!$stateParams.hasOwnProperty('token') || !$stateParams.token) {
-            $scope.alert = 'Bad registration URL';
-            $log.debug('bad url detected');
-        }
     });

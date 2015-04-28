@@ -28,18 +28,16 @@ from jsonschema import validate, ValidationError, FormatChecker
 from sqlalchemy.exc import IntegrityError
 from urlparse import urljoin
 
-from itsdangerous import URLSafeTimedSerializer, TimestampSigner
 from flask import current_app, url_for
 from app.framework.utils import send_message
 from app.framework.security import generate_response_dict
-from datetime import datetime
 
 request_register_options = RequestParser()
 request_register_options.add_argument('email', type=str, location='json', required=True)
 request_register_options.add_argument('password', type=str, location='json', required=True)
 request_register_options.add_argument('firstName', type=str, location='json', required=True)
 request_register_options.add_argument('lastName', type=str, location='json', required=True)
-request_register_options.add_argument('token', type=str, location='json', required=True)
+request_register_options.add_argument('token', type=str, location='json')
 
 request_confirm_options = RequestParser()
 request_confirm_options.add_argument('token', type=str, location='json', required=True)
@@ -90,22 +88,22 @@ class AuthView(BaseView):
             validate(data, schema, format_checker=FormatChecker())
 
             invite_token = data['token']
+            if invite_token:
+                expired, invalid, invitor = get_token_status(invite_token, 'invite', 'USE_INVITE')
 
-            expired, invalid, invitor = get_token_status(invite_token, 'invite', 'USE_INVITE')
+                if invalid or not invitor:
+                    return dict(status=409, message="Invite is invalid"), 409
 
-            if invalid or not invitor:
-                return dict(status=409, message="Invite is invalid"), 409
+                if expired:
+                    return dict(status=409, message="Invite has expired"), 409
 
-            if expired:
-                return dict(status=409, message="Invite has expired"), 409
+                inviteTokenObj = Invite.find(token=invite_token).first()
 
-            inviteTokenObj = Invite.find(token=invite_token).first()
+                if not inviteTokenObj:
+                    return dict(status=409, message="Invite not found"), 409
 
-            if not inviteTokenObj:
-                return dict(status=409, message="Invite not found"), 409
-
-            if inviteTokenObj.invitee_id:
-                return dict(status=409, message="Invite already used"), 409
+                if inviteTokenObj.invitee_id:
+                    return dict(status=409, message="Invite already used"), 409
 
             password = encrypt_password(data['password'])
             user = register_user(email=data['email'], password=password, first_name=data['firstName'],
