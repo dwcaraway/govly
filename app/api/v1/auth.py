@@ -109,8 +109,9 @@ class AuthView(BaseView):
             user = register_user(email=data['email'], password=password, first_name=data['firstName'],
                    last_name=data['lastName'], roles=[Role.first(name='user')])
 
-            inviteTokenObj.invitee_id = user.id
-            inviteTokenObj.save()
+            if invite_token:
+                inviteTokenObj.invitee_id = user.id
+                inviteTokenObj.save()
 
             token = generate_confirmation_token(user)
             confirmation_link = urljoin(current_app.config['CLIENT_DOMAIN'], '/#/confirm?token='+token)

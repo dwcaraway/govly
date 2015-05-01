@@ -62,7 +62,7 @@ RELS = {
                     "type":"string",
                     "maxLength":32
                 },
-                            "token": {"type": "string",
+                    "token": {"type": ["string", "null"],
                       "minLength": 8,
                       "maxLength": 120
             }

@@ -39,6 +39,15 @@ class TestRegistration:
         resp.json['status'].should.equal(400)
         resp.json['message'].should.contain("too short")
 
+    def test_invite_is_not_required_to_register(self, testapi, role):
+        """
+        SEE #93725066 User was unable to register after we removed the invite-only status
+        :return:
+        """
+        data = {"firstName":"myFirstName", "lastName":"myLastName", "email":"someone@somewhere.com", "password":"supersecret"}
+        resp = testapi.post_json(url_for('v1.AuthView:register_user'), data)
+        resp.status_code.should.equal(201)
+
     def test_valid_invite_is_required_to_register(self, testapi, role, invite):
         data = {"firstName":"myFirstName", "lastName":"myLastName", "email":"someone@somewhere.com", "password":"supersecret", "token":"abadtokenhere"}
         resp = testapi.post_json(url_for('v1.AuthView:register_user'), data, expect_errors=True)
