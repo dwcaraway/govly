@@ -27,7 +27,8 @@ class ApiModel(Model):
     hidden_attr = db.Column(db.String(64))
 
 class ApiFactory(BaseFactory):
-    FACTORY_FOR = ApiModel
+    class Meta:
+        model = ApiModel
 
     integer_attr = Sequence(lambda n: n)
     string_attr = Sequence(lambda n: "string {0}".format(n))
