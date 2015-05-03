@@ -19,7 +19,6 @@ from app.models.model import Organization
 from app.framework.sql import db
 
 class BaseFactory(Factory):
-    ABSTRACT_FACTORY = True
 
     @classmethod
     def _create(cls, target_class, *args, **kwargs):
@@ -29,14 +28,18 @@ class BaseFactory(Factory):
         return entity
 
 class RoleFactory(BaseFactory):
-    FACTORY_FOR = Role
+    class Meta:
+        model = Role
+
     name = 'user'
     description = 'A basic system user'
     bitmask = 2
 
 
 class UserFactory(BaseFactory):
-    FACTORY_FOR = User
+    class Meta:
+        model = User
+
     email = Sequence(lambda n: 'user{0}@foobar.com'.format(n))
     first_name = Sequence(lambda n: 'firstname{0}'.format(n))
     last_name = Sequence(lambda n: 'lastname{0}'.format(n))
@@ -53,11 +56,15 @@ class UserFactory(BaseFactory):
         self.password = encrypt_password(extracted or "password")
 
 class OrganizationFactory(BaseFactory):
-    FACTORY_FOR = Organization
+    class Meta:
+        model = Organization
+
     legalName = Sequence(lambda n: 'legalname{0}'.format(n))
 
 class InviteFactory(BaseFactory):
-    FACTORY_FOR = Invite
+    class Meta:
+        model = Invite
+
     invitee_email = Sequence(lambda n: 'user{0}@foobar.com'.format(n))
     token = LazyAttribute(lambda o: generate_invitation_token(o.invitor))
     invitor = SubFactory(UserFactory)
