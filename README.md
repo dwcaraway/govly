@@ -2,11 +2,6 @@ Vitals
 =================
 Welcome to Vitals, a market research tool for the federal government marketplace.
 
-Architecture
----------------
-Vitals consists of a static AngularJS application client connected to Python Flask-based data and services on the
-backend via a Hypermedia Application Language (HAL) REST interface.
-
 Installation (Server)
 ---------------------
 Install Python 2.7.x, pip, virtualenv
